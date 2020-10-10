@@ -1,4 +1,3 @@
-/* global jQuery */
 
 // import local dependencies
 import Router from './util/Router';
@@ -16,5 +15,6 @@ const routes = new Router({
   pageMain,
 });
 
-// Load Events
-jQuery(document).ready(() => routes.loadEvents());
+document.addEventListener("DOMContentLoaded", function () {
+  vueInvoker.init(Vue, vueCollection);
+});

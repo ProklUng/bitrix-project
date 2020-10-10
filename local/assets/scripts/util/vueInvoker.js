@@ -16,15 +16,11 @@
  * например, добавить Vuex-store и/или разнообразные плагины и миксины.
  */
 
-import logger from './logger';
-
-
 export default {
   init(Vue, components, options) {
     this.options = Object.assign(this.options, options);
 
     const nodes = Array.from(document.querySelectorAll(this.options.selector));
-
 
     const collection = [];
 
@@ -35,17 +31,23 @@ export default {
         try {
           initialData = JSON.parse(initialData);
         } catch (e) {
-          logger.warn(e);
+          if (DEBUG) {
+            console.warn(e);
+          }
         }
       }
 
-      if (components[item.dataset[this.options.componentDataAttr]] !== undefined) {
-        collection.push(this.createComponentInstance(
-          Vue,
-          item,
-          components[item.dataset[this.options.componentDataAttr]],
-          initialData,
-        ));
+      if (
+        components[item.dataset[this.options.componentDataAttr]] !== undefined
+      ) {
+        collection.push(
+          this.createComponentInstance(
+            Vue,
+            item,
+            components[item.dataset[this.options.componentDataAttr]],
+            initialData
+          )
+        );
       }
     });
 
@@ -53,11 +55,10 @@ export default {
   },
 
   options: {
-    selector: '.vue-component',
-    componentDataAttr: 'component',
-    initialDataAttr: 'initial',
+    selector: ".vue-component",
+    componentDataAttr: "component",
+    initialDataAttr: "initial",
   },
-
 
   createComponentInstance(Vue, element, component, data) {
     return new Vue({
@@ -69,5 +70,4 @@ export default {
       },
     });
   },
-
 };
