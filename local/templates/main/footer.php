@@ -1,14 +1,11 @@
+<?php
+global $APPLICATION;
+?>
+</div>
+<!--  Панель Битрикса  -->
+<?php $APPLICATION->ShowPanel() ?>
+<!-- / Панель Битрикса  -->
 
-                </section>
-            </main>
-        </div>
-        <div class="page__bottom">
-            <footer class="footer">
-                <div class="footer__inner">
-                    footer
-                </div>
-            </footer>
-        </div>
-        <script src="<?= $assetManager->getEntry('main.js') ?>"></script>
-    </body>
+<script src="<?= container()->get('guta.assets')->getEntry('main.js') ?>"></script>
+</body>
 </html>
