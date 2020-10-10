@@ -19,20 +19,14 @@ use Local\Seo\Canonical;
     Canonical::show(); ?>
 
     <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet"
-          href="//fonts.googleapis.com/css2?family=Lora&family=Montserrat:wght@300;400;500;600;700&display=swap">
     <link rel="stylesheet" href="<?= container()->get('guta.assets')->getEntry('main.css') ?>">
 
 </head>
 <body class="page page_<?= LANGUAGE_ID ?> page_<?php $APPLICATION->ShowProperty('page_type', 'secondary') ?>">
 <div style="display: none;"><?php echo container()->get('icons.svg.load') ?></div>
 
-
-<!-- wrapper -->
 <div class="wrapper">
-
-    <!--подключение twig-->
     <?php
     $twig = container()->get('twig.instance');
     ?>
-    <!--/подключение twig-->
+
