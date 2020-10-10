@@ -1,0 +1,115 @@
+###########
+# Роутинг
+###########
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  #####################
+  # Роутер.
+  #####################
+
+  ##########################################
+  # Subscribers Symfony HttpKernel events.
+  ##########################################
+
+  # kernel.controller
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SetContainer:
+    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SetContainer
+    arguments: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 50 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\BootTraits:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 50 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectServiceController:
+    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectServiceController
+    arguments: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 45 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectArgumentsToController:
+    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectArgumentsToController
+    arguments: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 40 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\CheckBitrixToken:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 35 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SecurityToken:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 30 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\AjaxCall:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 25 }
+
+  # kernel.request
+  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken:
+    class: Local\SymfonyTools\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken
+    arguments: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 10 }
+
+  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\FormUrlencodedTreatment:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 5 }
+
+  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\SetSession:
+    class: Local\SymfonyTools\Events\OnKernelRequest\Subscribers\SetSession
+    arguments: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 5 }
+
+  Symfony\Component\HttpKernel\Controller\ControllerResolver:
+    class: Symfony\Component\HttpKernel\Controller\ControllerResolver
+
+  # Загрузчик роутов из Yaml конфига.
+  routes.config:
+    class: Local\SymfonyTools\Router\RouterConfig
+    arguments: ['%kernel.project_dir%', '/local/configs/routes.yaml', '@load.annotated.routes']
+
+  # Коллекция загруженных роутов.
+  routes.collection:
+    class: Local\SymfonyTools\Router\RouterConfig
+    factory: ['@routes.config', 'routes']
+
+  Local\SymfonyTools\Router\RouterConfig: '@routes.config'
+
+  # Symfony загрузчик аннотированных роутов.
+  symfony.loader.annotated.routes:
+    class: Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader
+    arguments: ['@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader']
+
+  # Конечный сервис чтения и загрузки анотированных роутов.
+  load.annotated.routes:
+    class: Local\SymfonyTools\Router\Annotations\LoadAnnotatedRoutes
+    arguments: ['@class.collector', '@symfony.loader.annotated.routes']
+
+  # Стандартный контроллер ошибок.
+  standart.error.controller:
+    class: Local\SymfonyTools\Framework\Controllers\ErrorController
+    arguments: ['@serialize']
+
+  # Json контроллер ошибок.
+  json.error.controller:
+    class: Local\SymfonyTools\Framework\Controllers\ErrorJsonController
+    arguments: ['@serialize']
+  # Диспетчер запуска контроллеров.
+
+  # Инициализатор роутов.
+  init.router:
+    class: Local\SymfonyTools\Router\InitRouter
+    arguments: ['@routes.collection', '@json.error.controller', '@event_dispatcher']
+    # Подвязка на битриксовое событие.
+    tags:
+      - { name: bitrix.events.init, module: main, event: OnProlog, method: handle, sort: 1 }

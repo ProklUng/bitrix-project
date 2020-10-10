@@ -1,0 +1,59 @@
+imports:
+  - {resource: services/routing.yaml }
+  - {resource: services/utils.yaml }
+  - {resource: services/collections.yaml }
+  - {resource: services/annotations.yaml }
+  - {resource: services/filesystem.yaml }
+  - {resource: services/validations.yaml }
+  - {resource: services/serializer.yaml }
+  - {resource: services/sessions.yaml }
+  - {resource: services/twig.yaml }
+  - {resource: services/assets.yaml }
+  - {resource: services/bitrix.yaml }
+  - {resource: services/image_resizer.yaml }
+  - {resource: services/csrf.yaml }
+  - {resource: services/testing.yaml }
+  - {resource: services/seo.yaml }
+
+parameters:
+  namespace.models.infoblocks: 'Local\Models'
+  debug: '%env(bool:resolve:DEBUG)%'
+  # Компилировать ли сервис-контейнер?
+  compile.container: true
+
+  # Путь к сборке окружения dev.
+  build.dev.path: 'local/build/'
+  # Путь к сборке окружения prod.
+  build.production.path: 'local/dist/'
+
+  # Базовый API URL (partial).
+  base.api.url: '/api/'
+
+  csrf_protection: false
+
+  # Пути к аннотированным роутам.
+  controller.annotations.path: ~
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  # Ядро.
+  kernel:
+    class: Local\Services\AppKernel
+    arguments: ['%debug%']
+
+  # Опции приложения.
+  app.options:
+    class: Local\Services\Kernel
+
+  # Параметры приложения.
+  parameter_bag:
+    class: Symfony\Component\DependencyInjection\ParameterBag\ContainerBag
+    arguments: ["@service_container"]
+
+  event.dispatcher:
+    class: Local\Util\SymfonyEvents\Events

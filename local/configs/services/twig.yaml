@@ -1,0 +1,25 @@
+#########
+# Twig.
+#########
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  # Twig loader
+  twig.loader:
+    class: Twig_Loader_Filesystem
+    arguments: ['%kernel.project_dir%/local/twig/']
+
+  # Twig
+  twig:
+    class: Local\Services\TwigService
+    arguments: ['@twig.loader', '%debug%', '%kernel.project_dir%/bitrix/cache/twig']
+
+  # Экземпляр Twig.
+  twig.instance:
+    class: Local\Services\TwigService
+    factory: ['@twig', 'instance']

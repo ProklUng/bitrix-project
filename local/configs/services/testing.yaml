@@ -1,0 +1,20 @@
+###########################
+# Сервисы для тестирования
+###########################
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  # Исполнить контроллер.
+  dispatcher.controller:
+    class: Local\SymfonyTools\Framework\DispatchController
+    arguments: ['@event_dispatcher', '@json.error.controller', '@Symfony\Component\HttpKernel\Controller\ControllerResolver']
+
+  # Диспетчер запуска роутов.
+  dispatcher.route:
+    class: Local\SymfonyTools\Framework\Utils\DispatchRoute
+    arguments: ['@routes.collection', '@event_dispatcher', '@json.error.controller', '@Symfony\Component\HttpKernel\Controller\ControllerResolver']

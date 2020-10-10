@@ -1,0 +1,27 @@
+#########################
+# Валидация, санитизация
+#########################
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  # Валидатор Laravel. Пример. Загрузка из Yaml.
+  sample.validator:
+    class: Local\Services\Validation\Validator
+    arguments: ['%kernel.project_dir%', '/local/configs/Validation/example.yaml']
+
+  # Валидатор Laravel. Базовый сервис.
+  laravel.validator:
+    class: Local\Services\Validation\Validator
+    arguments: ['%kernel.project_dir%']
+
+  # Санитайзер.
+  sanitizer:
+    class: Local\Services\Sanitizing\SanitizerService
+
+  Local\Services\Sanitizing\SanitizerService: '@sanitizer'
+  Local\Services\Sanitizing\SanitizerInterface: '@sanitizer'

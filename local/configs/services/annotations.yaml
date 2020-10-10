@@ -1,0 +1,21 @@
+############
+# Аннотации
+############
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  Doctrine\Common\Annotations\Reader: '@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader'
+  annotation_reader: '@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader'
+
+  # Форк симфонического загрузчика аннотаций.
+  Local\SymfonyTools\Router\Annotations\ForkAnnotationReader: ~
+
+  # Поисковик классов в директориях.
+  class.collector:
+    class: Local\SymfonyTools\Router\Annotations\SearchAnnotatedClasses
+    arguments: ['%kernel.project_dir%', '%controller.annotations.path%']

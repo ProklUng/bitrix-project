@@ -2,6 +2,8 @@
 
 namespace Local\Util;
 
+use Exception;
+
 /**
  * Class Assets
  * @package Local\Util
@@ -29,7 +31,8 @@ class Assets
      * @param string $base         Расположение директории ассетов относительно
      *                             DOCUMENT_ROOT.
      * @param string $manifestFile Имя манифест-файла.
-     * @throws \Exception Стандартное исключение.
+     *
+     * @throws Exception Стандартное исключение.
      */
     public function __construct(string $base = 'local/build/', string $manifestFile = 'manifest.json')
     {
@@ -43,7 +46,7 @@ class Assets
      * Генерирует массив ассетов на основе файла манифеста.
      *
      * @return void
-     * @throws \Exception Стандартное исключение.
+     * @throws Exception Стандартное исключение.
      */
     private function loadManifest()
     {
@@ -52,7 +55,7 @@ class Assets
         ), true);
 
         if (! (bool) $manifest) {
-            throw new \Exception('Manifest file not found!');
+            throw new Exception('Manifest file not found!');
         }
 
         $this->manifest = $manifest;
@@ -63,7 +66,7 @@ class Assets
      *
      * @param string $entryName Имя файла-ассета.
      * @return string Путь до ассета.
-     * @throws \Exception Стандартное исключение.
+     * @throws Exception Стандартное исключение.
      */
     public function getEntry(string $entryName)
     {
@@ -71,7 +74,7 @@ class Assets
         $entry = $this->manifest[ $entryPath ];
 
         if (is_null($entry)) {
-            throw new \Exception('Entry `' . $entryPath .'` not found in manifest file!');
+            throw new Exception('Entry `' . $entryPath .'` not found in manifest file!');
         }
 
         return $entry;
