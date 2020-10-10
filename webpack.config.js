@@ -11,13 +11,16 @@ const {
     clean,
 } = require("./webpack.parts");
 
+//Добавляем переменные, чтобы точно понимать текущий режим
 const IS_DEV = Encore.isDev() && !Encore.isDevServer();
 const IS_DEV_SERVER = Encore.isDevServer();
 const IS_PRODUCTION = Encore.isProduction();
 
+//Сохранение текущей конфигурации webpack в файл
 const SAVE_WEBPACK_CONFIG_ENABLED = false;
 const SAVE_WEBPACK_CONFIG_FILENAME = "webpack.config.json";
 
+//Сохранения отчета для анализа сборки webpack
 const BUNDLE_ANALYZER_PLUGIN_ENABLED = false;
 const BUNDLE_ANALYZER_PLUGIN_REPORT_FILENAME = "report.html";
 const BUNDLE_ANALYZER_PLUGIN_MODE = "static";
@@ -60,9 +63,12 @@ Encore
     .setPublicPath(PUBLIC_PATH)
     .addEntry("main", resolvePath(PATHS.src.mainJs))
 
+    // Временно отрубаем runtime чанк  до тех пор пока Федор не включит поддержку нескольких файлов в entrypoints.json
+    //TODO: Включить после включения поддержки нескольких файлов для entrypoints.json
     .disableSingleRuntimeChunk()
 
-
+    // Копируем картинки из local/assets в папку, куда сейчас происходит сборка
+    //TODO: Вопрос на хрена?!
     .copyFiles({
         from: resolvePath(PATHS.src.images),
         context: "images",
@@ -108,6 +114,7 @@ Encore
         fonts: "fonts/[path][name].[hash:8].[ext]",
     })
     .enableVersioning(!IS_DEV_SERVER)
+    //TODO: перенастроить под chunks: "all" после включения поддержки нескольких файлов для entrypoints.json
     .splitEntryChunks()
     .configureSplitChunks((splitChunks) => {
         splitChunks.chunks = "async";
@@ -115,10 +122,12 @@ Encore
 
 addSVGSpritemapPlugin(PATHS.src.icons, IS_PRODUCTION);
 
+// Настройки для watch режима
 if (IS_DEV_SERVER) {
     configureWatchOptions();
 }
 
+// Настройки для работы dev-server
 if (IS_DEV_SERVER) {
     configureDevServer(PATHS.output.local);
 }
@@ -136,6 +145,7 @@ config.node = false;
 config.optimization.nodeEnv = IS_PRODUCTION ? "production" : "development";
 
 /**
+ * Значение node по умолчанию :
  * {
  *   console: false,
  *   global: true,
@@ -147,6 +157,7 @@ config.optimization.nodeEnv = IS_PRODUCTION ? "production" : "development";
  * }
  */
 
+// Сохранения конфига webpack. Для отладки
 if (SAVE_WEBPACK_CONFIG_ENABLED) {
     saveWebpackConfig(SAVE_WEBPACK_CONFIG_FILENAME, config);
 }

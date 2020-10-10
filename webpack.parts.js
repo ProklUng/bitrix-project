@@ -9,10 +9,10 @@ const addBundleAnalyzerPlugin = (reportFilename, analyzerMode) => {
   const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
   Encore.addPlugin(
-    new BundleAnalyzerPlugin({
-      reportFilename,
-      analyzerMode,
-    })
+      new BundleAnalyzerPlugin({
+        reportFilename,
+        analyzerMode,
+      })
   );
 };
 
@@ -27,27 +27,9 @@ const configureDevServer = (assetsPath) => {
   const Encore = require("@symfony/webpack-encore");
 
   Encore
-    //prettier-ignore
-    .setManifestKeyPrefix(`${assetsPath}/`)
-    .configureDevServerOptions((options) => {
-      options.index = "";
-      // TODO: Тут есть определенные хитрости, если потребуется в будущем генерировать HTML или тп
-      // options.writeToDisk = true;
-      options.overlay = {
-        errors: true,
-        warnings: true,
-      };
-      options.compress = true;
-      options.proxy = [
-        {
-          target: "https://fok.gutaweb.ru",
-          context: () => true,
-          changeOrigin: true,
-          secure: false,
-        },
-      ];
-      options.contentBase = [resolvePath(assetsPath)];
-    });
+      //prettier-ignore
+      .setManifestKeyPrefix(`${assetsPath}/`)
+
 };
 
 const prepareAliases = (aliases) => {
@@ -71,26 +53,26 @@ const addSVGSpritemapPlugin = (iconsPath, isProd) => {
   const SVGSpritemapPlugin = require("svg-spritemap-webpack-plugin");
 
   Encore.addPlugin(
-    new SVGSpritemapPlugin(`${iconsPath}/**/*.svg`, {
-      output: {
-        // prettier-ignore
-        filename: "images/icons.svg",
-        svgo: isProd
-          ? {
-              plugins: [
-                {
-                  convertColors: {
-                    currentColor: true,
+      new SVGSpritemapPlugin(`${iconsPath}/**/*.svg`, {
+        output: {
+          // prettier-ignore
+          filename: "images/icons.svg",
+          svgo: isProd
+              ? {
+                plugins: [
+                  {
+                    convertColors: {
+                      currentColor: true,
+                    },
+                    addAttributesToSVGElement: {
+                      attributes: { fill: "currentColor" },
+                    },
                   },
-                  addAttributesToSVGElement: {
-                    attributes: { fill: "currentColor" },
-                  },
-                },
-              ],
-            }
-          : false,
-      },
-    })
+                ],
+              }
+              : false,
+        },
+      })
   );
 };
 
@@ -122,7 +104,7 @@ const configureWatchOptions = () => {
 const clean = () => {
   const Encore = require("@symfony/webpack-encore");
 
-  //TODO: отключаем очистку в режиме dev-server, чтобы не снести прод или тп.
+  //TODO: РѕС‚РєР»СЋС‡Р°РµРј РѕС‡РёСЃС‚РєСѓ РІ СЂРµР¶РёРјРµ dev-server, С‡С‚РѕР±С‹ РЅРµ СЃРЅРµСЃС‚Рё РїСЂРѕРґ РёР»Рё С‚Рї.
   Encore.cleanupOutputBeforeBuild(["**/*"]);
 };
 
