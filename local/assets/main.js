@@ -1,4 +1,4 @@
-// import "@scss/main.scss";
+import "./styles/global.scss";
 
 import "./app";
 import "./scripts/main";
