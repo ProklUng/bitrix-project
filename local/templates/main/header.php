@@ -2,10 +2,6 @@
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Web\Uri;
-use Local\Constants;
-use Local\Guta\MenuCacher;
-use Local\Seo\Canonical;
-
 ?>
 <!doctype html>
 <html lang="<?= LANGUAGE_ID ?>">
@@ -16,7 +12,7 @@ use Local\Seo\Canonical;
 
     CJSCore::Init('jquery2');
     CJSCore::Init(['fx']);
-    Canonical::show(); ?>
+    ?>
 
     <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="<?= container()->get('guta.assets')->getEntry('main.css') ?>">
