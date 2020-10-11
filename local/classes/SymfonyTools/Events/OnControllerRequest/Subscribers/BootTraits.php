@@ -31,7 +31,7 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
      * @return void
      *
      * @since 10.09.2020
-     * @since 19.09.2020 Добавлена инициализация трэйтов.
+     * @since 11.10.2020 Переработка.
      */
     public function handle(ControllerEvent $event): void
     {
@@ -44,21 +44,39 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
         $booted = [];
 
         foreach (class_uses_recursive($controller[0]) as $trait) {
+            // Загрузка (статический метод).
             $method = 'boot' . class_basename($trait);
 
-            if (method_exists($controller[0], $method)
-                && !in_array($method, $booted, true)
-            ) {
+            if ($this->methodExist($controller[0], $method, $booted)) {
                 forward_static_call([$controller[0], $method]);
-
                 $booted[] = $method;
             }
 
-            // Иницализация.
-            // В трэйте должен существовать метод вида initialize<имя трэйта>
-            if (method_exists($trait, $method = 'initialize' . class_basename($trait))) {
-                $this->{$method}();
+            // Инициализация (динамический метод).
+            $method = 'initialize' . class_basename($trait);
+
+            if ($this->methodExist($controller[0], $method, $booted)) {
+                $controller[0]->{$method}();
+
+                $booted[] = $method;
             }
         }
+    }
+
+    /**
+     * Существует ли метод и был ли он уже загружен.
+     *
+     * @param mixed  $class  Класс.
+     * @param string $method Метод.
+     * @param array  $booted Загруженные методы трэйтов.
+     *
+     * @since 11.10.2020
+     *
+     * @return boolean
+     */
+    private function methodExist($class, string $method, array $booted = []) : bool
+    {
+        return method_exists($class, $method)
+            && !in_array($method, $booted, true);
     }
 }
