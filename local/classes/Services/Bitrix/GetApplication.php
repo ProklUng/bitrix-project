@@ -13,6 +13,11 @@ use CMain;
  */
 class GetApplication
 {
+    /**
+     * $APPLICATION.
+     *
+     * @return CMain
+     */
     public function instance() : CMain
     {
         global $APPLICATION;
