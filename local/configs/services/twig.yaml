@@ -21,5 +21,5 @@ services:
 
   # Экземпляр Twig.
   twig.instance:
-    class: Local\Services\TwigService
+    class: Twig_Environment
     factory: ['@twig', 'instance']
