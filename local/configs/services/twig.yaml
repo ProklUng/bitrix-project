@@ -32,10 +32,19 @@ services:
     tags:
       - {name: twig.extension}
 
+  # Супер-глобалы.
   Maximaster\Tools\Twig\PhpGlobalsExtension:
     tags:
       - {name: twig.extension}
 
+  # Битриксовые функции.
   Maximaster\Tools\Twig\BitrixExtension:
+    tags:
+      - {name: twig.extension}
+
+  # Различные хэлперы, связанные с сервис-контейнером.
+  Local\Services\Twig\Extensions\ContainerTwigExtension:
+    calls:
+      - setContainer: ['@service_container']
     tags:
       - {name: twig.extension}
