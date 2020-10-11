@@ -9,6 +9,7 @@ use CHTTP;
  * @package Local\Util
  *
  * @since 15.09.2020
+ * @since 11.10.2020 Изменен механизм проверки роутов на более точный.
  */
 class Handler404
 {
@@ -19,13 +20,12 @@ class Handler404
      */
     public function apiHandler()
     {
-        $baseApiUrl = container()->getParameter('base.api.url');
-
         if (defined("ERROR_404")
             ||
             CHTTP::GetLastStatus() == "404 Not Found"
             &&
-            strpos($_SERVER['REQUEST_URI'], $baseApiUrl) !== false) {
+            container()->get('route.checker')->isLiveRoute($_SERVER['REQUEST_URI']))
+        {
             CHTTP::SetStatus("The HTTP 200 OK");
             @define('ERROR_404', "N");
         }
