@@ -31,6 +31,7 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
      * @return void
      *
      * @since 10.09.2020
+     * @since 19.09.2020 Добавлена инициализация трэйтов.
      */
     public function handle(ControllerEvent $event): void
     {
@@ -51,6 +52,12 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
                 forward_static_call([$controller[0], $method]);
 
                 $booted[] = $method;
+            }
+
+            // Иницализация.
+            // В трэйте должен существовать метод вида initialize<имя трэйта>
+            if (method_exists($trait, $method = 'initialize' . class_basename($trait))) {
+                $this->{$method}();
             }
         }
     }
