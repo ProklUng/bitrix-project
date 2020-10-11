@@ -7,7 +7,6 @@ use CFile;
 use CIBlock;
 use Local\Constants;
 use Local\Facades\CacherFacade;
-use Local\Guta\Cacher;
 
 /**
  * Class IblockManager
@@ -40,17 +39,17 @@ class IblockManager
     /**
      * ID инфоблока по его коду из кэша.
      *
-     * @param string $sIBlockType - тип инфоблока
-     * @param string $sIBlockCode - код инфоблока
+     * @param string $iblockType - тип инфоблока
+     * @param string $iblockCode - код инфоблока
      *
      * @return integer
      */
-    public function getIBlockIdByCodeCached($sIBlockType, $sIBlockCode)
+    public function getIBlockIdByCodeCached($iblockType, $iblockCode)
     {
         /** @noinspection PhpUndefinedMethodInspection */
-        $cacher = CacherFacade::setCacheId($sIBlockType . $sIBlockCode)
+        $cacher = CacherFacade::setCacheId($iblockType . $iblockCode)
                                ->setCallback([$this, 'getIBlockIdByCode'])
-                               ->setCallbackParams($sIBlockType, $sIBlockCode)
+                               ->setCallbackParams($iblockType, $iblockCode)
                                ->setTtl(Constants::SECONDS_IN_WEEK);
 
 
@@ -83,17 +82,17 @@ class IblockManager
     /**
      * Описание инфоблока по его коду из кэша.
      *
-     * @param string $sIBlockType  Тип инфоблока.
-     * @param string $sIBlockCode  Код инфоблока.
+     * @param string $iblockType  Тип инфоблока.
+     * @param string $iblockCode  Код инфоблока.
      *
      * @return string
      */
-    public function getIBlockDescriptionByCodeCached($sIBlockType, $sIBlockCode)
+    public function getIBlockDescriptionByCodeCached($iblockType, $iblockCode)
     {
         /** @noinspection PhpUndefinedMethodInspection */
-        $cacher = CacherFacade::setCacheId('iblockDescription'.$sIBlockType . $sIBlockCode)
+        $cacher = CacherFacade::setCacheId('iblockDescription' . $iblockType . $iblockCode)
             ->setCallback([$this, 'getIBlockDescriptionByCode'])
-            ->setCallbackParams($sIBlockType, $sIBlockCode)
+            ->setCallbackParams($iblockType, $iblockCode)
             ->setTtl(Constants::SECONDS_IN_WEEK);
 
 

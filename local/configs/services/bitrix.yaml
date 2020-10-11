@@ -41,7 +41,7 @@ services:
 
   # Кэшер.
   cacher:
-    class: Local\Guta\Cacher
+    class: Local\Util\Bitrix\Cacher
     arguments: ['@bitrix.cacher']
 
   # Инстанс $APPLICATION

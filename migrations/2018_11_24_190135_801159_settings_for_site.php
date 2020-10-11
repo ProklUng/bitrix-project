@@ -34,7 +34,7 @@ class SettingsForSite20181124190135801159 extends BitrixMigration
             "DOC_ROOT" => "",
             "DOMAINS" => "site.ru
             site.loc
-            site.test.gutaweb.ru",
+            site.test.ru",
 
             "TEMPLATE" => array(
                 array(

@@ -4,13 +4,13 @@ namespace Local\Services\Filesystem;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
-use Local\Services\Filesystem\Interfaces\GutaFilesystemAdapterInterface;
+use Local\Services\Filesystem\Interfaces\FilesystemAdapterInterface;
 
 /**
  * Class LocalFilesystemAdapter
  * @package Local\Services\Filesystem
  */
-class LocalFilesystemAdapter implements GutaFilesystemAdapterInterface
+class LocalFilesystemAdapter implements FilesystemAdapterInterface
 {
     /**
      * @var AdapterInterface $adapter Адаптер League файловой системы.

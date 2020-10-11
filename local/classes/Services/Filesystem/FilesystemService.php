@@ -3,7 +3,7 @@
 namespace Local\Services\Filesystem;
 
 use League\Flysystem\Filesystem;
-use Local\Services\Filesystem\Interfaces\GutaFilesystemAdapterInterface;
+use Local\Services\Filesystem\Interfaces\FilesystemAdapterInterface;
 
 /**
  * Class Filesystem
@@ -24,10 +24,10 @@ class FilesystemService
     /**
      * FilesystemService constructor.
      *
-     * @param GutaFilesystemAdapterInterface $adapter
+     * @param FilesystemAdapterInterface $adapter
      */
     public function __construct(
-        GutaFilesystemAdapterInterface $adapter
+        FilesystemAdapterInterface $adapter
     ) {
         $this->setup($adapter);
     }
@@ -45,9 +45,9 @@ class FilesystemService
     /**
      * Сменить адаптер. С сохранением предыдущей системы в резервной копии.
      *
-     * @param GutaFilesystemAdapterInterface | null $adapter
+     * @param FilesystemAdapterInterface | null $adapter
      */
-    public function swap(GutaFilesystemAdapterInterface $adapter = null) : void
+    public function swap(FilesystemAdapterInterface $adapter = null) : void
     {
         // Достать из резервной копии, если она есть.
         if ($adapter === null && $this->backupFilesystem !== null) {
@@ -62,9 +62,9 @@ class FilesystemService
     /**
      * Инициализация адаптера.
      *
-     * @param GutaFilesystemAdapterInterface $adapter
+     * @param FilesystemAdapterInterface $adapter
      */
-    private function setup(GutaFilesystemAdapterInterface $adapter) : void
+    private function setup(FilesystemAdapterInterface $adapter) : void
     {
         $this->filesystem = new Filesystem(
             $adapter->getAdapter(),

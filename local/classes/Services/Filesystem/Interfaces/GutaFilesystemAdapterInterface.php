@@ -5,10 +5,10 @@ namespace Local\Services\Filesystem\Interfaces;
 use League\Flysystem\AdapterInterface;
 
 /**
- * Interface GutaFilesystemAdapterInterface
+ * Interface FilesystemAdapterInterface
  * @package Local\Services\Interfaces
  */
-interface GutaFilesystemAdapterInterface
+interface FilesystemAdapterInterface
 {
     /**
      * @return AdapterInterface

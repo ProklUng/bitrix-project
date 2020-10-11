@@ -7,7 +7,7 @@ use Local\ServiceProvider\Interfaces\ServiceProviderContract;
 
 /**
  * Class AbstractServiceProvider
- * @package Local\Guta\ServiceProvider\AbstractClasses
+ * @package Local\ServiceProvider\AbstractClasses
  */
 abstract class AbstractServiceProvider implements ServiceProviderContract
 {

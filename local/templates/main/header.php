@@ -15,7 +15,7 @@ use Bitrix\Main\Web\Uri;
     ?>
 
     <meta id="viewport" name="viewport" content="width=device-width,initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="<?= container()->get('guta.assets')->getEntry('main.css') ?>">
+    <link rel="stylesheet" href="<?= container()->get('assets.manager')->getEntry('main.css') ?>">
 
 </head>
 <body class="page page_<?= LANGUAGE_ID ?> page_<?php $APPLICATION->ShowProperty('page_type', 'secondary') ?>">

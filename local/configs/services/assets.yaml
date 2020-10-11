@@ -17,7 +17,7 @@ services:
     factory: ['@Local\Services\AssetPathService', 'pathBuild']
     arguments: ['%debug%', '%build.dev.path%', '%build.production.path%']
 
-  guta.assets:
+  assets.manager:
     class: Local\Util\Assets
     arguments: ['@build.path']
 
