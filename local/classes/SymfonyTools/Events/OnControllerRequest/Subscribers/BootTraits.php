@@ -20,6 +20,9 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
 {
     use AbstractSubscriberTrait;
 
+    /** @var array $booted Загруженные методы трэйтов. */
+    private $booted = [];
+
     /**
      * Обработчик события kernel.controller.
      *
@@ -41,24 +44,25 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
             return;
         }
 
-        $booted = [];
+        $this->booted = [];
 
         foreach (class_uses_recursive($controller[0]) as $trait) {
             // Загрузка (статический метод).
             $method = 'boot' . class_basename($trait);
 
-            if ($this->methodExist($controller[0], $method, $booted)) {
+            if ($this->methodExist($controller[0], $method)) {
                 forward_static_call([$controller[0], $method]);
-                $booted[] = $method;
+
+                $this->booted[] = $method;
             }
 
             // Инициализация (динамический метод).
             $method = 'initialize' . class_basename($trait);
 
-            if ($this->methodExist($controller[0], $method, $booted)) {
+            if ($this->methodExist($controller[0], $method)) {
                 $controller[0]->{$method}();
 
-                $booted[] = $method;
+                $this->booted[] = $method;
             }
         }
     }
@@ -68,15 +72,14 @@ class BootTraits implements EventSubscriberInterface, OnControllerRequestHandler
      *
      * @param mixed  $class  Класс.
      * @param string $method Метод.
-     * @param array  $booted Загруженные методы трэйтов.
      *
      * @since 11.10.2020
      *
      * @return boolean
      */
-    private function methodExist($class, string $method, array $booted = []) : bool
+    private function methodExist($class, string $method) : bool
     {
         return method_exists($class, $method)
-            && !in_array($method, $booted, true);
+            && !in_array($method, $this->booted, true);
     }
 }
