@@ -47,4 +47,11 @@ services:
     calls:
       - setContainer: ['@service_container']
     tags:
-      - {name: twig.extension}
+      - { name: twig.extension }
+
+  # The "sortByField" filter sorts an array of entries (objects or arrays) by the specified field's value
+  # Usage: {% for entry in master.entries|sortbyfield('ordering', 'desc') %}
+  Local\Services\Twig\Extensions\SortByFieldExtension:
+    tags:
+      - { name: twig.extension }
+
