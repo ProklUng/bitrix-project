@@ -15,10 +15,10 @@ use ReflectionException;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
- * Class GutaTestCase
+ * Class CustomTestCase
  * @package Local\Tests\PhpUnitExtensions
  */
-class GutaTestCase extends IntelligentTestCase
+class CustomTestCase extends TestCase
 {
     /**
      * @internal Используемые аннотации классов:
@@ -164,5 +164,4 @@ class GutaTestCase extends IntelligentTestCase
 
         return $annotations;
     }
-
 }

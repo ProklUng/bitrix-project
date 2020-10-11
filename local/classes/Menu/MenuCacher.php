@@ -1,13 +1,14 @@
 <?php
 
-namespace Local\Guta;
+namespace Local\Menu;
 
 use CHTTP;
+use Local\Util\Bitrix\Cacher;
 
 /**
  * Class MenuCacher
- * Кэширование. Изобретено для кэширования Дэновского меню.
- * @package Local\Guta
+ * Кэширование.
+ * @package Local\Menu
  */
 class MenuCacher extends Cacher
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Guta;
+namespace Local\Menu;
 
 use Bitrix\Main\DB\Exception;
 use CIBlock;
@@ -14,7 +14,7 @@ use Local\Facades\IblockFacade;
 
 /**
  * Class MenuManager
- * @package Local\Guta
+ * @package Local\Menu
  */
 class MenuManager
 {
@@ -33,12 +33,12 @@ class MenuManager
      * @param array $arParams Параметры.
      *
      * @return array
-     * @throws Exception Системная ошибка.
+     * @throws \Exception Системная ошибка.
      */
     public static function getMenuByIBlockType(array $arParams = ['IBLOCK_TYPE' => 'blocks'])
     {
         if (!CModule::IncludeModule('iblock')) {
-            throw new Exception('Module iblock not found!');
+            throw new \Exception('Module iblock not found!');
         }
 
         $cMain = new CMain();

@@ -48,8 +48,11 @@ services:
   application:
     class: CMain
 
-  CFile:
-    class: CFile
+  Bitrix\Main\Application: '@application'
+
+  CFile: ~
+  CUser: ~
+  CMain: ~
 
   Bitrix\Main\Mail\Event: ~
 

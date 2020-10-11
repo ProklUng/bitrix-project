@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Guta;
+namespace Local\Util\Bitrix;
 
 use CIBlockElement;
 use CIBlockSection;
@@ -10,7 +10,7 @@ use Exception;
  * Class IblockTree
  * Генерация дерева из инфоблока, включающее
  * элементы.
- * @package Local\Guta
+ * @package Local\Util\Bitrix
  */
 class IblockTree
 {

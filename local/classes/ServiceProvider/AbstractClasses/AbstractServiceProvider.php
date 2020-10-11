@@ -1,9 +1,9 @@
 <?php
 
-namespace Local\Guta\ServiceProvider\AbstractClasses;
+namespace Local\ServiceProvider\AbstractClasses;
 
 use Illuminate\Container\Container;
-use Local\Guta\ServiceProvider\Contracts\ServiceProviderContract;
+use Local\ServiceProvider\Interfaces\ServiceProviderContract;
 
 /**
  * Class AbstractServiceProvider

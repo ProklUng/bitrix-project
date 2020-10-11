@@ -2,8 +2,12 @@
 
 namespace Local\Tests\FixtureGenerator;
 
-use Local\Guta\ServiceProvider\AbstractClasses\AbstractServiceProvider;
+use Local\ServiceProvider\AbstractClasses\AbstractServiceProvider;
 
+/**
+ * Class FixtureServiceProvider
+ * @package Local\Tests\FixtureGenerator
+ */
 class FixtureServiceProvider extends AbstractServiceProvider
 {
     /** Путь к фикстурам */

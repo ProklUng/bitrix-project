@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Guta;
+namespace Local\Util\Bitrix;
 
 use CPHPCache;
 use Local\Constants;
@@ -9,7 +9,7 @@ use Local\Facades\KernelFacade;
 /**
  * Class Cacher
  * Кэширование.
- * @package Local\Guta
+ * @package Local\Util\Bitrix
  */
 class Cacher
 {

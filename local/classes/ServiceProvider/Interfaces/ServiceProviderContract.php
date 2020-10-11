@@ -1,7 +1,11 @@
 <?php
 
-namespace Local\Guta\ServiceProvider\Contracts;
+namespace Local\ServiceProvider\Interfaces;
 
+/**
+ * Interface ServiceProviderContract
+ * @package Local\ServiceProvider\Contracts
+ */
 interface ServiceProviderContract
 {
     /**
