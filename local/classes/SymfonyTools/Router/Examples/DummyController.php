@@ -4,6 +4,7 @@ namespace Local\SymfonyTools\Router\Examples;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * Class DummyController
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @since 07.09.2020
  */
-class DummyController
+class DummyController extends AbstractController
 {
     public function action(
         Request $request
