@@ -13,7 +13,6 @@ use Twig_Loader_Filesystem;
  * @package Local\Services
  *
  * @since 07.09.2020
- * @since 11.10.2020 Инициализация расширений.
  */
 class TwigService
 {
@@ -41,9 +40,6 @@ class TwigService
                 'cache' => $cachePath,
             ]
         );
-
-        // Extensions.
-        $this->initExtensions();
     }
 
     /**
@@ -54,19 +50,5 @@ class TwigService
     public function instance() : Twig_Environment
     {
         return $this->twigEnvironment;
-    }
-
-    /**
-     * Инициализация расширений.
-     *
-     * @return void
-     *
-     * @since 11.10.2020
-     */
-    private function initExtensions() : void
-    {
-        $this->twigEnvironment->addExtension(new BitrixExtension());
-        $this->twigEnvironment->addExtension(new PhpGlobalsExtension());
-        $this->twigEnvironment->addExtension(new Twig_Extension_Debug());
     }
 }
