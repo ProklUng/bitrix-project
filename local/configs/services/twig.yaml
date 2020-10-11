@@ -23,3 +23,19 @@ services:
   twig.instance:
     class: Twig_Environment
     factory: ['@twig', 'instance']
+
+  ##################
+  # Twig extensions
+  ##################
+  debug.extension:
+    class: Twig_Extension_Debug
+    tags:
+      - {name: twig.extension}
+
+  Maximaster\Tools\Twig\PhpGlobalsExtension:
+    tags:
+      - {name: twig.extension}
+
+  Maximaster\Tools\Twig\BitrixExtension:
+    tags:
+      - {name: twig.extension}

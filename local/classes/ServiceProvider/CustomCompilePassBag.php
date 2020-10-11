@@ -4,9 +4,11 @@ namespace Local\ServiceProvider;
 
 use Local\ServiceProvider\CompilePasses\BaseAggregatedTaggedServicesPass;
 use Local\ServiceProvider\CompilePasses\ContainerAwareCompilerPass;
+use Local\ServiceProvider\CompilePasses\TwigExtensionTaggedServicesPass;
 use Local\ServiceProvider\CompilePasses\ValidateServiceDefinitions;
 use Local\ServiceProvider\PostLoadingPass\BootstrapServices;
 use Local\ServiceProvider\PostLoadingPass\InitBitrixEvents;
+use Local\ServiceProvider\PostLoadingPass\TwigExtensionApply;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
@@ -46,6 +48,11 @@ class CustomCompilePassBag
         [
             'pass' => ContainerAwareCompilerPass::class
         ],
+
+        // Регистрация Twig extensions.
+        [
+            'pass' => TwigExtensionTaggedServicesPass::class
+        ],
     ];
 
     /**
@@ -54,6 +61,7 @@ class CustomCompilePassBag
     private $postLoadingPassesBag = [
         ['pass' => InitBitrixEvents::class, 'priority' => 10],
         ['pass' => BootstrapServices::class, 'priority' => 20],
+        ['pass' => TwigExtensionApply::class, 'priority' => 20],
     ];
 
     /**
