@@ -48,7 +48,11 @@ services:
   application:
     class: CMain
 
-  Bitrix\Main\Application: '@application'
+  Local\Services\Bitrix\GetApplication: ~
+
+  application.instance:
+    class: CMain
+    factory: ['@Local\Services\Bitrix\GetApplication', 'instance']
 
   CFile: ~
   CUser: ~
