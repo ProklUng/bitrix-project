@@ -3,17 +3,6 @@
 use Local\Seo\Clearizer;
 use Local\Seo\CMainHandlers;
 use Local\Seo\SchemaOrg;
-use Local\Util\Handler404;
-
-// Чтобы Битрикс не рубил 404-й запросы через Symfony Router
-AddEventHandler(
-    'main',
-    'OnEpilog',
-    [
-        new Handler404(),
-        'apiHandler',
-    ]
-);
 
 // LastModified
 AddEventHandler(
