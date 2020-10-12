@@ -117,7 +117,7 @@ class InitRouter
         }
 
         // Перебиваю битриксовый 404 для роутов.
-        CHTTP::SetStatus("200 OK");
+        CHTTP::SetStatus('200 OK');
 
         // Send the response to the browser and exit app.
         $response->send();
