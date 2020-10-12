@@ -2,6 +2,7 @@
 
 namespace Local\SymfonyTools\Router;
 
+use CHTTP;
 use Exception;
 use Local\SymfonyTools\Framework\Controllers\ErrorControllerInterface;
 use Local\SymfonyTools\Framework\Listeners\StringResponseListener;
@@ -114,6 +115,9 @@ class InitRouter
             // If no route found do noting and let continue.
             return;
         }
+
+        // Перебиваю битриксовый 404 для роутов.
+        CHTTP::SetStatus("200 OK");
 
         // Send the response to the browser and exit app.
         $response->send();
