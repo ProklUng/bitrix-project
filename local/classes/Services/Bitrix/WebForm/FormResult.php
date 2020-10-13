@@ -32,6 +32,8 @@ class FormResult
      *
      * @return bool | UpdateResult
      * @throws \Bitrix\Main\LoaderException
+     *
+     * @see https://github.com/ASDAFF/hipot.framework
      */
     public function formResultAddSimple($WEB_FORM_ID, $arrVALUES = [])
     {
