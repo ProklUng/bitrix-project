@@ -33,7 +33,7 @@ class FormResult
      * @return bool | UpdateResult
      * @throws \Bitrix\Main\LoaderException
      */
-    public static function formResultAddSimple($WEB_FORM_ID, $arrVALUES = [])
+    public function formResultAddSimple($WEB_FORM_ID, $arrVALUES = [])
     {
         global $strError;
 
