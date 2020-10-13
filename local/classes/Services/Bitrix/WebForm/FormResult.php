@@ -3,20 +3,49 @@
 namespace Local\Services\Bitrix\WebForm;
 
 use Bitrix\Main\Loader;
+use Bitrix\Main\LoaderException;
+use CFormCRM;
+use CFormResult;
 
 /**
  * Class FormResult
  * @package Local\Services\Bitrix\WebForm
  *
  * @since 13.10.2020
+ *
+ * @see https://github.com/ASDAFF/hipot.framework. Light refactoring.
  */
 class FormResult
 {
     /**
+     * @var CFormResult $formResult
+     */
+    private $formResult;
+
+    /**
+     * @var CFormCRM $cFormCRM
+     */
+    private $cFormCRM;
+
+    /**
+     * FormResult constructor.
+     *
+     * @param CFormResult $formResult
+     * @param CFormCRM $cFormCRM
+     */
+    public function __construct(
+        CFormResult $formResult,
+        CFormCRM $cFormCRM
+    ) {
+        $this->formResult = $formResult;
+        $this->cFormCRM = $cFormCRM;
+    }
+
+    /**
      * Добавить в модуль веб-формы в форму данные
      *
      * @param int $WEB_FORM_ID id формы, для которой пришел ответ
-     * @param array $arrVALUES = <pre>array (
+     * @param array $arValuesForm = <pre>array (
      * [WEB_FORM_ID] => 3
      * [web_form_submit] => Отправить
      *
@@ -31,11 +60,11 @@ class FormResult
      * )</pre>
      *
      * @return bool | UpdateResult
-     * @throws \Bitrix\Main\LoaderException
+     * @throws LoaderException
      *
      * @see https://github.com/ASDAFF/hipot.framework
      */
-    public function formResultAddSimple($WEB_FORM_ID, $arrVALUES = [])
+    public function formResultAddSimple($WEB_FORM_ID, $arValuesForm = [])
     {
         global $strError;
 
@@ -44,19 +73,19 @@ class FormResult
         }
 
         // add result like bitrix:form.result.new
-        $arrVALUES['WEB_FORM_ID'] = (int)$WEB_FORM_ID;
-        if ($arrVALUES['WEB_FORM_ID'] <= 0) {
+        $arValuesForm['WEB_FORM_ID'] = (int)$WEB_FORM_ID;
+        if ($arValuesForm['WEB_FORM_ID'] <= 0) {
             return false;
         }
 
-        $arrVALUES["web_form_submit"] = "Отправить";
+        $arValuesForm["web_form_submit"] = "Отправить";
 
-        if ($RESULT_ID = \CFormResult::Add($WEB_FORM_ID, $arrVALUES)) {
+        if ($RESULT_ID = $this->formResult::Add($WEB_FORM_ID, $arValuesForm)) {
             if ($RESULT_ID) {
                 // send email notifications
-                \CFormCRM::onResultAdded($WEB_FORM_ID, $RESULT_ID);
-                \CFormResult::SetEvent($RESULT_ID);
-                \CFormResult::Mail($RESULT_ID);
+                $this->cFormCRM::onResultAdded($WEB_FORM_ID, $RESULT_ID);
+                $this->formResult::SetEvent($RESULT_ID);
+                $this->formResult::Mail($RESULT_ID);
 
                 return new UpdateResult(['RESULT' => $RESULT_ID, 'STATUS' => UpdateResult::STATUS_OK]);
             }
