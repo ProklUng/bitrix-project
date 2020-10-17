@@ -79,6 +79,9 @@ class ServiceProvider
     public function __construct(
         string $filename = self::SERVICE_CONFIG_FILE
     ) {
+        // Buggy local fix.
+        $_ENV['DEBUG'] = env('DEBUG', false);
+
         $this->errorHandler = new ErrorScreen(
             new LoaderContent(),
             new CMain()
