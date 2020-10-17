@@ -28,3 +28,6 @@ services:
 
   Local\Services\Validation\Custom\CustomEmailValidatorNullable: ~
   Local\Services\Validation\Custom\LaravelPhoneValidatorNullable: ~
+
+  Local\Services\Validation\Custom\CyrillicAlphaValidator: ~
+  Local\Services\Validation\Custom\CyrillicAlphaValidatorNullable: ~
