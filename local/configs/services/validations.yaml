@@ -26,4 +26,5 @@ services:
   Local\Services\Sanitizing\SanitizerService: '@sanitizer'
   Local\Services\Sanitizing\SanitizerInterface: '@sanitizer'
 
-  Local\Services\Validation\Custom\CustomEmailValidator: ~
+  Local\Services\Validation\Custom\CustomEmailValidatorNullable: ~
+  Local\Services\Validation\Custom\LaravelPhoneValidatorNullable: ~

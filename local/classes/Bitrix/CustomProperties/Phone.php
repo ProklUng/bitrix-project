@@ -6,27 +6,27 @@ use Illuminate\Contracts\Validation\Rule;
 use WebArch\BitrixIblockPropertyType\Abstraction\IblockPropertyTypeBase;
 
 /**
- * Class Email
- * Кастомное поле типа EMAIL.
+ * Class Phone
+ * Кастомное поле типа телефон.
  * @package Local\Bitrix\CustomProperties
  *
  * @since 17.10.2020
  */
-class Email extends IblockPropertyTypeBase
+class Phone extends IblockPropertyTypeBase
 {
     /**
-     * @var Rule $emailValidator
+     * @var Rule $phoneValidator
      */
-    private $emailValidator;
+    private $phoneValidator;
 
     /**
      * Email constructor.
      *
-     * @param Rule $emailValidator Валидатор email.
+     * @param Rule $phoneValidator Валидатор email.
      */
-    public function __construct(Rule $emailValidator)
+    public function __construct(Rule $phoneValidator)
     {
-        $this->emailValidator = $emailValidator;
+        $this->phoneValidator = $phoneValidator;
     }
 
     /**
@@ -42,7 +42,7 @@ class Email extends IblockPropertyTypeBase
      */
     public function getDescription()
     {
-        return 'Email';
+        return 'Phone';
     }
 
     /**
@@ -111,8 +111,8 @@ class Email extends IblockPropertyTypeBase
      */
     public function checkFields(array $property, array $value)
     {
-        if (!$this->emailValidator->passes('', $value['VALUE'])) {
-            return ['Email не валиден'];
+        if (!$this->phoneValidator->passes('', $value['VALUE'])) {
+            return ['Телефон не валиден'];
         }
 
         return [];

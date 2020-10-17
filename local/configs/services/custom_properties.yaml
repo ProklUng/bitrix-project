@@ -11,7 +11,13 @@ services:
 
   # Свойство EMAIL.
   Local\Bitrix\CustomProperties\Email:
-    arguments: ['@Local\Services\Validation\Custom\CustomEmailValidator']
+    arguments: ['@Local\Services\Validation\Custom\CustomEmailValidatorNullable']
+    tags:
+      - { name: bitrix.property.type }
+
+  # Свойство PHONE.
+  Local\Bitrix\CustomProperties\Phone:
+    arguments: ['@Local\Services\Validation\Custom\LaravelPhoneValidatorNullable']
     tags:
       - { name: bitrix.property.type }
 
