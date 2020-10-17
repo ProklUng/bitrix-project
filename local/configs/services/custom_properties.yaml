@@ -21,6 +21,11 @@ services:
     tags:
       - { name: bitrix.property.type }
 
+  # Свойство YoutubeVideo.
+  Local\Bitrix\CustomProperties\YoutubeVideo:
+    tags:
+      - { name: bitrix.property.type }
+
   WebArch\BitrixIblockPropertyType\YesNoType:
     tags:
       - { name: bitrix.property.type }
