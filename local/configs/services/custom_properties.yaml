@@ -1,0 +1,20 @@
+#####################
+# Кастомные свойства
+#####################
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  # Свойство EMAIL.
+  Local\Bitrix\CustomProperties\Email:
+    arguments: ['@Local\Services\Validation\Custom\CustomEmailValidator']
+    tags:
+      - { name: bitrix.property.type }
+
+  WebArch\BitrixIblockPropertyType\YesNoType:
+    tags:
+      - { name: bitrix.property.type }

@@ -2,13 +2,14 @@
 
 namespace Local\ServiceProvider;
 
+use Local\ServiceProvider\CompilePasses\TwigExtensionTaggedServicesPass;
 use Local\ServiceProvider\CompilePasses\BaseAggregatedTaggedServicesPass;
 use Local\ServiceProvider\CompilePasses\ContainerAwareCompilerPass;
-use Local\ServiceProvider\CompilePasses\TwigExtensionTaggedServicesPass;
+use Local\ServiceProvider\PostLoadingPass\InitCustomPropertiesType;
+use Local\ServiceProvider\PostLoadingPass\TwigExtensionApply;
 use Local\ServiceProvider\CompilePasses\ValidateServiceDefinitions;
 use Local\ServiceProvider\PostLoadingPass\BootstrapServices;
 use Local\ServiceProvider\PostLoadingPass\InitBitrixEvents;
-use Local\ServiceProvider\PostLoadingPass\TwigExtensionApply;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
@@ -38,6 +39,13 @@ class CustomCompilePassBag
                 ['bitrix.events.init', '_events'],
         ],
 
+        // Инициализация кастомных типов свойств через сервисные тэги.
+        [
+            'pass' => BaseAggregatedTaggedServicesPass::class,
+            'params' =>
+                ['bitrix.property.type', '_custom_bitrix_property'],
+        ],
+
         // Проверка классов сервисов на существование.
         [
             'pass' => ValidateServiceDefinitions::class,
@@ -62,6 +70,7 @@ class CustomCompilePassBag
         ['pass' => InitBitrixEvents::class, 'priority' => 10],
         ['pass' => BootstrapServices::class, 'priority' => 20],
         ['pass' => TwigExtensionApply::class, 'priority' => 20],
+        ['pass' => InitCustomPropertiesType::class, 'priority' => 20],
     ];
 
     /**
