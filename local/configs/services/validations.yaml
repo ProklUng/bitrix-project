@@ -25,3 +25,5 @@ services:
 
   Local\Services\Sanitizing\SanitizerService: '@sanitizer'
   Local\Services\Sanitizing\SanitizerInterface: '@sanitizer'
+
+  Local\Services\Validation\Custom\CustomEmailValidator: ~
