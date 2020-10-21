@@ -1,0 +1,12 @@
+# Пример рендеринга простой статической страницы прямо из роута.
+simple_static_page:
+  path: /simple_page/
+  methods: [GET]
+  controller: 'Local\Services\Twig\Tools\TemplateController::templateAction'
+  defaults:
+    template:  './static/example2.twig'
+    context:
+      site_name: 'Example site'
+      page_type: 'static-page'
+      title: 'Простая статическая страница'
+      description: 'Простая статическая страница'

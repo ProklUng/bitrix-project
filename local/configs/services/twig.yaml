@@ -24,6 +24,10 @@ services:
     class: Twig_Environment
     factory: ['@twig', 'instance']
 
+  # Рендер по роуту.
+  Local\Services\Twig\Tools\TemplateController:
+    arguments: ['@twig.instance']
+
   ##################
   # Twig extensions
   ##################
@@ -41,6 +45,13 @@ services:
   Maximaster\Tools\Twig\BitrixExtension:
     tags:
       - {name: twig.extension}
+
+  # Битриксовые штучки-дрючки.
+  bitrix.pieces:
+    arguments: ['%kernel.project_dir%']
+    class: Local\Services\Twig\Extensions\BitrixPiecesExtension
+    tags:
+      - { name: twig.extension }
 
   # Различные хэлперы, связанные с сервис-контейнером.
   Local\Services\Twig\Extensions\ContainerTwigExtension:
@@ -67,6 +78,7 @@ services:
     arguments:
       - '@Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware'
       - '@dispatcher.controller'
+      - '@routes.collection'
     calls:
       - setContainer: ['@service_container']
     tags:

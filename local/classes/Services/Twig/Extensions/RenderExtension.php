@@ -8,6 +8,11 @@ use Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMaker
 use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Twig_ExtensionInterface;
@@ -49,17 +54,25 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
     private $dispatchController;
 
     /**
+     * @var RouteCollection $routeCollection Коллекция роутов.
+     */
+    private $routeCollection;
+
+    /**
      * RenderExtension constructor.
      *
      * @param ResolveDependencyMakerContainerAware $resolveDependencyMakerContainerAware Разрешитель зависимостей.
      * @param DispatchController                   $dispatchController                   Исполнитель контроллеров.
+     * @param RouteCollection                      $routeCollection                      Коллекция роутов.
      */
     public function __construct(
         ResolveDependencyMakerContainerAware $resolveDependencyMakerContainerAware,
-        DispatchController $dispatchController
+        DispatchController $dispatchController,
+        RouteCollection $routeCollection
     ) {
         $this->resolveDependencyMakerContainerAware = $resolveDependencyMakerContainerAware;
         $this->dispatchController = $dispatchController;
+        $this->routeCollection = $routeCollection;
     }
 
     /**
@@ -87,15 +100,40 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
     /**
      * Twig команда render().
      *
-     * @param ControllerReference $controller Референс контроллера.
+     * @param ControllerReference|string $controller Референс контроллера.
+     * @param array                      $options    Опции.
      *
-     * @throws RuntimeException Ошибка рендеринга контроллера.
+     * @return void
+     *
+     * @throws RuntimeException Не удалось найти роут.
      */
-    public function render(ControllerReference $controller)
+    public function render($controller, array $options = []) : void
     {
-        $controllerClass = $controller->controller;
-        $attributes = $controller->attributes;
-        $query = $controller->query;
+        // Если в options присутствует ключ headers, то считаем, что это заголовки запроса.
+        if (!empty($options['headers'])) {
+            $this->dispatchController->setHeaders($options['headers']);
+            unset($options['headers']); // Чтобы не замусоривать дальнейшее использование опций.
+        }
+
+        if ($controller instanceof ControllerReference) {
+            $resolvedInboundController = $controller;
+        } else {
+            // Получить данные из url роута.
+            $resolvedInboundController = $this->getRouteInfo($controller, $options);
+
+            if ($resolvedInboundController === null) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Twig function render: error rendering route %s.',
+                        $controller
+                    )
+                );
+            }
+        }
+
+        $controllerClass = $resolvedInboundController->controller;
+        $attributes = $resolvedInboundController->attributes;
+        $query = $resolvedInboundController->query;
 
         $resolvedController = $this->parseControllerString($controllerClass);
 
@@ -104,7 +142,14 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
 
         if ($this->dispatchController->dispatch($resolvedController)) {
             $response = $this->dispatchController->getResponse();
-            echo $response->getContent();
+            $content =  $response->getContent();
+
+            // Ответ может быть зазипован.
+            $isGzipped = (mb_strpos($content , "\x1f" . "\x8b" . "\x08") === 0);
+            if ($isGzipped) {
+                $content = gzdecode($content);
+            }
+            echo $content;
 
             return;
         }
@@ -155,6 +200,36 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
         $this->checkClassAndMethod($resolvedControllerClass, $controller, $methodDefault);
 
         return [$resolvedControllerClass, $methodDefault];
+    }
+
+    /**
+     * Получить информацию о роуте по URL.
+     *
+     * @param string $uri     URL.
+     * @param array  $options Опции.
+     *
+     * @return ControllerReference|null
+     */
+    private function getRouteInfo(string $uri, array $options = []) : ?ControllerReference
+    {
+        // Удалить служебные роуты.
+        $this->routeCollection->remove(['index', 'remove_trailing_slash', 'not-found']);
+        $matcher = new UrlMatcher($this->routeCollection, new RequestContext());
+
+        try {
+            $routeData = $matcher->match($uri);
+
+            $controllerRoute = $routeData['_controller'];
+            unset($routeData['_controller'], $routeData['_route']);
+
+            return new ControllerReference(
+                $controllerRoute,
+                array_merge($routeData, $options)
+            );
+
+        } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
+            return null;
+        }
     }
 
     /**

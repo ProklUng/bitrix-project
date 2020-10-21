@@ -80,7 +80,7 @@ services:
 
   # Коллекция загруженных роутов.
   routes.collection:
-    class: Local\SymfonyTools\Router\RouterConfig
+    class: Symfony\Component\Routing\RouteCollection
     factory: ['@routes.config', 'routes']
 
   Local\SymfonyTools\Router\RouterConfig: '@routes.config'

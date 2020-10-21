@@ -1,3 +1,6 @@
+_common:
+  resource: staticPages/statics.yaml
+
 foo_route:
   path: /api/foo/
   controller: 'Local\SymfonyTools\Router\Examples\DummyController::action'
