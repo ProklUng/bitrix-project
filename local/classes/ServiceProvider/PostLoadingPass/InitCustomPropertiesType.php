@@ -6,8 +6,8 @@ use Exception;
 use InvalidArgumentException;
 use Local\ServiceProvider\Interfaces\PostLoadingPassInterface;
 use Local\ServiceProvider\PostLoadingPass\Exceptions\RuntimePostLoadingPassException;
+use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeInterface;
 use Symfony\Component\DependencyInjection\Container;
-use WebArch\BitrixIblockPropertyType\Abstraction\IblockPropertyTypeInterface;
 
 /**
  * Class InitCustomPropertiesType
@@ -46,6 +46,7 @@ class InitCustomPropertiesType implements PostLoadingPassInterface
         if (empty($customPropertyServices)) {
             return $result;
         }
+
         foreach ($customPropertyServices as $service => $value) {
             /**
              * @var IblockPropertyTypeInterface $serviceInstance Обработчик.
@@ -55,10 +56,10 @@ class InitCustomPropertiesType implements PostLoadingPassInterface
             $interfaces = class_implements($serviceInstance);
             if (!in_array(IblockPropertyTypeInterface::class, $interfaces, true)) {
                 throw new RuntimePostLoadingPassException(
-                  sprintf(
-                      'Custom property type error. Class %s not implement IblockPropertyTypeInterface',
-                      get_class($serviceInstance)
-                  )
+                    sprintf(
+                        'Custom property type error. Class %s not implement IblockPropertyTypeInterface',
+                        get_class($serviceInstance)
+                    )
                 );
             }
             $serviceInstance->init();
