@@ -13,7 +13,7 @@ use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
  *
  * @package namespace Local\Bitrix\CustomProperties
  */
-class FormType extends IblockPropertyTypeBase
+class BitrixFormType extends IblockPropertyTypeBase
 {
     /**
      * @var array
