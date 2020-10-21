@@ -15,7 +15,7 @@ imports:
   - {resource: services/testing.yaml }
   - {resource: services/seo.yaml }
   - {resource: services/controllers.yaml }
-  - {resource: services/custom_properties.yaml.yaml }
+  - {resource: services/custom_properties.yaml }
 
 parameters:
   namespace.models.infoblocks: 'Local\Models'

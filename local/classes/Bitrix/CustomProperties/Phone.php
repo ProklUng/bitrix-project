@@ -3,7 +3,7 @@
 namespace Local\Bitrix\CustomProperties;
 
 use Illuminate\Contracts\Validation\Rule;
-use WebArch\BitrixIblockPropertyType\Abstraction\IblockPropertyTypeBase;
+use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
 
 /**
  * Class Phone

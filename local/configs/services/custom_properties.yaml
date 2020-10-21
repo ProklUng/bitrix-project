@@ -26,6 +26,10 @@ services:
     tags:
       - { name: bitrix.property.type }
 
-  WebArch\BitrixIblockPropertyType\YesNoType:
+  Local\Bitrix\CustomProperties\YesNoType:
+    tags:
+      - { name: bitrix.property.type }
+
+  Local\Bitrix\CustomProperties\FormType:
     tags:
       - { name: bitrix.property.type }

@@ -55,3 +55,19 @@ services:
     tags:
       - { name: twig.extension }
 
+  # controller()
+  controller:
+    class: Local\Services\Twig\Extensions\ControllerExtension
+    tags:
+      - { name: twig.extension }
+
+  # render()
+  render:
+    class: Local\Services\Twig\Extensions\RenderExtension
+    arguments:
+      - '@Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware'
+      - '@dispatcher.controller'
+    calls:
+      - setContainer: ['@service_container']
+    tags:
+      - { name: twig.extension }

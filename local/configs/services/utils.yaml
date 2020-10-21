@@ -33,3 +33,6 @@ services:
 
   Local\Util\Pipeline\Hub:
     arguments: ['@service_container']
+
+  Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMaker: ~
+  Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware: ~

@@ -4,96 +4,18 @@ namespace Local\SymfonyTools\Framework\Utils\ResolverDependency;
 
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * Class ResolveDependencyMaker
- * Реализация рекурсивного разрешения зависимостей.
- * @package Local\SymfonyTools\Framework\Utils\ResolverDependency
+ * Class ResolveDependencyMakerContainerAware
+ * Реализация рекурсивного разрешения зависимостей с учетом сервис-контейнера.
+ * @package Fedy\Lib\Objects
  *
- * @since 06.09.2020 Moved from library base.
+ * @since 12.10.2020
  */
-class ResolveDependencyMaker
+class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
 {
-    /** @var string | null $className Название класса. */
-    protected $className;
-
-    /**
-     * @var array $arDepends Массив сопоставлений интерфейс - реализация.
-     */
-    protected $arDepends = [];
-
-    /**
-     * ResolveDependencyMaker constructor.
-     *
-     * @param string|null $className Название класса.
-     */
-    public function __construct(string $className = null)
-    {
-        $this->className = $className;
-    }
-
-    /**
-     * Сеттер сопоставлений.
-     *
-     * @param array $arDepends
-     *
-     * @return ResolveDependencyMaker
-     */
-    public function setDepends(array $arDepends): ResolveDependencyMaker
-    {
-        $this->arDepends = $arDepends;
-
-        return $this;
-    }
-
-    /**
-     * Разрешить зависимости callable.
-     *
-     * @param string $callable
-     *
-     * @return array|null
-     */
-    public function resolveDependenciesCallable(string $callable): ?array
-    {
-        $arResult = [];
-
-        if (!is_callable($callable)) {
-            return null;
-        }
-
-        // Вычленить метод и класс.
-        $arParse = explode('::', $callable);
-
-        try {
-            $reflectionCallable = new ReflectionMethod($arParse[0], $arParse[1]);
-        } catch (ReflectionException $e) {
-            return null;
-        }
-
-        $param = $reflectionCallable->getParameters();
-
-        foreach ($param as $item) {
-            $class = $item->getClass();
-
-            // В параметрах класс.
-            if ($class !== null && class_exists($class->name)) {
-                $arResult[] = $this->resolveDependencies($class->name);
-                continue;
-            }
-
-            // Не класс - integer, string & etc.
-            try {
-                $defaultValue = $item->getDefaultValue();
-            } catch (ReflectionException $e) {
-                $defaultValue = null;
-            }
-
-            $arResult[] = $defaultValue;
-        }
-
-        return $arResult;
-    }
+    use ContainerAwareTrait;
 
     /**
      * Разрешить зависимости класса автоматически.
@@ -105,6 +27,11 @@ class ResolveDependencyMaker
      */
     public function resolveDependencies(string $class, array $arDepends = [])
     {
+        // Из контейнера сначала.
+        if ($this->container && $this->container->has($class)) {
+            return $this->container->get($class);
+        }
+
         // Реализации - приоритет имеет переданное напрямую.
         $arDepends = !empty($arDepends) ? $arDepends : $this->arDepends;
 
@@ -122,14 +49,23 @@ class ResolveDependencyMaker
                 return null;
             }
 
+            if (is_object($realizationInterface)) {
+                return $realizationInterface;
+            }
+
             return $this->resolveDependencies($realizationInterface, $arDepends);
         }
 
         // Абстрактные классы.
         if ($reflectionClass->isAbstract()) {
             $realizationAbstractClass = $this->tryResolveAbstractClass(
-                $class, $arDepends
+                $class,
+                $arDepends
             );
+
+            if (is_object($realizationAbstractClass)) {
+                return $realizationAbstractClass;
+            }
 
             return $this->resolveDependencies($realizationAbstractClass, $arDepends);
         }
@@ -177,11 +113,20 @@ class ResolveDependencyMaker
                 continue;
             }
 
+            /** Название класса из рефлексии. */
+            $className = $param->getClass()->getName();
+
+            // Пытаюсь достать из контейнера.
+            if ($this->container && $this->container->has($className)) {
+                $newInstanceParams[] = $this->container->get($className);
+                continue;
+            }
+
             // This is where 'the magic happens'. We resolve each
             // of the dependencies, by recursively calling the
             // resolve() method.
             $newInstanceParams[] = $this->resolveDependencies(
-                $param->getClass()->getName(),
+                $className,
                 $arDepends
             );
         }
@@ -200,24 +145,17 @@ class ResolveDependencyMaker
      * @param string $interfaceClass Интерфейс.
      * @param array  $arDepends      Зависимости.
      *
-     * @return bool|mixed|string
+     * @return boolean|mixed|string
      */
     protected function tryResolveInterface(
         string $interfaceClass,
         array $arDepends = []
     ) {
-        if (empty($arDepends)) {
-            return false;
+        if ($this->container && $this->container->has($interfaceClass)) {
+            return $this->container->get($interfaceClass);
         }
 
-        foreach ($arDepends as $realization) {
-            $interfaces = class_implements($realization);
-            if (in_array($interfaceClass, $interfaces, true)) {
-                return $realization;
-            }
-        }
-
-        return '';
+        return parent::tryResolveInterface($interfaceClass, $arDepends);
     }
 
     /**
@@ -226,22 +164,16 @@ class ResolveDependencyMaker
      * @param string $abstractClass Абстрактный класс.
      * @param array  $arDepends     Зависимости.
      *
-     * @return bool|mixed|string
+     * @return boolean|mixed|string
      */
     protected function tryResolveAbstractClass(
         string $abstractClass,
         array $arDepends = []
     ) {
-        if (empty($arDepends)) {
-            return false;
+        if ($this->container && $this->container->has($abstractClass)) {
+            return $this->container->get($abstractClass);
         }
 
-        foreach ($arDepends as $realization) {
-            if (is_subclass_of($realization, $abstractClass)) {
-                return $realization;
-            }
-        }
-
-        return '';
+        return parent::tryResolveAbstractClass($abstractClass, $arDepends);
     }
 }

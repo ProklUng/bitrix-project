@@ -20,6 +20,7 @@ use Local\SymfonyTools\Framework\Listeners\StringResponseListener;
  * @since 05.09.2020
  * @since 07.09.2020 Light rewriting.
  * @since 11.09.2020 Упрощение.
+ * @since 21.10.2020 Доработки. Сеттеры и геттеры.
  */
 class DispatchController
 {
@@ -143,6 +144,22 @@ class DispatchController
     }
 
     /**
+     * Задать $_GET параметры.
+     *
+     * @param array $query Query параметры.
+     *
+     * @return $this
+     *
+     * @since 21.10.2020
+     */
+    public function setQuery(array $query) : self
+    {
+        $this->request->query->add($query);
+
+        return $this;
+    }
+
+    /**
      * Задать параметры Request.
      *
      * @param array $arParams Параметры (лягут в аттрибуты Request).
@@ -157,9 +174,21 @@ class DispatchController
     }
 
     /**
+     * Получить Response.
+     *
+     * @return Response
+     *
+     * @since 21.10.2020
+     */
+    public function getResponse(): Response
+    {
+        return $this->response;
+    }
+
+    /**
      * Задать дополнительного подписчика на события.
      *
-     * @param mixed $listener
+     * @param mixed $listener Слушатель.
      *
      * @return $this
      *

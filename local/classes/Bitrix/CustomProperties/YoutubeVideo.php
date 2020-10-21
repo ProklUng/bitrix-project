@@ -3,8 +3,8 @@
 namespace Local\Bitrix\CustomProperties;
 
 use Exception;
-use WebArch\BitrixIblockPropertyType\Abstraction\IblockPropertyTypeBase;
 use CFile;
+use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
 
 /**
  * Class YoutubeVideo
