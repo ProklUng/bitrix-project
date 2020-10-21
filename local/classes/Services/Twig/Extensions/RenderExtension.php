@@ -145,7 +145,7 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
             $content =  $response->getContent();
 
             // Ответ может быть зазипован.
-            $isGzipped = (mb_strpos($content , "\x1f" . "\x8b" . "\x08") === 0);
+            $isGzipped = mb_strpos($content, "\x1f" . "\x8b" . "\x08") === 0;
             if ($isGzipped) {
                 $content = gzdecode($content);
             }

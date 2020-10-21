@@ -4,6 +4,9 @@ namespace Local\Services\Twig\Tools;
 
 use Twig\Environment;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Class TemplateController
@@ -17,10 +20,15 @@ use Symfony\Component\HttpFoundation\Response;
 class TemplateController
 {
     /**
-     * @var Environment|null $twig
+     * @var Environment|null $twig Twig.
      */
     private $twig;
 
+    /**
+     * TemplateController constructor.
+     *
+     * @param Environment|null $twig Twig.
+     */
     public function __construct(Environment $twig = null)
     {
         $this->twig = $twig;
@@ -29,13 +37,17 @@ class TemplateController
     /**
      * Renders a template.
      *
-     * @param string $template The template name
-     * @param integer|null $maxAge Max age for client caching
-     * @param integer|null $sharedAge Max age for shared (proxy) caching
-     * @param integer|null $private Whether or not caching should apply for client caches only
-     * @param array $context The context (arguments) of the template
+     * @param string       $template  The template name.
+     * @param integer|null $maxAge    Max age for client caching.
+     * @param integer|null $sharedAge Max age for shared (proxy) caching.
+     * @param boolean|null $private   Whether or not caching should apply for client caches only.
+     * @param array        $context   The context (arguments) of the template.
      *
      * @return Response
+     *
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function templateAction(
         string $template,
@@ -68,13 +80,19 @@ class TemplateController
     }
 
     /**
-     * @param string $template The template name
-     * @param int|null $maxAge Max age for client caching
-     * @param int|null $sharedAge Max age for shared (proxy) caching
-     * @param bool|null $private Whether or not caching should apply for client caches only
-     * @param array $context The context (arguments) of the template
+     * Renders a template.
+     *
+     * @param string       $template  The template name.
+     * @param integer|null $maxAge    Max age for client caching.
+     * @param integer|null $sharedAge Max age for shared (proxy) caching.
+     * @param boolean|null $private   Whether or not caching should apply for client caches only.
+     * @param array        $context   The context (arguments) of the template.
      *
      * @return Response
+     *
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function __invoke(
         string $template,

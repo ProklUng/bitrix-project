@@ -2,7 +2,6 @@
 
 namespace Local\Services\Twig\Extensions;
 
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Twig_ExtensionInterface;
@@ -21,7 +20,7 @@ class BitrixPiecesExtension extends AbstractExtension implements Twig_ExtensionI
     /**
      * BitrixPiecesExtension constructor.
      *
-     * @param string $documentRoot
+     * @param string $documentRoot DOCUMENT_ROOT.
      */
     public function __construct(
         string $documentRoot
