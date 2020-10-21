@@ -30,6 +30,6 @@ services:
     tags:
       - { name: bitrix.property.type }
 
-  Local\Bitrix\CustomProperties\FormType:
+  Local\Bitrix\CustomProperties\BitrixFormType:
     tags:
       - { name: bitrix.property.type }
