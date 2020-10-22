@@ -62,6 +62,7 @@ class BitrixPiecesExtension extends AbstractExtension implements Twig_ExtensionI
     public function getHeader() : void
     {
         global $SiteExpireDate; // Убираем надпись о просрочке сайта.
+        global $APPLICATION;
 
         require($this->documentRoot . '/bitrix/modules/main/include/prolog.php');
     }
@@ -73,6 +74,8 @@ class BitrixPiecesExtension extends AbstractExtension implements Twig_ExtensionI
      */
     public function getFooter()
     {
+        global $APPLICATION;
+
         // Так исключается shutdown в системе обработки футеров Битрикса.
         require($this->documentRoot . SITE_TEMPLATE_PATH .'/footer.php');
     }
