@@ -100,7 +100,7 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
     /**
      * Twig команда render().
      *
-     * @param ControllerReference|string $controller Референс контроллера.
+     * @param ControllerReference|string $controller Референс контроллера или URL.
      * @param array                      $options    Опции.
      *
      * @return void
@@ -138,7 +138,7 @@ class RenderExtension extends AbstractExtension implements Twig_ExtensionInterfa
         $resolvedController = $this->parseControllerString($controllerClass);
 
         $this->dispatchController->setParams($attributes)
-            ->setQuery($query);
+                                 ->setQuery($query);
 
         if ($this->dispatchController->dispatch($resolvedController)) {
             $response = $this->dispatchController->getResponse();

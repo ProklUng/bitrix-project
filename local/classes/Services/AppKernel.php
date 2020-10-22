@@ -9,6 +9,7 @@ use Bitrix\Main\Application;
  * @package Local\Services
  *
  * @since 08.10.2020 kernel.site.host
+ * @since 22.10.2020 kernel.schema
  */
 class AppKernel
 {
@@ -95,7 +96,8 @@ class AppKernel
             'kernel.debug' => $this->debug,
             'kernel.cache_dir' => realpath($this->getCacheDir()),
             'kernel.http.host' => $_SERVER['HTTP_HOST'],
-            'kernel.site.host' => $this->getSiteHost()
+            'kernel.site.host' => $this->getSiteHost(),
+            'kernel.schema' => $this->getSchema()
         ];
     }
 
@@ -108,10 +110,20 @@ class AppKernel
      */
     private function getSiteHost() : string
     {
-        $schema =  (!empty($_SERVER['HTTPS'])
+        return $this->getSchema() . $_SERVER['HTTP_HOST'];
+    }
+
+    /**
+     * Schema http or https.
+     *
+     * @return string
+     *
+     * @since 22.10.2020
+     */
+    private function getSchema() : string
+    {
+        return (!empty($_SERVER['HTTPS'])
             && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443
         ) ? 'https://' : 'http://';
-
-        return $schema . $_SERVER['HTTP_HOST'];
     }
 }
