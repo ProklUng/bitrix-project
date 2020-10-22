@@ -21,6 +21,8 @@ services:
     class: Local\Util\Assets
     arguments: ['@build.path']
 
+  Local\Util\Assets: '@assets.manager'
+
   # Загрузчик иконок SVG.
   icons.svg:
     class: Local\Services\IconSvgLoaders

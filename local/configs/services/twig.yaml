@@ -89,3 +89,9 @@ services:
       - setContainer: ['@service_container']
     tags:
       - { name: twig.extension }
+
+  # Symfony Encore.
+  Local\Services\Twig\Extensions\SymfonyEncoreExtension:
+    arguments: ['@guta.assets']
+    tags:
+      - { name: twig.extension }
