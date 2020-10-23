@@ -95,3 +95,8 @@ services:
     arguments: ['@guta.assets']
     tags:
       - { name: twig.extension }
+
+  # json_decode.
+  Local\Services\Twig\Extensions\JsonDecodeExtension:
+    tags:
+      - { name: twig.extension }
