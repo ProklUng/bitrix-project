@@ -17,7 +17,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class BundlesLoader
 {
-    private const PATH_BUNDLES_CONFIG = '/configs/standalone_bundles.php';
+    private const PATH_BUNDLES_CONFIG = '/local/configs/standalone_bundles.php';
 
     /**
      * @var ContainerBuilder $container Контейнер.
