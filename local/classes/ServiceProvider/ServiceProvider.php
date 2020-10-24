@@ -5,6 +5,8 @@ namespace Local\ServiceProvider;
 use Bitrix\Main\Application;
 use CMain;
 use Exception;
+use InvalidArgumentException;
+use Local\ServiceProvider\Bundles\BundlesLoader;
 use Local\ServiceProvider\CompilePasses\AggregatedTaggedServicesPass;
 use Local\Util\ErrorScreen;
 use Local\Util\LoaderContent;
@@ -28,6 +30,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * @since 21.09.2020 Исправление ошибки: сервисы, помеченные к автозагрузке не запускались в
  * случае компилированного контейнера.
  * @since 28.09.2020 Доработка.
+ * @since 24.10.2020 Загрузка "автономных" бандлов Symfony.
  */
 class ServiceProvider
 {
@@ -177,7 +180,7 @@ class ServiceProvider
 
         /** Путь к скомпилированному контейнеру. */
         $compiledContainerFile = $this->projectRoot . self::COMPILED_CONTAINER_DIR
-                                 . self::COMPILED_CONTAINER_FILE;
+            . self::COMPILED_CONTAINER_FILE;
 
         $containerConfigCache = new ConfigCache($compiledContainerFile, true);
         // Класс скомпилированного контейнера.
@@ -226,6 +229,9 @@ class ServiceProvider
     protected function loadContainer(string $fileName)
     {
         self::$containerBuilder = new ContainerBuilder();
+
+        // Пассы бандлов нужно пускать раньше всех остальных.
+        $this->loadSymfonyBundless();
 
         // Набор стандартных Compile Pass
         $passes = new PassConfig();
@@ -326,6 +332,23 @@ class ServiceProvider
                 $this->errorHandler->die('An error occurred while creating your directory at '.$exception->getPath());
             }
         }
+    }
+
+    /**
+     * Загрузка "автономных" бандлов Symfony.
+     *
+     * @return void
+     *
+     * @throws InvalidArgumentException Не найден класс бандла.
+     *
+     * @since 24.10.2020
+     */
+    private function loadSymfonyBundless() : void
+    {
+        $bundlesLoader = new BundlesLoader(
+            self::$containerBuilder
+        );
+        $bundlesLoader->load();
     }
 
     /**
