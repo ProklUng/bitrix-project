@@ -94,7 +94,7 @@ class BundlesLoader
     private function loadYmlConfig(string $sectionConfig) : array
     {
         try {
-            return Yaml::parseFile($_SERVER['DOCUMENT_ROOT'] . '/config/packages/' . $sectionConfig . '.yaml');
+            return Yaml::parseFile($_SERVER['DOCUMENT_ROOT'] . '/local/configs/packages/' . $sectionConfig . '.yaml');
         } catch (ParseException $e) {
             return [];
         }
