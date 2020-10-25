@@ -134,4 +134,33 @@ class AppKernel extends Kernel
             }
         }
     }
+    
+    /**
+     * Регистрация одного бандла.
+     *
+     * @param object $bundle Бандл.
+     */
+    public function registerBundle($bundle) : void
+    {
+        $name = $bundle->getName();
+        if (isset($this->bundles[$name])) {
+            throw new LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));
+        }
+
+        $this->bundles[$name] = $bundle;
+    }
+
+    /**
+     * Регистрация "отдельностоящих" бандлов.
+     *
+     * @return void
+     *
+     * @since 25.10.2020
+     */
+    private function registerStandaloneBundles(): void
+    {
+        foreach (BundlesLoader::getBundlesMap() as $bundle) {
+            $this->registerBundle($bundle);
+        }
+    }
 }
