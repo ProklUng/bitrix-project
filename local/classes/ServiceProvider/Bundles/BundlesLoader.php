@@ -75,6 +75,7 @@ class BundlesLoader
 
             $extension = $bundle->getContainerExtension();
             if ($extension !== null) {
+                $bundle->boot();
                 $config = $this->loadYmlConfig($extension->getAlias());
                 $extension->load($config, $this->container);
                 $bundle->build($this->container);
