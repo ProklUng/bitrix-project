@@ -47,6 +47,9 @@ services:
   kernel:
     class: Local\Services\AppKernel
     arguments: ['%debug%']
+    
+  Symfony\Component\HttpKernel\KernelInterface: '@kernel'
+  Symfony\Component\HttpKernel\Kernel: '@kernel'  
 
   # Опции приложения.
   app.options:
