@@ -7,7 +7,6 @@ use CMain;
 use Exception;
 use InvalidArgumentException;
 use Local\ServiceProvider\Bundles\BundlesLoader;
-use Local\ServiceProvider\CompilePasses\AggregatedTaggedServicesPass;
 use Local\Util\ErrorScreen;
 use Local\Util\LoaderContent;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
@@ -77,7 +76,8 @@ class ServiceProvider
      * ServiceProvider constructor.
      *
      * @param string $filename Конфиг.
-     * @throws Exception
+     *
+     * @throws Exception Ошибка инициализации контейнера.
      */
     public function __construct(
         string $filename = self::SERVICE_CONFIG_FILE
@@ -118,10 +118,10 @@ class ServiceProvider
     /**
      * Сервис по ключу.
      *
-     * @param string $id
+     * @param string $id ID сервиса.
      *
      * @return mixed
-     * @throws Exception
+     * @throws Exception Ошибки контейнера.
      */
     public function get(string $id)
     {
@@ -141,7 +141,9 @@ class ServiceProvider
     /**
      * Жестко установить контейнер.
      *
-     * @param PsrContainerInterface $container
+     * @param PsrContainerInterface $container Контейнер.
+     *
+     * @return void
      */
     public function setContainer(PsrContainerInterface $container): void
     {
@@ -151,7 +153,7 @@ class ServiceProvider
     /**
      * Инициализировать контейнер.
      *
-     * @param string $fileName
+     * @param string $fileName Yaml конфиг.
      *
      * @return mixed
      *
@@ -180,7 +182,7 @@ class ServiceProvider
 
         /** Путь к скомпилированному контейнеру. */
         $compiledContainerFile = $this->projectRoot . self::COMPILED_CONTAINER_DIR
-            . self::COMPILED_CONTAINER_FILE;
+                                 . self::COMPILED_CONTAINER_FILE;
 
         $containerConfigCache = new ConfigCache($compiledContainerFile, true);
         // Класс скомпилированного контейнера.
@@ -231,7 +233,7 @@ class ServiceProvider
         self::$containerBuilder = new ContainerBuilder();
 
         // Пассы бандлов нужно пускать раньше всех остальных.
-        $this->loadSymfonyBundless();
+        $this->loadSymfonyBundles();
 
         // Набор стандартных Compile Pass
         $passes = new PassConfig();
@@ -299,11 +301,12 @@ class ServiceProvider
         return self::$containerBuilder;
     }
 
-
     /**
      * Параметры из сервиса kernel (если он существует).
      *
-     * @throws Exception
+     * @return void
+     *
+     * @throws Exception Ошибки контейнера.
      */
     private function setDefaultParamsContainer() : void
     {
@@ -322,6 +325,8 @@ class ServiceProvider
 
     /**
      * Если надо создать директорию для компилированного контейнера.
+     *
+     * @return void
      */
     protected function createCacheDirectory() : void
     {
@@ -343,12 +348,14 @@ class ServiceProvider
      *
      * @since 24.10.2020
      */
-    private function loadSymfonyBundless() : void
+    private function loadSymfonyBundles() : void
     {
         $bundlesLoader = new BundlesLoader(
             self::$containerBuilder
         );
-        $bundlesLoader->load();
+
+        $bundlesLoader->load(); // Загрузить бандлы.
+        $bundlesLoader->registerExtensions(); // Зарегистрировать extensions.
     }
 
     /**
@@ -380,9 +387,8 @@ class ServiceProvider
      * @param string $method Метод. В данном случае instance().
      * @param mixed  $args   Аргументы (конфигурационный файл).
      *
-     *
      * @return mixed | void
-     * @throws Exception
+     * @throws Exception Ошибки контейнера.
      */
     public static function __callStatic(string $method, $args = null)
     {
