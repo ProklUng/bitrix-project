@@ -3,6 +3,8 @@
 namespace Local\Services;
 
 use Bitrix\Main\Application;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Class AppKernel
@@ -10,8 +12,9 @@ use Bitrix\Main\Application;
  *
  * @since 08.10.2020 kernel.site.host
  * @since 22.10.2020 kernel.schema
+ * @since 25.10.2020 Наследование от HttpKernel.
  */
-class AppKernel
+class AppKernel extends Kernel
 {
     /**
      * @var string $environment Окружение.
@@ -37,26 +40,8 @@ class AppKernel
     {
         $this->debug = (bool)$debug;
         $this->environment = $this->debug ? 'dev' : 'prod';
-    }
 
-    /**
-     * Геттер окружения.
-     *
-     * @return string
-     */
-    public function getEnvironment(): string
-    {
-        return $this->environment;
-    }
-
-    /**
-     * Debug?
-     *
-     * @return boolean
-     */
-    public function isDebug(): bool
-    {
-        return $this->debug;
+        parent::__construct($this->environment, $this->debug);
     }
 
     /**
@@ -123,7 +108,30 @@ class AppKernel
     private function getSchema() : string
     {
         return (!empty($_SERVER['HTTPS'])
-            && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443
+            && ($_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] === 443)
         ) ? 'https://' : 'http://';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function registerContainerConfiguration(LoaderInterface $loader)
+    {
+    }
+
+    /**
+     * Регистрация бандла.
+     *
+     * @return iterable
+     */
+    public function registerBundles(): iterable
+    {
+        $contents = require $this->getProjectDir() . '/local/configs/bundles.php';
+
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
     }
 }
