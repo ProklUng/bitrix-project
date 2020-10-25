@@ -1,24 +1,25 @@
 <?php
 
-namespace Fedy\SymfonyDI\Bundles;
+namespace Local\ServiceProvider\Bundles;
 
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class BundlesLoader
- * @package Fedy\SymfonyDI\Bundles
+ * @package Local\ServiceProvider\Bundles
  * Загрузчик бандлов.
  *
  * @since 24.10.2020
- * @since 25.10.2020 Доработка.
  */
 class BundlesLoader
 {
-    private const PATH_BUNDLES_CONFIG = '/config/standalone_bundles.php';
+    /** @const string PATH_BUNDLES_CONFIG Путь к конфигурационному файлу. */
+    private const PATH_BUNDLES_CONFIG = '/local/configs/standalone_bundles.php';
 
     /**
      * @var ContainerBuilder $container Контейнер.
@@ -29,6 +30,11 @@ class BundlesLoader
      * @var array Конфигурация бандлов.
      */
     private $bundles = [];
+
+    /**
+     * @var array $bundlesMap Инициализированные классы бандлов.
+     */
+    private static $bundlesMap = [];
 
     /**
      * BundlesLoader constructor.
@@ -58,7 +64,7 @@ class BundlesLoader
      */
     public function load() : void
     {
-        foreach ($this->bundles as $bundleClass => $data) {
+        foreach ($this->bundles as $bundleClass => $envs) {
             if (!class_exists($bundleClass)) {
                 throw new InvalidArgumentException(
                     sprintf(
@@ -78,9 +84,45 @@ class BundlesLoader
                 $bundle->boot();
                 $config = $this->loadYmlConfig($extension->getAlias());
                 $extension->load($config, $this->container);
+                $bundle->setContainer($this->container);
                 $bundle->build($this->container);
+
+                $this->container->registerExtension($extension);
+
+                // Сохраняю инстанцированный бандл в статику.
+                self::$bundlesMap[$bundle->getName()] = $bundle;
             }
         }
+    }
+
+    /**
+     * Регистрация extensions.
+     *
+     * @return void
+     */
+    public function registerExtensions() : void
+    {
+        // Extensions in container.
+        $extensions = [];
+        foreach ($this->container->getExtensions() as $extension) {
+            $extensions[] = $extension->getAlias();
+        }
+
+        // ensure these extensions are implicitly loaded
+        $this->container->getCompilerPassConfig()
+            ->setMergePass(
+                new MergeExtensionConfigurationPass($extensions)
+            );
+    }
+
+    /**
+     * Инстанцы бандлов.
+     *
+     * @return array
+     */
+    public static function getBundlesMap() : array
+    {
+        return self::$bundlesMap;
     }
 
     /**
