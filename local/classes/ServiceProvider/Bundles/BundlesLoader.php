@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\ServiceProvider\Bundles;
+namespace Fedy\SymfonyDI\Bundles;
 
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -10,14 +10,15 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class BundlesLoader
- * @package Local\ServiceProvider\Bundles
+ * @package Fedy\SymfonyDI\Bundles
  * Загрузчик бандлов.
  *
  * @since 24.10.2020
+ * @since 25.10.2020 Доработка.
  */
 class BundlesLoader
 {
-    private const PATH_BUNDLES_CONFIG = '/local/configs/standalone_bundles.php';
+    private const PATH_BUNDLES_CONFIG = '/config/standalone_bundles.php';
 
     /**
      * @var ContainerBuilder $container Контейнер.
@@ -61,7 +62,7 @@ class BundlesLoader
             if (!class_exists($bundleClass)) {
                 throw new InvalidArgumentException(
                     sprintf(
-                        'Bundle class % not exist.',
+                        'Bundle class %s not exist.',
                         $bundleClass
                     )
                 );
@@ -72,9 +73,12 @@ class BundlesLoader
              */
             $bundle = new $bundleClass;
 
-            $config = $this->loadYmlConfig($bundle->getContainerExtension()->getAlias());
-            $bundle->getContainerExtension()->load($config, $this->container);
-            $bundle->build($this->container);
+            $extension = $bundle->getContainerExtension();
+            if ($extension !== null) {
+                $config = $this->loadYmlConfig($extension->getAlias());
+                $extension->load($config, $this->container);
+                $bundle->build($this->container);
+            }
         }
     }
 
