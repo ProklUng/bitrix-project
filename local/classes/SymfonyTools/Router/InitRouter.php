@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
@@ -51,16 +52,23 @@ class InitRouter
      */
     private $controllerResolver;
 
+    /**
+     * @var ArgumentResolverInterface $argumentResolver Argument Resolver.
+     */
+    protected $argumentResolver;
+
     /** @var array $defaultSubscribers Подписчики на события по умолчанию. */
     private $defaultSubscribers;
 
     /**
      * InitRouter constructor.
      *
-     * @param RouteCollection          $routeCollection Коллекция роутов.
-     * @param ErrorControllerInterface $errorController Error controller.
-     * @param EventDispatcher          $dispatcher      Event dispatcher.
-     * @param Request|null             $request         Request.
+     * @param RouteCollection             $routeCollection    Коллекция роутов.
+     * @param ErrorControllerInterface    $errorController    Error controller.
+     * @param EventDispatcher             $dispatcher         Event dispatcher.
+     * @param ControllerResolverInterface $controllerResolver Controller resolver.
+     * @param ArgumentResolverInterface   $argumentResolver   Argument resolver.
+     * @param Request|null                $request            Request.
      *
      * @since 16.09.2020 Инициализация RequestContext.
      */
@@ -68,12 +76,15 @@ class InitRouter
         RouteCollection $routeCollection,
         ErrorControllerInterface $errorController,
         EventDispatcher $dispatcher,
+        ControllerResolverInterface $controllerResolver,
+        ArgumentResolverInterface $argumentResolver,
         Request $request = null
     ) {
         $this->request = $request ?? Request::createFromGlobals();
         $this->errorController = $errorController;
         $this->dispatcher = $dispatcher;
-        $this->controllerResolver = new ControllerResolver();
+        $this->controllerResolver = $controllerResolver;
+        $this->argumentResolver = $argumentResolver;
 
         // RequestContext init.
         $requestContext = new RequestContext();
@@ -102,7 +113,12 @@ class InitRouter
     public function handle(): void
     {
         // Setup framework kernel
-        $framework = new HttpKernel($this->dispatcher, $this->controllerResolver);
+        $framework = new HttpKernel(
+            $this->dispatcher,
+            $this->controllerResolver,
+            null,
+            $this->argumentResolver
+        );
 
         try {
             $response = $framework->handle($this->request);
