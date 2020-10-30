@@ -27,8 +27,9 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @since 07.09.2020
  * @since 09.09.2020 Проброс Error Controller снаружи.
- * @since 11.09.20202 Переработка.
- * @since 16.09.20202 Доработка. RequestContext.
+ * @since 11.09.2020 Переработка.
+ * @since 16.09.2020 Доработка. RequestContext.
+ * @since 30.10.2020 ArgumentResolver пробрасывается снаружи.
  */
 class InitRouter
 {
