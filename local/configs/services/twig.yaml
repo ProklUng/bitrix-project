@@ -100,3 +100,8 @@ services:
   Local\Services\Twig\Extensions\JsonDecodeExtension:
     tags:
       - { name: twig.extension }
+
+  # inline_css.
+  Local\Services\Twig\Extensions\CssInlinerExtension:
+    tags:
+      - { name: twig.extension }
