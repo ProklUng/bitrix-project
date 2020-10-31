@@ -12,7 +12,6 @@ imports:
   - {resource: services/bitrix.yaml }
   - {resource: services/image_resizer.yaml }
   - {resource: services/csrf.yaml }
-  - {resource: services/testing.yaml }
   - {resource: services/seo.yaml }
   - {resource: services/controllers.yaml }
   - {resource: services/custom_properties.yaml }
