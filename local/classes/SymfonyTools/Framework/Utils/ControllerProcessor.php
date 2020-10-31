@@ -3,14 +3,14 @@
 namespace Local\SymfonyTools\Framework\Utils;
 
 use Closure;
+use Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer;
+use Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware;
 use Psr\Container\ContainerInterface;
 use Local\SymfonyTools\Framework\Exceptions\ArgumentsControllersException;
 use Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMaker;
 use Local\SymfonyTools\Framework\Interfaces\InjectorControllerInterface;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -23,6 +23,7 @@ use ReflectionObject;
  *
  * @since 05.09.2020
  * @since 10.09.2020 PSR-2 форматирование.
+ * @since 31.10.2020 Фикс ошибки рефлексии параметра, не имеющего значения по умолчанию.
  */
 class ControllerProcessor implements InjectorControllerInterface
 {
@@ -32,6 +33,11 @@ class ControllerProcessor implements InjectorControllerInterface
     private $resolveDependencyMaker;
 
     /**
+     * @var ResolveParamsFromContainer $resolveParamsFromContainer Ресолвер параметров и сервисов из контейнера.
+     */
+    private $resolveParamsFromContainer;
+
+    /**
      * @var ContainerInterface $container Сервис-контейнер.
      */
     private $container;
@@ -39,15 +45,18 @@ class ControllerProcessor implements InjectorControllerInterface
     /**
      * ControllerProcessor constructor.
      *
-     * @param ContainerInterface     $container       Сервис-контейнер.
-     * @param ResolveDependencyMaker $dependencyMaker Разрешитель зависимостей.
+     * @param ContainerInterface                   $container                  Сервис-контейнер.
+     * @param ResolveDependencyMakerContainerAware $dependencyMaker            Разрешитель зависимостей.
+     * @param ResolveParamsFromContainer           $resolveParamsFromContainer Разрешитель зависимостей переменных и сервисов.
      */
     public function __construct(
         ContainerInterface $container,
-        ResolveDependencyMaker $dependencyMaker
+        ResolveDependencyMakerContainerAware $dependencyMaker,
+        ResolveParamsFromContainer $resolveParamsFromContainer
     ) {
         $this->container = $container;
         $this->resolveDependencyMaker = $dependencyMaker;
+        $this->resolveParamsFromContainer = $resolveParamsFromContainer;
     }
 
     /**
@@ -88,61 +97,83 @@ class ControllerProcessor implements InjectorControllerInterface
 
         // Загнать аргументы в контроллер.
         foreach ($arArguments as $param => $argItem) {
-            // Ресолвинг переменных из контейнера.
-            if (strpos($argItem, '%') === 0) {
-                $containerVar = str_replace('%', '', $argItem);
+            if (is_object($argItem)) {
+                $event->getRequest()->attributes->set($param, $argItem);
+                continue;
+            }
 
-                /** @var Reference|string $resolvedVarValue Референс сервиса. */
-                $resolvedVarValue = $this->container->getParameter($containerVar);
+            // Массив.
+            if (is_array($argItem)) {
+                $event->getRequest()->attributes->set(
+                    $param,
+                    $this->resolveParamsInArrayRecursively($argItem)
+                );
+                continue;
+            }
 
-                // Референс сервиса: ID отдается через __toString.
-                // Просто строка - не повредит привести к строке.
-                if ($this->container->has((string)$resolvedVarValue)) {
-                    $resolvedVarValue = '@' . (string)$resolvedVarValue;
-                }
-
-                $event->getRequest()->attributes->set($param, $resolvedVarValue);
-
-                $argItem = $resolvedVarValue;
-                // Продолжаем дальше, потому что в переменной может быть алиас сервиса.
+            // Ресолвинг всего чего можно из контейнера.
+            $resolvedFromContainer = $this->resolveParamsFromContainer->resolve($argItem);
+            if ($resolvedFromContainer !== null) {
+                $event->getRequest()->attributes->set($param, $resolvedFromContainer);
+                continue;
             }
 
             // Всегда в начале пытаться достать из контейнера.
-            // Но только, если не передали параметр снаружи!
-            if (empty($event->getRequest()->attributes->get($param))
+            // Не вынес в метод, потому что дело касается только основного цикла инжекции.
+            if (!is_object($event->getRequest()->attributes->get($param)) // На всякий случай!
                 &&
                 $this->container->has($argItem)
             ) {
-                $resolvedService = $this->container->get($argItem);
-
-                $event->getRequest()->attributes->set($param, $resolvedService);
+                $event->getRequest()->attributes->set($param, $this->container->get($argItem));
                 continue;
             }
 
-            // Если использован алиас сервиса, то попробовать получить его из контейнера.
-            if (strpos($argItem, '@') === 0) {
-                $serviceName = ltrim($argItem, '@');
-
-                try {
-                    $resolvedService = $this->container->get($serviceName);
-                } catch (ServiceNotFoundException $e) {
-                    throw new ArgumentsControllersException(
-                        'Сервис '.$serviceName.' не найден'
-                    );
-                }
-
-                $event->getRequest()->attributes->set($param, $resolvedService);
-                continue;
-            }
-
+            // Крайний случай. Разрешить зависимости во всю рекурсивную глубину.
             if (class_exists($argItem)) {
-                // Разрешить зависимости во всю рекурсивную глубину.
                 $resolved = $this->resolveDependencyMaker->resolveDependencies($argItem);
                 $event->getRequest()->attributes->set($param, $resolved);
+                continue;
+            }
+
+            // Значения по умолчанию. Когда ничего не получилось.
+            if ($argItem !== null) {
+                $event->getRequest()->attributes->set($param, $argItem);
             }
         }
 
         return $event;
+    }
+
+    /**
+     * Массив со значениями по умолчанию обработать рекурсивно. Попутно разрешить
+     * сервисы из контейнера. Но игнорить классы как параметры.
+     *
+     * @param array $array Параметры в виде массива.
+     *
+     * @return array
+     *
+     * @since 28.10.2020
+     */
+    protected function resolveParamsInArrayRecursively(array $array) : array
+    {
+        $result = [];
+
+        foreach ($array as $param => $argItem) {
+            if (is_array($argItem)) {
+                $result[$param] = $this->resolveParamsInArrayRecursively($argItem);
+                continue;
+            }
+
+            if (is_string($argItem)) {
+                // Ресолвинг всего чего можно из контейнера.
+                $resolvedFromContainer = $this->resolveParamsFromContainer->resolve($argItem);
+                $argItem = $resolvedFromContainer ?? $argItem;
+            }
+
+            $result[$param] = $argItem;
+        }
+
+        return $result;
     }
 
     /**
@@ -205,14 +236,32 @@ class ControllerProcessor implements InjectorControllerInterface
      *
      * @return array
      * @throws ReflectionException Ошибки рефлексии.
+     *
+     * @since 28.10.2020 Обработка значений по умолчанию.
+     * @since 31.10.2020 Фикс ошибки рефлексии параметра, не имеющего значения по умолчанию.
      */
-    protected function getTypesArguments($controller): array
+    protected function getTypesArguments($controller) : array
     {
         $arResult = [];
 
         $reflection = $this->reflectionController($controller);
+
         foreach ($reflection->getParameters() as $param) {
             $class = $param->getClass();
+            if (!$class) {
+                // Обработка значений по умолчанию.
+                try {
+                    $defaultValue = $param->getDefaultValue();
+                } catch (ReflectionException $e) {
+                    $defaultValue = null;
+                }
+
+                if ($defaultValue !== null) {
+                    $arResult[$param->getName()] = $defaultValue;
+                }
+
+                continue;
+            }
 
             // Не дать проскочить абстрактным классам.
             if (!$class
