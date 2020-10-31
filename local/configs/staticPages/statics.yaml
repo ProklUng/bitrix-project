@@ -6,6 +6,10 @@ simple_static_page:
   defaults:
     template:  './static/example2.twig'
     context:
+      object:
+        errored: true
+        finished: true
+        pending: true
       site_name: 'Example site'
       page_type: 'static-page'
       title: 'Простая статическая страница'

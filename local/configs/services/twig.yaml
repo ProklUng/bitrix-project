@@ -105,3 +105,8 @@ services:
   Local\Services\Twig\Extensions\CssInlinerExtension:
     tags:
       - { name: twig.extension }
+
+  # html_classes.
+  Fedy\Services\Twig\Extensions\HtmlExtension:
+    tags:
+      - { name: twig.extension }
