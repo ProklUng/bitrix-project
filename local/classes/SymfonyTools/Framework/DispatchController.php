@@ -3,8 +3,9 @@
 namespace Local\SymfonyTools\Framework;
 
 use Exception;
-use Local\SymfonyTools\Framework\Controllers\ErrorControllerInterface;
+use Local\SymfonyTools\Framework\Controllers\ErrorJsonController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,8 +20,10 @@ use Local\SymfonyTools\Framework\Listeners\StringResponseListener;
  *
  * @since 05.09.2020
  * @since 07.09.2020 Light rewriting.
- * @since 11.09.2020 Упрощение.
- * @since 21.10.2020 Доработки. Сеттеры и геттеры.
+ * @since 11.09.2020 Доработки.
+ * @since 21.10.2020 Доработки. Сеттеры и геттеры. Заголовки.
+ * @since 24.10.2020 ErrorJsonController прибывает снаружи.
+ * @since 31.10.2020 ArgumentResolverInterface пробрасывается снаружи.
  */
 class DispatchController
 {
@@ -45,30 +48,36 @@ class DispatchController
     private $controllerResolver;
 
     /**
-     * @var ErrorControllerInterface $errorController Error Controller.
+     * @var ArgumentResolverInterface $argumentResolver Argument Resolver.
      */
-    private $errorController;
+    protected $argumentResolver;
 
     /** @var array $defaultSubscribers Подписчики на события по умолчанию. */
     private $defaultSubscribers;
 
+    /** @var array $headers Заголовки запроса. */
+    private $headers = [];
+
     /**
      * DispatchController constructor.
      *
-     * @param EventDispatcherInterface    $dispatcher         Диспетчер событий.
-     * @param ErrorControllerInterface    $errorController    Error controller.
-     * @param ControllerResolverInterface $controllerResolver Разрешитель контроллеров.
-     * @param Request|null                $request            Request.
+     * @param EventDispatcherInterface    $dispatcher          Диспетчер событий.
+     * @param ControllerResolverInterface $controllerResolver  Разрешитель контроллеров.
+     * @param ArgumentResolverInterface   $argumentResolver    Argument resolver.
+     * @param ErrorJsonController         $errorJsonController Ошибки в JSON.
+     * @param Request|null                $request             Request.
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        ErrorControllerInterface $errorController,
         ControllerResolverInterface $controllerResolver,
+        ArgumentResolverInterface $argumentResolver,
+        ErrorJsonController $errorJsonController,
         Request $request = null
     ) {
         $this->dispatcher = $dispatcher;
+
         $this->controllerResolver = $controllerResolver;
-        $this->errorController = $errorController;
+        $this->argumentResolver = $argumentResolver;
 
         $this->request = $request ?? Request::createFromGlobals();
 
@@ -76,7 +85,7 @@ class DispatchController
         $this->defaultSubscribers = [
             new StringResponseListener(),
             new ErrorListener(
-                [$this->errorController, 'exceptionAction']
+                [$errorJsonController, 'exceptionAction']
             ),
             new ResponseListener('UTF-8')
         ];
@@ -97,16 +106,24 @@ class DispatchController
     ): bool {
         // Задать контроллер
         $this->request->attributes->set(
-            '_controller',
-            $controllerAction
+            '_controller', $controllerAction
         );
+
+        $this->request->headers->add($this->headers);
 
         $this->addSubscribers($this->defaultSubscribers);
 
-        $framework = new HttpKernel($this->dispatcher, $this->controllerResolver);
+        $framework = new HttpKernel(
+            $this->dispatcher,
+            $this->controllerResolver,
+            null,
+            $this->argumentResolver
+        );
 
         try {
-            $this->response = $framework->handle($this->request);
+            $this->response = $framework->handle(
+                $this->request
+            );
         } catch (Exception $e) {
             return false;
         }
@@ -160,6 +177,22 @@ class DispatchController
     }
 
     /**
+     * Задать заголовки запроса.
+     *
+     * @param array $headers Заголовки.
+     *
+     * @return $this
+     *
+     * @since 21.10.2020
+     */
+    public function setHeaders(array $headers): self
+    {
+        $this->headers = $headers;
+
+        return $this;
+    }
+
+    /**
      * Задать параметры Request.
      *
      * @param array $arParams Параметры (лягут в аттрибуты Request).
@@ -174,21 +207,9 @@ class DispatchController
     }
 
     /**
-     * Получить Response.
-     *
-     * @return Response
-     *
-     * @since 21.10.2020
-     */
-    public function getResponse(): Response
-    {
-        return $this->response;
-    }
-
-    /**
      * Задать дополнительного подписчика на события.
      *
-     * @param mixed $listener Слушатель.
+     * @param mixed $listener
      *
      * @return $this
      *
@@ -201,6 +222,18 @@ class DispatchController
         }
 
         return $this;
+    }
+
+    /**
+     * Получить Response.
+     *
+     * @return Response
+     *
+     * @since 21.10.2020
+     */
+    public function getResponse(): Response
+    {
+        return $this->response;
     }
 
     /**

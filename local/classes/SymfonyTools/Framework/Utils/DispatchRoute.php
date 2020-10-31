@@ -6,6 +6,7 @@ use Exception;
 use InvalidArgumentException;
 use Local\SymfonyTools\Framework\Controllers\ErrorControllerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,12 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * Class DispatchRoute
  * Исполнить роут.
- * @package Local\SymfonyTools\Framework\Utils
+ * @package Local\SymfonyTools\Framework
  *
- * @since 18.09.2020
+ * @since 17.09.2020
+ * @since 18.09.2020 Доработки.
+ * @since 21.10.2020 Убрал лишний catch.
+ * @since 31.10.2020 ArgumentResolverInterface пробрасывается снаружи.
  */
 class DispatchRoute
 {
@@ -49,7 +53,7 @@ class DispatchRoute
     private $controllerResolver;
 
     /**
-     * @var RouteCollection $routes Коллекция роутов.
+     * @var RouteCollection
      */
     private $routes;
 
@@ -59,9 +63,9 @@ class DispatchRoute
     private $requestContext;
 
     /**
-     * @var ErrorControllerInterface $errorController Error Controller.
+     * @var ArgumentResolverInterface $argumentResolver Argument Resolver.
      */
-    private $errorController;
+    protected $argumentResolver;
 
     /** @var array $defaultSubscribers Подписчики на события по умолчанию. */
     private $defaultSubscribers;
@@ -75,21 +79,20 @@ class DispatchRoute
     /**
      * DispatchRoute constructor.
      *
-     * @param RouteCollection             $routes             Коллекция роутов.
      * @param EventDispatcherInterface    $dispatcher         Диспетчер событий.
      * @param ErrorControllerInterface    $errorController    Error controller.
      * @param ControllerResolverInterface $controllerResolver Разрешитель контроллеров.
+     * @param ArgumentResolverInterface   $argumentResolver   Argument resolver.
      */
     public function __construct(
-        RouteCollection $routes,
         EventDispatcherInterface $dispatcher,
         ErrorControllerInterface $errorController,
-        ControllerResolverInterface $controllerResolver
+        ControllerResolverInterface $controllerResolver,
+        ArgumentResolverInterface $argumentResolver
     ) {
-        $this->routes = $routes;
         $this->dispatcher = $dispatcher;
         $this->controllerResolver = $controllerResolver;
-        $this->errorController = $errorController;
+        $this->argumentResolver = $argumentResolver;
 
         $this->request = Request::createFromGlobals();
         $this->initContext();
@@ -98,7 +101,7 @@ class DispatchRoute
         $this->defaultSubscribers = [
             new StringResponseListener(),
             new ErrorListener(
-                [$this->errorController, 'exceptionAction']
+                [$errorController, 'exceptionAction']
             ),
             new ResponseListener('UTF-8')
         ];
@@ -111,6 +114,8 @@ class DispatchRoute
      * @param array  $payload Параметры запроса.
      *
      * @return false | Response
+     *
+     * @since 18.09.2020
      */
     public function post(string $url, array $payload = [])
     {
@@ -128,6 +133,8 @@ class DispatchRoute
      * @param array  $payload Параметры запроса.
      *
      * @return false | Response
+     *
+     * @since 18.09.2020
      */
     public function get(string $url, array $payload = [])
     {
@@ -145,6 +152,8 @@ class DispatchRoute
      *
      * @return false | Response
      *
+     * @since 31.10.2020 ArgumentResolverInterface пробрасывается снаружи.
+     *
      */
     public function dispatch(string $url)
     {
@@ -161,7 +170,12 @@ class DispatchRoute
 
         $this->addSubscribers($this->defaultSubscribers);
 
-        $framework = new HttpKernel($this->dispatcher, $this->controllerResolver);
+        $framework = new HttpKernel(
+            $this->dispatcher,
+            $this->controllerResolver,
+            null,
+            $this->argumentResolver
+        );
 
         try {
             $this->response = $framework->handle($this->request);
@@ -197,6 +211,8 @@ class DispatchRoute
      * @param array $arParams Параметры (лягут в аттрибуты Request).
      *
      * @return $this
+     *
+     * @since 18.09.2020
      */
     public function setParams(array $arParams): self
     {
@@ -204,10 +220,10 @@ class DispatchRoute
             return $this;
         }
 
-        if ($this->method !== 'GET') {
-            $this->request->request->add($arParams);
-        } else {
+        if ($this->method === 'GET') {
             $this->request->query->add($arParams);
+        } else {
+            $this->request->request->add($arParams);
         }
 
         // Переинциализировать RequestContext.
@@ -284,6 +300,8 @@ class DispatchRoute
      * @param string $uri URL.
      *
      * @return array
+     *
+     * @since 21.10.2020 Убрал лишний catch.
      */
     private function getRouteInfo(string $uri) : array
     {
@@ -293,9 +311,7 @@ class DispatchRoute
 
         try {
             return $matcher->match($uri);
-        } catch (ResourceNotFoundException $e) {
-            return [];
-        } catch (MethodNotAllowedException $e) {
+        } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
             return [];
         }
     }

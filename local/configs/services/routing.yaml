@@ -1,11 +1,6 @@
-##########
-# Роутер
-##########
-
-parameters:
-  router.request_context.host: localhost
-  router.request_context.scheme: http
-  router.request_context.base_url: ~
+###########
+# Роутинг
+###########
 
 services:
   # конфигурация по умолчанию в *этом* файле
@@ -14,132 +9,122 @@ services:
     autoconfigure: true
     public: true
 
-  # Инициализация роутера Symfony.
-  # custom.events.init: если ['custom.events.init'], то инициализация пойдет через трэйт Eventable.
-  # Если -  { name: 'custom.events.init', event: 'template_redirect', method: 'router', priority: 5 }
-  # то вызовется метод с приоритетом.
-  symfony_router:
-    class: Fedy\Services\SymfonyRouter
-    arguments:
-      - '@symfony.routes.collection'
-      - '@json.error.controller'
-      - '@event_dispatcher'
-      - '@Symfony\Component\HttpKernel\Controller\ControllerResolver'
-      - '@argument_resolver'
-      - '@global.request'
-    tags:
-      - { name: 'custom.events.init', event: 'template_redirect', type: 'add_action', method: 'router', priority: 5 }
-
-  # Конечный сервис чтения и загрузки анотированных роутов.
-  load.annotated.routes:
-    class: Fedy\Services\Router\Annotations\LoadAnnotatedRoutes
-    arguments: ['@class.collector', '@symfony.loader.annotated.routes']
-
-  # Symfony загрузчик аннотированных роутов.
-  symfony.loader.annotated.routes:
-    class: Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader
-    arguments: ['@Local\PhpAnnotations\ForkAnnotationReader']
-
-  #########
-  # Роутер
-  #########
-
-  # Загрузчик нативных роутов Symfony.
-  loader.yaml.config.routes:
-    class: Fedy\App\RoutesYamlConfigLoader
-    arguments: ['%kernel.project_dir%', '%base.config.path%', '@load.annotated.routes','%yaml.main.routes.file%']
-
-  Fedy\App\RoutesYamlConfigLoader: '@loader.yaml.config.routes'
-
-  # RoutesCollection нативных роутов Symfony.
-  symfony.routes.collection:
-    class: Symfony\Component\Routing\RouteCollection
-    factory: ['@loader.yaml.config.routes', 'load']
-
-  symfony.get.routes:
-    class: Symfony\Component\Routing\RouteCollection
-    factory: ['@loader.yaml.config.routes', 'routes']
+  #####################
+  # Роутер.
+  #####################
 
   ##########################################
   # Subscribers Symfony HttpKernel events.
   ##########################################
 
   # kernel.controller
-  Fedy\Events\OnControllerRequest\Subscribers\AjaxCall:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 5 }
 
-  Fedy\Events\OnControllerRequest\Subscribers\InjectServiceController:
-    class: Fedy\Events\OnControllerRequest\Subscribers\InjectServiceController
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SetContainer:
+    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SetContainer
     arguments: ['@service_container']
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 60 }
-
-  Fedy\Events\OnControllerRequest\Subscribers\SecurityToken:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 15 }
-
-  Fedy\Events\OnControllerRequest\Subscribers\SetContainer:
-    class: Fedy\Events\OnControllerRequest\Subscribers\SetContainer
-    arguments: ['@service_container']
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 55 }
-
-  Fedy\Events\InjectorController\Fabrics:
-    class: Fedy\Events\InjectorController\Fabrics
-    arguments: ['@service_container']
-
-  Fedy\Events\OnControllerRequest\Subscribers\ResolverParamsController:
-    class: Fedy\Events\OnControllerRequest\Subscribers\ResolverParamsController
-    arguments: ['@Fedy\Events\InjectorController\Fabrics']
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 55 }
-
-  Fedy\Events\OnControllerRequest\Subscribers\BootTraits:
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 50 }
 
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\BootTraits:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 50 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectServiceController:
+    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectServiceController
+    arguments: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 45 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectArgumentsToController:
+    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectArgumentsToController
+    arguments: ['@Local\SymfonyTools\Framework\Utils\ControllerProcessor']
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 40 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\CheckBitrixToken:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 35 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SecurityToken:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 30 }
+
+  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\AjaxCall:
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 25 }
+
   # kernel.request
-  Fedy\Events\OnKernelRequest\Subscribers\SetSession:
-    class: Fedy\Events\OnKernelRequest\Subscribers\SetSession
+  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken:
+    class: Local\SymfonyTools\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken
     arguments: ['@service_container']
     tags:
       - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 10 }
 
-  Fedy\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken:
-    class: Fedy\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken
+  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\FormUrlencodedTreatment:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 5 }
+
+  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\SetSession:
+    class: Local\SymfonyTools\Events\OnKernelRequest\Subscribers\SetSession
     arguments: ['@service_container']
     tags:
-      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 10 }
+      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 5 }
 
-  Fedy\Events\OnKernelRequest\Subscribers\FormUrlencodedTreatment:
-    tags:
-      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 10 }
+  Symfony\Component\HttpKernel\Controller\ControllerResolver:
+    class: Symfony\Component\HttpKernel\Controller\ControllerResolver
 
-  #  Fedy\Events\OnKernelResponse\Subscribers\SetHeaders:
-  #    arguments: ['@Symfony\Component\ExpressionLanguage\ExpressionLanguage', '@headers.response.config']
-  #    tags:
-  #      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+  # Загрузчик роутов из Yaml конфига.
+  routes.config:
+    class: Local\SymfonyTools\Router\RouterConfig
+    arguments: ['%kernel.project_dir%', '/local/configs/routes.yaml', '@load.annotated.routes']
 
-  Symfony\Component\HttpKernel\Controller\ControllerResolver: ~
+  # Коллекция загруженных роутов.
+  routes.collection:
+    class: Symfony\Component\Routing\RouteCollection
+    factory: ['@routes.config', 'routes']
+
+  Local\SymfonyTools\Router\RouterConfig: '@routes.config'
+
+  # Symfony загрузчик аннотированных роутов.
+  symfony.loader.annotated.routes:
+    class: Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader
+    arguments: ['@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader']
+
+  # Конечный сервис чтения и загрузки анотированных роутов.
+  load.annotated.routes:
+    class: Local\SymfonyTools\Router\Annotations\LoadAnnotatedRoutes
+    arguments: ['@class.collector', '@symfony.loader.annotated.routes']
 
   # Стандартный контроллер ошибок.
   standart.error.controller:
-    class: Fedy\wpSymfonyRouter\ErrorController
-
-  Fedy\wpSymfonyRouter\ErrorController: '@standart.error.controller'
+    class: Local\SymfonyTools\Framework\Controllers\ErrorController
+    arguments: ['@serialize']
 
   # Json контроллер ошибок.
   json.error.controller:
-    class: Fedy\wpSymfonyRouter\ErrorJsonController
-    arguments: ['@serializer']
+    class: Local\SymfonyTools\Framework\Controllers\ErrorJsonController
+    arguments: ['@serialize']
+  # Диспетчер запуска контроллеров.
 
-  Fedy\wpSymfonyRouter\ErrorJsonController: '@json.error.controller'
+  # Инициализатор роутов.
+  init.router:
+    class: Local\SymfonyTools\Router\InitRouter
+    arguments:
+      - '@routes.collection'
+      - '@json.error.controller'
+      - '@event_dispatcher'
+      - '@controller_resolver'
+      - '@argument_resolver'
 
-  # Поисковик классов в директориях.
-  class.collector:
-    class: Fedy\Services\Router\Annotations\SearchAnnotatedClasses
-    arguments: ['%kernel.project_dir%', '%controller.annotations.path%']
+    # Подвязка на битриксовое событие.
+    tags:
+      - { name: bitrix.events.init, module: main, event: OnProlog, method: handle, sort: 1 }
+
+  # Проверка роутов.
+  route.checker:
+    class: Local\ServiceProvider\Utils\RouteChecker
+    arguments: ['@routes.collection']
+
 
   # Диспетчер запуска контроллеров.
   dispatcher.controller:
@@ -147,6 +132,7 @@ services:
     arguments:
       - '@event_dispatcher'
       - '@Symfony\Component\HttpKernel\Controller\ControllerResolver'
+      - '@argument_resolver'
       - '@json.error.controller'
 
   Local\SymfonyTools\Framework\DispatchController: '@dispatcher.controller'
@@ -154,6 +140,19 @@ services:
   # Диспетчер запуска роутов.
   dispatcher.route:
     class: Local\SymfonyTools\Framework\Utils\DispatchRoute
-    arguments: ['@event_dispatcher','@json.error.controller', '@Symfony\Component\HttpKernel\Controller\ControllerResolver', '@serializer']
+    arguments:
+      - '@event_dispatcher'
+      - '@json.error.controller'
+      - '@Symfony\Component\HttpKernel\Controller\ControllerResolver'
+      - '@argument_resolver'
+      - '@serializer'
 
   Local\SymfonyTools\Framework\Utils\DispatchRoute: '@dispatcher.route'
+
+  Local\SymfonyTools\Framework\Utils\ControllerProcessor:
+    class: Local\SymfonyTools\Framework\Utils\ControllerProcessor
+    arguments:
+      - '@service_container'
+      - '@Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware'
+      - '@Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer'
+
