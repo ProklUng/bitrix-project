@@ -104,6 +104,9 @@ services:
   json.error.controller:
     class: Local\SymfonyTools\Framework\Controllers\ErrorJsonController
     arguments: ['@serialize']
+
+  Local\SymfonyTools\Framework\Controllers\ErrorJsonController: '@json.error.controller'
+
   # Диспетчер запуска контроллеров.
 
   # Инициализатор роутов.
@@ -131,7 +134,7 @@ services:
     class: Local\SymfonyTools\Framework\DispatchController
     arguments:
       - '@event_dispatcher'
-      - '@Symfony\Component\HttpKernel\Controller\ControllerResolver'
+      - '@controller_resolver'
       - '@argument_resolver'
       - '@json.error.controller'
 
@@ -155,4 +158,3 @@ services:
       - '@service_container'
       - '@Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware'
       - '@Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer'
-
