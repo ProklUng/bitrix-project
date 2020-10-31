@@ -52,7 +52,7 @@ class ArrayRecursiveArgumentResolver implements ArgumentValueResolverInterface
         $values = $request->attributes->get($argument->getName());
         $result = $values;
 
-        if ($argument->hasDefaultValue()) {
+        if (empty($values) && $argument->hasDefaultValue()) {
               $defaultValues = $argument->getDefaultValue();
               $result = $this->resolveParamsInArrayRecursively($defaultValues);
               $request->attributes->set($argument->getName(), $result);
