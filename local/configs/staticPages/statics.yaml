@@ -2,7 +2,7 @@
 simple_static_page:
   path: /simple_page/
   methods: [GET]
-  controller: 'Local\Services\Twig\Tools\TemplateController::templateAction'
+  controller: 'Local\Services\Twig\Tools\TemplateControllerContainerAware::templateAction'
   defaults:
     template:  './static/example2.twig'
     context:

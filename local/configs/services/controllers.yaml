@@ -8,3 +8,6 @@ services:
     autowire: true
     autoconfigure: true
     public: true
+
+  Local\Services\Twig\Tools\TemplateControllerContainerAware:
+    arguments: ['@Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer', '@twig.instance']
