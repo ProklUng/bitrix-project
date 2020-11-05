@@ -37,7 +37,8 @@
     "doctrine/annotations": "^1.10",
     "webarchitect609/bitrix-iblock-property-type": "^1.2",
     "webarchitect609/bitrix-user-type": "^0.7.2",
-    "tijsverkoyen/css-to-inline-styles": "^2.2"
+    "tijsverkoyen/css-to-inline-styles": "^2.2",
+    "spatie/data-transfer-object": "^2.5"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "2.*",
