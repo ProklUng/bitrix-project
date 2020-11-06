@@ -12,17 +12,24 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  * @package Local\ServiceProvider\CompilePasses
  *
  * @since 11.10.2020
+ * @since 06.11.2020 Добавление к уже существующим параметрам, а не перезаписывание. Позволяет бандлам
+ * добавлять свои Twig Extension.
  */
 class TwigExtensionTaggedServicesPass implements CompilerPassInterface
 {
     /** @const string TAG_TWIG_EXTENSION Тэг сервисов, расширяющих Twig. */
     protected const TAG_TWIG_EXTENSION = 'twig.extension';
 
+    /** @const string TWIG_EXTENSION_PARAM_CONTAINER Название переменной в контейнере. */
+    protected const TWIG_EXTENSION_PARAM_CONTAINER = '_twig_extension';
+
     /**
-     * @param ContainerBuilder $container
+     * Движуха.
+     *
+     * @param ContainerBuilder $container Контейнер.
      *
      * @return void
-     * @throws Exception
+     * @throws Exception Ошибки контейнера.
      */
     public function process(ContainerBuilder $container) : void
     {
@@ -30,10 +37,14 @@ class TwigExtensionTaggedServicesPass implements CompilerPassInterface
             self::TAG_TWIG_EXTENSION
         );
 
+        $params = $container->hasParameter(self::TWIG_EXTENSION_PARAM_CONTAINER) ?
+            $container->getParameter(self::TWIG_EXTENSION_PARAM_CONTAINER)
+            : [];
+
         // Сервисы автозапуска.
         $container->setParameter(
-            '_twig_extension',
-            $taggedServices
+            self::TWIG_EXTENSION_PARAM_CONTAINER,
+            array_merge($params, $taggedServices)
         );
     }
 }
