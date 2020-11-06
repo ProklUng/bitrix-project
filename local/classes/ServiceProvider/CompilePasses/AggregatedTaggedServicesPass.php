@@ -13,31 +13,43 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  *
  * @since 21.09.2020 ID сервисов пробрасываются в параметры, чтобы их можно было
  * запускать в случае компилированного контейнера.
+ * @since 06.11.2020 Добавление к уже существующим параметрам, а не перезаписывание. Позволяет бандлам
+ * подмешивать свои добавления.
  */
 class AggregatedTaggedServicesPass implements CompilerPassInterface
 {
     /** @const string TAG_BOOTSTRAP_SERVICES Тэг сервисов запускающихся при загрузке. */
     protected const TAG_BOOTSTRAP_SERVICES = 'service.bootstrap';
 
+    /** @const string VARIABLE_CONTAINER Название переменной в контейнере. */
+    protected const VARIABLE_CONTAINER = '_bootstrap';
+
     /**
-     * @param ContainerBuilder $container
+     * Движуха.
      *
-     * @throws Exception
+     * @param ContainerBuilder $container Контейнер.
+     *
+     * @return void
+     * @throws Exception Ошибки контейнера.
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container) : void
     {
         $taggedServices = $container->findTaggedServiceIds(
             self::TAG_BOOTSTRAP_SERVICES
         );
 
+        if (empty($taggedServices)) {
+            return;
+        }
+
+        $params = $container->hasParameter(self::VARIABLE_CONTAINER) ?
+            $container->getParameter(self::VARIABLE_CONTAINER)
+            : [];
+
         // Сервисы автозапуска.
         $container->setParameter(
-            '_bootstrap',
-            $taggedServices
+            self::VARIABLE_CONTAINER,
+            array_merge($params, $taggedServices)
         );
-
-        foreach ($taggedServices as $id => $tags) {
-            $container->get($id);
-        }
     }
 }

@@ -11,6 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @package Local\ServiceProvider\CompilePasses
  *
  * @since 26.09.2020
+ * @since 06.11.2020 Добавление к уже существующим параметрам, а не перезаписывание. Позволяет бандлам
+ * подмешивать свои добавления.
  */
 class BaseAggregatedTaggedServicesPass implements CompilerPassInterface
 {
@@ -27,7 +29,7 @@ class BaseAggregatedTaggedServicesPass implements CompilerPassInterface
      * BaseAggregatedTaggedServicesPass constructor.
      *
      * @param string $tag                     Искомый сервисный тэг.
-     * @param string $nameSectionParameterBag Название раздела в ParameterBag
+     * @param string $nameSectionParameterBag Название раздела в ParameterBag.
      */
     public function __construct(
         string $tag,
@@ -38,6 +40,8 @@ class BaseAggregatedTaggedServicesPass implements CompilerPassInterface
     }
 
     /**
+     * Движуха.
+     *
      * @param ContainerBuilder $container Контейнер.
      *
      * @return void
@@ -52,9 +56,13 @@ class BaseAggregatedTaggedServicesPass implements CompilerPassInterface
             return;
         }
 
+        $params = $container->hasParameter($this->nameSectionParameterBag) ?
+            $container->getParameter($this->nameSectionParameterBag)
+            : [];
+
         $container->setParameter(
             $this->nameSectionParameterBag,
-            $taggedServices
+            array_merge($params, $taggedServices)
         );
     }
 }

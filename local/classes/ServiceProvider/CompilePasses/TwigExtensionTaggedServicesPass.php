@@ -37,6 +37,10 @@ class TwigExtensionTaggedServicesPass implements CompilerPassInterface
             self::TAG_TWIG_EXTENSION
         );
 
+        if (empty($taggedServices)) {
+            return;
+        }
+
         $params = $container->hasParameter(self::TWIG_EXTENSION_PARAM_CONTAINER) ?
             $container->getParameter(self::TWIG_EXTENSION_PARAM_CONTAINER)
             : [];
