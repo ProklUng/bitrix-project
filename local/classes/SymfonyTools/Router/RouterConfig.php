@@ -15,9 +15,15 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @since 07.09.2020
  * @since 09.10.2020 Загрузка аннотированных роутов.
+ * @since 08.11.2020 Загрузка роутов из бандлов.
  */
 class RouterConfig
 {
+    /**
+     * @var RouteCollection $bundleRoutes Роуты бандлов.
+     */
+    private static $bundleRoutes;
+
     /**
      * @var RouteCollection $routeCollection Коллекция роутов.
      */
@@ -62,7 +68,32 @@ class RouterConfig
     {
         $this->routeCollection = $this->load($this->documentRoot . $this->filename);
 
+        // Роуты бандлов.
+        if (self::$bundleRoutes !== null && self::$bundleRoutes->count() > 0) {
+            $this->routeCollection->addCollection(
+                self::$bundleRoutes
+            );
+        }
+
         return $this->routeCollection;
+    }
+
+    /**
+     * Добавить роуты из бандла.
+     *
+     * @param RouteCollection $routeCollection Коллекция роутов.
+     *
+     * @return void
+     *
+     * @since 08.11.2020
+     */
+    public static function addRoutesBundle(RouteCollection $routeCollection) : void
+    {
+        if (self::$bundleRoutes === null) {
+            self::$bundleRoutes = new RouteCollection();
+        }
+
+        self::$bundleRoutes->addCollection($routeCollection);
     }
 
     /**
