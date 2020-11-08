@@ -6,8 +6,6 @@ use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class BundlesLoader
@@ -15,6 +13,7 @@ use Symfony\Component\Yaml\Yaml;
  * Загрузчик бандлов.
  *
  * @since 24.10.2020
+ * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
  */
 class BundlesLoader
 {
@@ -82,8 +81,6 @@ class BundlesLoader
             $extension = $bundle->getContainerExtension();
             if ($extension !== null) {
                 $bundle->boot();
-                $config = $this->loadYmlConfig($extension->getAlias());
-                $extension->load($config, $this->container);
                 $bundle->setContainer($this->container);
                 $bundle->build($this->container);
 
@@ -91,6 +88,13 @@ class BundlesLoader
 
                 // Сохраняю инстанцированный бандл в статику.
                 self::$bundlesMap[$bundle->getName()] = $bundle;
+            } else {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Bundle %s dont have implemented getContainerExtension method.',
+                        $bundle->getName()
+                    )
+                );
             }
         }
     }
@@ -123,22 +127,5 @@ class BundlesLoader
     public static function getBundlesMap() : array
     {
         return self::$bundlesMap;
-    }
-
-    /**
-     * Загрузить Yaml конфиг бандла.
-     *
-     * @param string $sectionConfig Alias extension.
-     *
-     * @return array
-     *
-     */
-    private function loadYmlConfig(string $sectionConfig) : array
-    {
-        try {
-            return Yaml::parseFile($_SERVER['DOCUMENT_ROOT'] . '/local/configs/packages/' . $sectionConfig . '.yaml');
-        } catch (ParseException $e) {
-            return [];
-        }
     }
 }

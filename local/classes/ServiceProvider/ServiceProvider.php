@@ -12,6 +12,7 @@ use Local\Util\LoaderContent;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -30,6 +31,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * случае компилированного контейнера.
  * @since 28.09.2020 Доработка.
  * @since 24.10.2020 Загрузка "автономных" бандлов Symfony.
+ * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
  */
 class ServiceProvider
 {
@@ -227,6 +229,7 @@ class ServiceProvider
      *
      * @since 11.09.2020 Подключение возможности обработки событий HtppKernel через Yaml конфиг.
      * @since 28.09.2020 Набор стандартных Compile Pass. Кастомные Compiler Pass.
+     * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
      */
     protected function loadContainer(string $fileName)
     {
@@ -240,6 +243,11 @@ class ServiceProvider
         $allPasses = $passes->getPasses();
 
         foreach ($allPasses as $pass) {
+            // Тонкость: MergeExtensionConfigurationPass добавляется в BundlesLoader.
+            // Если не проигнорировать здесь, то он вызовется еще раз.
+            if (get_class($pass) === MergeExtensionConfigurationPass::class) {
+                continue;
+            }
             self::$containerBuilder->addCompilerPass($pass);
         }
 
