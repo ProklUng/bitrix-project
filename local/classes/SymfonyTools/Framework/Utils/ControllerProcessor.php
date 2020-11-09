@@ -3,6 +3,7 @@
 namespace Local\SymfonyTools\Framework\Utils;
 
 use Closure;
+use Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag;
 use Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer;
 use Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware;
 use Psr\Container\ContainerInterface;
@@ -24,6 +25,7 @@ use ReflectionObject;
  * @since 05.09.2020
  * @since 10.09.2020 PSR-2 форматирование.
  * @since 31.10.2020 Фикс ошибки рефлексии параметра, не имеющего значения по умолчанию.
+ * @since 08.11.2020 Обработка классов-исключений из автовязи (DTO, например).
  */
 class ControllerProcessor implements InjectorControllerInterface
 {
@@ -43,20 +45,29 @@ class ControllerProcessor implements InjectorControllerInterface
     private $container;
 
     /**
+     * @var IgnoredAutowiringControllerParamsBag $autowiringControllerParamsBag Игнорируемые при автовайринге классы
+     *  (учитывя наследование).
+     */
+    private $autowiringControllerParamsBag;
+
+    /**
      * ControllerProcessor constructor.
      *
-     * @param ContainerInterface                   $container                  Сервис-контейнер.
-     * @param ResolveDependencyMakerContainerAware $dependencyMaker            Разрешитель зависимостей.
-     * @param ResolveParamsFromContainer           $resolveParamsFromContainer Разрешитель зависимостей переменных и сервисов.
+     * @param ContainerInterface                   $container                     Сервис-контейнер.
+     * @param ResolveDependencyMakerContainerAware $dependencyMaker               Разрешитель зависимостей.
+     * @param ResolveParamsFromContainer           $resolveParamsFromContainer    Разрешитель зависимостей переменных и сервисов.
+     * @param IgnoredAutowiringControllerParamsBag $autowiringControllerParamsBag Игнорируемые при автовайринге классы.
      */
     public function __construct(
         ContainerInterface $container,
         ResolveDependencyMakerContainerAware $dependencyMaker,
-        ResolveParamsFromContainer $resolveParamsFromContainer
+        ResolveParamsFromContainer $resolveParamsFromContainer,
+        IgnoredAutowiringControllerParamsBag $autowiringControllerParamsBag
     ) {
         $this->container = $container;
         $this->resolveDependencyMaker = $dependencyMaker;
         $this->resolveParamsFromContainer = $resolveParamsFromContainer;
+        $this->autowiringControllerParamsBag = $autowiringControllerParamsBag;
     }
 
     /**
@@ -65,9 +76,12 @@ class ControllerProcessor implements InjectorControllerInterface
      * @param ControllerEvent $event Событие.
      *
      * @return ControllerEvent
+     *
      * @throws ArgumentsControllersException Ошибки инжекции.
+     * @throws ReflectionException           Ошибки рефлексии.
      *
      * @since 06.09.2020 Рефакторинг в сторону упрощения.
+     * @since 09.11.2020 Поддержка заданных имплицитно классов, игнорируемых при обработке.
      */
     public function inject(ControllerEvent $event): ControllerEvent
     {
@@ -130,6 +144,17 @@ class ControllerProcessor implements InjectorControllerInterface
 
             // Крайний случай. Разрешить зависимости во всю рекурсивную глубину.
             if (class_exists($argItem)) {
+
+                /**
+                 * Игнорировать autowiring классов для некоторых исключений (DTO),
+                 * указанных в массиве ignoredBaseClasses.
+                 *
+                 * @since 08.11.2020
+                 */
+                if ($this->autowiringControllerParamsBag->isIgnoredClass($argItem)) {
+                    continue;
+                }
+
                 $resolved = $this->resolveDependencyMaker->resolveDependencies($argItem);
                 $event->getRequest()->attributes->set($param, $resolved);
                 continue;
