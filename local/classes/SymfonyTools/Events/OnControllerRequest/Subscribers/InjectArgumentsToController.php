@@ -7,8 +7,6 @@ use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSub
 use Local\SymfonyTools\Framework\Exceptions\ArgumentsControllersException;
 use Local\SymfonyTools\Framework\Interfaces\InjectorControllerInterface;
 use Local\SymfonyTools\Framework\Utils\ControllerProcessor;
-use Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMaker;
-use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -31,14 +29,12 @@ class InjectArgumentsToController implements EventSubscriberInterface, OnControl
     /**
      * InjectArgumentsToController constructor.
      *
-     * @param ContainerInterface $container Сервис-контейнер.
+     * @param ControllerProcessor $controllerProcessor Обработчик параметров контроллера.
      */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->controllerProcessor = new ControllerProcessor(
-            $container,
-            new ResolveDependencyMaker()
-        );
+    public function __construct(
+        ControllerProcessor $controllerProcessor
+    ) {
+        $this->controllerProcessor = $controllerProcessor;
     }
 
     /**
@@ -47,7 +43,7 @@ class InjectArgumentsToController implements EventSubscriberInterface, OnControl
      * @param ControllerEvent $event Объект события.
      *
      * @return void
-     * @throws ArgumentsControllersException
+     * @throws ArgumentsControllersException Ошибки аргументов контроллера.
      */
     public function handle(ControllerEvent $event): void
     {

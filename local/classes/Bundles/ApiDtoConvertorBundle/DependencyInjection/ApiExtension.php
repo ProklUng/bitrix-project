@@ -8,6 +8,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag;
 
 class ApiExtension extends Extension
 {
@@ -18,5 +19,11 @@ class ApiExtension extends Extension
 
 
         $processedConfigs = $this->processConfiguration(new Configuration(), $configs);
+
+        // Игнорируемые при автовайринге классы - интерфейсы.
+        $autowiringControllerParamsBag = new IgnoredAutowiringControllerParamsBag();
+        $autowiringControllerParamsBag->add(
+            [BaseDTOInterface::class]
+        );
     }
 }

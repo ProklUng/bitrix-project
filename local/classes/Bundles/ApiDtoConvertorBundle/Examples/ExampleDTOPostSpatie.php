@@ -2,6 +2,7 @@
 
 namespace Local\Bundles\ApiDtoConvertorBundle\Examples;
 
+use Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\BaseDTOInterface;
 use Spatie\DataTransferObject\DataTransferObject;
 
 /**
@@ -10,7 +11,7 @@ use Spatie\DataTransferObject\DataTransferObject;
  * DTO с валидацией.
  * @Local\Bundles\ApiDtoConvertorBundle\HttpApi\HttpApiPost
  */
-class ExampleDTOPostSpatie extends DataTransferObject
+class ExampleDTOPostSpatie extends DataTransferObject implements BaseDTOInterface
 {
     /**
      * @var int $amount
@@ -50,6 +51,7 @@ class ExampleDTOPostSpatie extends DataTransferObject
         return [
             'amount' => 'trim|escape|cast:integer',
             'articles' => 'trim|escape|cast:string',
+            'unknown' => 'trim|escape|cast:boolean',
         ];
     }
 }
