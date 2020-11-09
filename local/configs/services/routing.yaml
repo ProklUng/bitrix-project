@@ -152,13 +152,13 @@ services:
 
   Local\SymfonyTools\Framework\Utils\DispatchRoute: '@dispatcher.route'
 
-Local\SymfonyTools\Framework\Utils\ControllerProcessor:
-  class: Local\SymfonyTools\Framework\Utils\ControllerProcessor
-  arguments:
-    - '@service_container'
-    - '@Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware'
-    - '@Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer'
-    - '@Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag'
+  Local\SymfonyTools\Framework\Utils\ControllerProcessor:
+    class: Local\SymfonyTools\Framework\Utils\ControllerProcessor
+    arguments:
+      - '@service_container'
+      - '@Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware'
+      - '@Local\SymfonyTools\ArgumentsResolvers\Supply\ResolveParamsFromContainer'
+      - '@Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag'
 
   # Игнорируемые при автовайринге классы (учитывя наследование).
   ignored.autowiring.controller.arguments:
