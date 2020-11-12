@@ -7,9 +7,11 @@ use CMain;
 use Exception;
 use InvalidArgumentException;
 use Local\ServiceProvider\Bundles\BundlesLoader;
+use Local\Services\AppKernel;
 use Local\Util\ErrorScreen;
 use Local\Util\LoaderContent;
 use Psr\Container\ContainerInterface as PsrContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
@@ -17,10 +19,19 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
+use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
+use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
+use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
+use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
+use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 
 /**
  * Class ServiceProvider
@@ -32,6 +43,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * @since 28.09.2020 Доработка.
  * @since 24.10.2020 Загрузка "автономных" бандлов Symfony.
  * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
+ * @since 12.11.2020 Значение debug передаются снаружи. Рефакторинг.
  */
 class ServiceProvider
 {
@@ -50,6 +62,11 @@ class ServiceProvider
      */
     protected $filesystem;
 
+    /**
+     * @var BundlesLoader $bundlesLoader Загрузчик бандлов.
+     */
+    protected $bundlesLoader;
+
     /** @const string SERVICE_CONFIG_FILE Конфигурация сервисов. */
     protected const SERVICE_CONFIG_FILE = 'local/configs/services.yaml';
 
@@ -63,6 +80,11 @@ class ServiceProvider
 
     /** @var string|null $projectRoot DOCUMENT_ROOT */
     protected $projectRoot;
+
+    /**
+     * @var array Конфигурация бандлов.
+     */
+    private $bundles = [];
 
     /**
      * @var array $compilerPassesBag Набор Compiler Pass.
@@ -184,7 +206,7 @@ class ServiceProvider
 
         /** Путь к скомпилированному контейнеру. */
         $compiledContainerFile = $this->projectRoot . self::COMPILED_CONTAINER_DIR
-                                 . self::COMPILED_CONTAINER_FILE;
+            . self::COMPILED_CONTAINER_FILE;
 
         $containerConfigCache = new ConfigCache($compiledContainerFile, true);
         // Класс скомпилированного контейнера.
@@ -227,15 +249,18 @@ class ServiceProvider
      *
      * @return boolean|ContainerBuilder
      *
-     * @since 11.09.2020 Подключение возможности обработки событий HtppKernel через Yaml конфиг.
+     * @throws Exception Ошибки контейнера.
+     *
      * @since 28.09.2020 Набор стандартных Compile Pass. Кастомные Compiler Pass.
-     * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
+     * @since 11.09.2020 Подключение возможности обработки событий HtppKernel через Yaml конфиг.
      */
     protected function loadContainer(string $fileName)
     {
         self::$containerBuilder = new ContainerBuilder();
 
-        // Пассы бандлов нужно пускать раньше всех остальных.
+        $this->setDefaultParamsContainer();
+
+        // Инициализация автономных бандлов.
         $this->loadSymfonyBundles();
 
         // Набор стандартных Compile Pass
@@ -250,6 +275,8 @@ class ServiceProvider
             }
             self::$containerBuilder->addCompilerPass($pass);
         }
+
+        $this->standartSymfonyPasses();
 
         // Локальные compile pass.
         foreach ($this->compilerPassesBag as $compilerPass) {
@@ -268,6 +295,7 @@ class ServiceProvider
         //      - { name: kernel.event_listener, event: kernel.request, method: handle }
         self::$containerBuilder->register('event_dispatcher', EventDispatcher::class);
         self::$containerBuilder->addCompilerPass(new RegisterListenersPass());
+
 
         $loader = new YamlFileLoader(self::$containerBuilder, new FileLocator(
             $this->projectRoot
@@ -296,7 +324,11 @@ class ServiceProvider
     {
         try {
             $this->loadContainer($fileName);
-            $this->setDefaultParamsContainer();
+
+            // Boot bundles.
+            $this->bundlesLoader->boot(self::$containerBuilder);
+            $this->bundlesLoader->registerExtensions(self::$containerBuilder);
+
             self::$containerBuilder->compile(true);
         } catch (Exception $e) {
             $this->errorHandler->die(
@@ -310,25 +342,28 @@ class ServiceProvider
     }
 
     /**
-     * Параметры из сервиса kernel (если он существует).
+     * Параметры контейнера и регистрация сервиса kernel.
      *
      * @return void
      *
      * @throws Exception Ошибки контейнера.
+     *
+     * @since 12.11.2020 Полная переработка. Регистрация сервиса.
      */
     private function setDefaultParamsContainer() : void
     {
-        // Параметры из сервиса kernel.
-        $parameterBag = self::$containerBuilder->getParameterBag();
-        try {
-            $kernelService = self::$containerBuilder->get('kernel');
-        } catch (Exception $e) {
-            return;
+        if (!self::$containerBuilder->hasDefinition('kernel')) {
+            self::$containerBuilder->register('kernel', AppKernel::class)
+                ->addTag('service.bootstrap')
+                ->setAutoconfigured(true)
+                ->setPublic(true)
+                ->setArguments([$_ENV['DEBUG']])
+            ;
         }
 
-        if ($parameterBag !== null && $kernelService !== null) {
-            $parameterBag->add($kernelService->getKernelParameters());
-        }
+        self::$containerBuilder->getParameterBag()->add(
+            self::$containerBuilder->get('kernel')->getKernelParameters()
+        );
     }
 
     /**
@@ -348,22 +383,78 @@ class ServiceProvider
     }
 
     /**
+     * Стандартные Symfony манипуляции над контейнером.
+     *
+     * @return void
+     *
+     * @since 28.09.2020
+     *
+     * @see FrameworkBundle
+     */
+    private function standartSymfonyPasses(): void
+    {
+        // Пассы Symfony.
+        $standartCompilerPasses = [
+            [
+                'pass' => ControllerArgumentValueResolverPass::class,
+            ],
+            [
+                'pass' => RegisterControllerArgumentLocatorsPass::class,
+            ],
+            [
+                'pass' => RoutingResolverPass::class,
+            ],
+            [
+                'pass' => SerializerPass::class,
+            ],
+            [
+                'pass' => PropertyInfoPass::class,
+            ],
+            [
+                'pass' => RemoveEmptyControllerArgumentLocatorsPass::class,
+                'phase' => PassConfig::TYPE_BEFORE_REMOVING,
+            ],
+        ];
+
+        self::$containerBuilder->registerForAutoconfiguration(AbstractController::class)
+            ->addTag('controller.service_arguments');
+
+        self::$containerBuilder->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
+            ->addTag('controller.argument_value_resolver');
+
+        self::$containerBuilder->registerForAutoconfiguration(ServiceLocator::class)
+            ->addTag('container.service_locator');
+
+        self::$containerBuilder->registerForAutoconfiguration(EventSubscriberInterface::class)
+            ->addTag('kernel.event_subscriber');
+
+        // Применяем compiler passes.
+        foreach ($standartCompilerPasses as $pass) {
+            self::$containerBuilder->addCompilerPass(
+                new $pass['pass'],
+                $pass['phase'] ?? PassConfig::TYPE_BEFORE_OPTIMIZATION
+            );
+        }
+    }
+
+    /**
      * Загрузка "автономных" бандлов Symfony.
      *
      * @return void
      *
-     * @throws InvalidArgumentException Не найден класс бандла.
+     * @throws InvalidArgumentException  Не найден класс бандла.
      *
      * @since 24.10.2020
      */
     private function loadSymfonyBundles() : void
     {
-        $bundlesLoader = new BundlesLoader(
+        $this->bundlesLoader = new BundlesLoader(
             self::$containerBuilder
         );
 
-        $bundlesLoader->load(); // Загрузить бандлы.
-        $bundlesLoader->registerExtensions(); // Зарегистрировать extensions.
+        $this->bundlesLoader->load(); // Загрузить бандлы.
+
+        $this->bundles = $this->bundlesLoader->bundles();
     }
 
     /**

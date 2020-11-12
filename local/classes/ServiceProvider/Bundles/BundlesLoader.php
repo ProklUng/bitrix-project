@@ -4,6 +4,7 @@ namespace Local\ServiceProvider\Bundles;
 
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 
@@ -80,11 +81,8 @@ class BundlesLoader
 
             $extension = $bundle->getContainerExtension();
             if ($extension !== null) {
-                $bundle->boot();
-                $bundle->setContainer($this->container);
-                $bundle->build($this->container);
-
                 $this->container->registerExtension($extension);
+                $bundle->build($this->container);
 
                 // Сохраняю инстанцированный бандл в статику.
                 self::$bundlesMap[$bundle->getName()] = $bundle;
@@ -102,21 +100,53 @@ class BundlesLoader
     /**
      * Регистрация extensions.
      *
+     * @param ContainerBuilder $container Контейнер.
+     *
      * @return void
      */
-    public function registerExtensions() : void
+    public function registerExtensions(ContainerBuilder $container) : void
     {
         // Extensions in container.
         $extensions = [];
-        foreach ($this->container->getExtensions() as $extension) {
+        foreach ($container->getExtensions() as $extension) {
             $extensions[] = $extension->getAlias();
         }
 
         // ensure these extensions are implicitly loaded
-        $this->container->getCompilerPassConfig()
+        $container->getCompilerPassConfig()
             ->setMergePass(
                 new MergeExtensionConfigurationPass($extensions)
             );
+    }
+
+    /**
+     * Boot bundles.
+     *
+     * @param ContainerInterface $container Контейнер.
+     *
+     * @return void
+     *
+     * @since 11.11.2020
+     */
+    public function boot(ContainerInterface $container) : void
+    {
+        /**
+         * @var Bundle $bundle
+         */
+        foreach (self::$bundlesMap as $bundle) {
+            $bundle->setContainer($container);
+            $bundle->boot();
+        }
+    }
+
+    /**
+     * Бандлы.
+     *
+     * @return array
+     */
+    public function bundles() : array
+    {
+        return self::$bundlesMap;
     }
 
     /**

@@ -16,7 +16,7 @@ imports:
   - {resource: services/controllers.yaml }
   - {resource: services/custom_properties.yaml }
   - {resource: services/resolvers.yaml }
-  
+
 parameters:
   namespace.models.infoblocks: 'Local\Models'
   debug: '%env(bool:resolve:DEBUG)%'
@@ -44,12 +44,9 @@ services:
     public: true
 
   # Ядро.
-  kernel:
-    class: Local\Services\AppKernel
-    arguments: ['%debug%']
-    
+  # Сервис kernel регистрируется при загрузке контейнера.
   Symfony\Component\HttpKernel\KernelInterface: '@kernel'
-  Symfony\Component\HttpKernel\Kernel: '@kernel'  
+  Symfony\Component\HttpKernel\Kernel: '@kernel'
 
   # Опции приложения.
   app.options:

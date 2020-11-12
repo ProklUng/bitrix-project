@@ -3,6 +3,8 @@
 namespace Local\Services;
 
 use Bitrix\Main\Application;
+use Local\ServiceProvider\Bundles\BundlesLoader;
+use LogicException;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -42,6 +44,8 @@ class AppKernel extends Kernel
         $this->environment = $this->debug ? 'dev' : 'prod';
 
         parent::__construct($this->environment, $this->debug);
+
+        $this->registerStandaloneBundles(); // "Standalone" бандлы.
     }
 
     /**
@@ -75,14 +79,31 @@ class AppKernel extends Kernel
      */
     public function getKernelParameters(): array
     {
+        $bundles = [];
+        $bundlesMetadata = [];
+
+        foreach ($this->bundles as $name => $bundle) {
+            $bundles[$name] = get_class($bundle);
+            $bundlesMetadata[$name] = [
+                'path' => $bundle->getPath(),
+                'namespace' => $bundle->getNamespace(),
+            ];
+        }
+
         return [
             'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
+            // Deprecated. Для совместимости.
+            'kernel.root_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,
             'kernel.debug' => $this->debug,
             'kernel.cache_dir' => realpath($this->getCacheDir()),
             'kernel.http.host' => $_SERVER['HTTP_HOST'],
             'kernel.site.host' => $this->getSiteHost(),
-            'kernel.schema' => $this->getSchema()
+            'kernel.schema' => $this->getSchema(),
+            'kernel.bundles' => $bundles,
+            'kernel.bundles_metadata' => $bundlesMetadata,
+            'kernel.container_class' => $this->getContainerClass(),
+            'kernel.charset' => $this->getCharset(),
         ];
     }
 
@@ -134,11 +155,13 @@ class AppKernel extends Kernel
             }
         }
     }
-    
+
     /**
      * Регистрация одного бандла.
      *
      * @param object $bundle Бандл.
+     *
+     * @return void
      */
     public function registerBundle($bundle) : void
     {
