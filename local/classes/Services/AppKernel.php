@@ -3,6 +3,7 @@
 namespace Local\Services;
 
 use Bitrix\Main\Application;
+use Bitrix\Main\SystemException;
 use Local\ServiceProvider\Bundles\BundlesLoader;
 use LogicException;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -120,17 +121,20 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Schema http or https.
+     * REQUEST_URI.
      *
      * @return string
      *
-     * @since 22.10.2020
+     * @throws SystemException Битриксовые ошибки.
+     *
+     * @since 16.10.2020
      */
-    private function getSchema() : string
+    public function getRequestUri() : string
     {
-        return (!empty($_SERVER['HTTPS'])
-            && ($_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] === 443)
-        ) ? 'https://' : 'http://';
+        $request = Application::getInstance()->getContext()->getRequest();
+        $uriString = $request->getRequestUri();
+
+        return !empty($uriString) ? $uriString : '';
     }
 
     /**
@@ -171,6 +175,20 @@ class AppKernel extends Kernel
         }
 
         $this->bundles[$name] = $bundle;
+    }
+
+    /**
+     * Schema http or https.
+     *
+     * @return string
+     *
+     * @since 22.10.2020
+     */
+    private function getSchema() : string
+    {
+        return (!empty($_SERVER['HTTPS'])
+            && ($_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] === 443)
+        ) ? 'https://' : 'http://';
     }
 
     /**
