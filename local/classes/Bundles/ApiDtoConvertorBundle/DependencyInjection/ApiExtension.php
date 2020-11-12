@@ -19,11 +19,5 @@ class ApiExtension extends Extension
 
 
         $processedConfigs = $this->processConfiguration(new Configuration(), $configs);
-
-        // Игнорируемые при автовайринге классы - интерфейсы.
-        $autowiringControllerParamsBag = new IgnoredAutowiringControllerParamsBag();
-        $autowiringControllerParamsBag->add(
-            [BaseDTOInterface::class]
-        );
     }
 }

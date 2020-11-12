@@ -29,6 +29,7 @@ class IgnoredAutowiringControllerParamsBag
     public function add(array $classes) : void
     {
         static::$ignoredClasses = array_merge(static::$ignoredClasses, $classes);
+        static::$ignoredClasses = array_unique(static::$ignoredClasses);
     }
 
     /**

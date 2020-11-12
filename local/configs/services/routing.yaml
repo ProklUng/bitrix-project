@@ -163,5 +163,7 @@ services:
   # Игнорируемые при автовайринге классы (учитывя наследование).
   ignored.autowiring.controller.arguments:
     class: Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag
+    calls:
+      - add: [['Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\BaseDTOInterface']]
 
   Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag: '@ignored.autowiring.controller.arguments'
