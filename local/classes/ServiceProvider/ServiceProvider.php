@@ -325,6 +325,13 @@ class ServiceProvider
         try {
             $this->loadContainer($fileName);
 
+            // Дополнить переменные приложения сведениями о зарегистрированных бандлах.
+            self::$containerBuilder->get('kernel')->registerStandaloneBundles();
+
+            self::$containerBuilder->getParameterBag()->add(
+                self::$containerBuilder->get('kernel')->getKernelParameters()
+            );
+
             // Boot bundles.
             $this->bundlesLoader->boot(self::$containerBuilder);
             $this->bundlesLoader->registerExtensions(self::$containerBuilder);

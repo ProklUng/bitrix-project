@@ -178,6 +178,20 @@ class AppKernel extends Kernel
     }
 
     /**
+     * Регистрация "отдельностоящих" бандлов.
+     *
+     * @return void
+     *
+     * @since 25.10.2020
+     */
+    public function registerStandaloneBundles(): void
+    {
+        foreach (BundlesLoader::getBundlesMap() as $bundle) {
+            $this->registerBundle($bundle);
+        }
+    }
+
+    /**
      * Schema http or https.
      *
      * @return string
@@ -189,19 +203,5 @@ class AppKernel extends Kernel
         return (!empty($_SERVER['HTTPS'])
             && ($_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] === 443)
         ) ? 'https://' : 'http://';
-    }
-
-    /**
-     * Регистрация "отдельностоящих" бандлов.
-     *
-     * @return void
-     *
-     * @since 25.10.2020
-     */
-    private function registerStandaloneBundles(): void
-    {
-        foreach (BundlesLoader::getBundlesMap() as $bundle) {
-            $this->registerBundle($bundle);
-        }
     }
 }
