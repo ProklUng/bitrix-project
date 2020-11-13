@@ -80,6 +80,34 @@ class AppKernel extends Kernel
      */
     public function getKernelParameters(): array
     {
+        $bundlesMetaData = $this->getBundlesMetaData();
+
+        return [
+            'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
+            // Deprecated. Для совместимости.
+            'kernel.root_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
+            'kernel.environment' => $this->environment,
+            'kernel.debug' => $this->debug,
+            'kernel.cache_dir' => realpath($this->getCacheDir()),
+            'kernel.http.host' => $_SERVER['HTTP_HOST'],
+            'kernel.site.host' => $this->getSiteHost(),
+            'kernel.schema' => $this->getSchema(),
+            'kernel.bundles' => $bundlesMetaData['kernel.bundles'],
+            'kernel.bundles_metadata' => $bundlesMetaData['kernel.bundles_metadata'],
+            'kernel.container_class' => $this->getContainerClass(),
+            'kernel.charset' => $this->getCharset(),
+        ];
+    }
+
+    /**
+     * Мета-данные бандлов.
+     *
+     * @return array[]
+     *
+     * @since 13.11.2020
+     */
+    public function getBundlesMetaData() : array
+    {
         $bundles = [];
         $bundlesMetadata = [];
 
@@ -92,19 +120,8 @@ class AppKernel extends Kernel
         }
 
         return [
-            'kernel.project_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
-            // Deprecated. Для совместимости.
-            'kernel.root_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
-            'kernel.environment' => $this->environment,
-            'kernel.debug' => $this->debug,
-            'kernel.cache_dir' => realpath($this->getCacheDir()),
-            'kernel.http.host' => $_SERVER['HTTP_HOST'],
-            'kernel.site.host' => $this->getSiteHost(),
-            'kernel.schema' => $this->getSchema(),
             'kernel.bundles' => $bundles,
-            'kernel.bundles_metadata' => $bundlesMetadata,
-            'kernel.container_class' => $this->getContainerClass(),
-            'kernel.charset' => $this->getCharset(),
+            'kernel.bundles_metadata' => $bundlesMetadata
         ];
     }
 

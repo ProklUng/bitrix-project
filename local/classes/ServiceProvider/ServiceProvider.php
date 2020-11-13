@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPa
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -319,18 +320,16 @@ class ServiceProvider
      * @return null|ContainerBuilder
      *
      * @since 28.09.2020
+     * @since 13.11.2020 Мета-данные бандлов. Обработка ошибки отсутствия сервиса kernel.
+     *
+     * @throws LogicException Не инициализирован сервис kernel или пустой ParameterBag.
      */
     private function initialize(string $fileName): ?ContainerBuilder
     {
         try {
             $this->loadContainer($fileName);
 
-            // Дополнить переменные приложения сведениями о зарегистрированных бандлах.
-            self::$containerBuilder->get('kernel')->registerStandaloneBundles();
-
-            self::$containerBuilder->getParameterBag()->add(
-                self::$containerBuilder->get('kernel')->getKernelParameters()
-            );
+            $this->updateBundlesMetaData();
 
             // Boot bundles.
             $this->bundlesLoader->boot(self::$containerBuilder);
@@ -346,6 +345,40 @@ class ServiceProvider
         }
 
         return self::$containerBuilder;
+    }
+
+    /**
+     * Дополнить переменные приложения сведениями о зарегистрированных бандлах.
+     *
+     * @return void
+     *
+     * @throws LogicException  Не инициализирован сервис kernel или пустой ParameterBag.
+     * @throws Exception       Ошибки контейнера.
+     *
+     * @since 13.11.2020
+     */
+    private function updateBundlesMetaData() : void
+    {
+        if (!self::$containerBuilder->has('kernel')) {
+            throw new LogicException(
+                'Service kernel not initialized.'
+            );
+        }
+
+        $kernelService = self::$containerBuilder->get('kernel');
+        $parameterBag = self::$containerBuilder->getParameterBag();
+        if ($kernelService && $parameterBag) {
+            // Дополнить переменные приложения сведениями о загруженных бандлах.
+            $kernelService->registerStandaloneBundles();
+
+            $parameterBag->add(
+                $kernelService->getBundlesMetaData()
+            );
+        } else {
+            throw new LogicException(
+                'ParameterBag not initialized.'
+            );
+        }
     }
 
     /**
