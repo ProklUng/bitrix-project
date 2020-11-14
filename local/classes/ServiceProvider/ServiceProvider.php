@@ -14,11 +14,20 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
+use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
+use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -76,6 +85,9 @@ class ServiceProvider
     /** @const string COMPILED_CONTAINER_DIR Путь к скомпилированному контейнеру. */
     protected const COMPILED_CONTAINER_DIR = '/bitrix/cache/s1';
 
+    /** @const string CONFIG_EXTS Расширения конфигурационных файлов. */
+    protected const CONFIG_EXTS = '.{php,xml,yaml,yml}';
+
     /** @var string $filename Yaml файл конфигурации. */
     protected $filename;
 
@@ -97,6 +109,9 @@ class ServiceProvider
      */
     protected $postLoadingPassesBag = [];
 
+    /** @var string $environment Среда */
+    protected $environment;
+
     /**
      * ServiceProvider constructor.
      *
@@ -109,6 +124,7 @@ class ServiceProvider
     ) {
         // Buggy local fix.
         $_ENV['DEBUG'] = env('DEBUG', false);
+        $this->environment = $_ENV['DEBUG'] ? 'dev' : 'prod';
 
         $this->errorHandler = new ErrorScreen(
             new LoaderContent(),
@@ -304,6 +320,12 @@ class ServiceProvider
 
         try {
             $loader->load($fileName);
+
+            // Подгрузить конфигурации из папки config.
+            $this->configureContainer(
+                self::$containerBuilder,
+                $this->getContainerLoader(self::$containerBuilder)
+            );
 
             return self::$containerBuilder;
         } catch (Exception $e) {
@@ -518,6 +540,59 @@ class ServiceProvider
                 $class->action(self::$containerBuilder);
             }
         }
+    }
+
+    /**
+     * Загрузка конфигураций в различных форматах из папки configs.
+     *
+     * @param ContainerBuilder $container Контейнер.
+     * @param LoaderInterface  $loader    Загрузчик.
+     *
+     * @return void
+     * @throws Exception Ошибки контейнера.
+     *
+     * @since 06.11.2020
+     */
+    private function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
+    {
+        $confDir = $_SERVER['DOCUMENT_ROOT'] .'/local/configs';
+        $container->setParameter('container.dumper.inline_class_loader', true);
+
+        $loader->load($confDir . '/packages/*' . self::CONFIG_EXTS, 'glob');
+        if (is_dir($confDir . '/packages/' . $this->environment)) {
+            $loader->load($confDir . '/packages/' . $this->environment . '/**/*' . self::CONFIG_EXTS, 'glob');
+        }
+
+        $loader->load($confDir . '/services_'. $this->environment. self::CONFIG_EXTS, 'glob');
+    }
+
+    /**
+     * Returns a loader for the container.
+     *
+     * @param ContainerBuilder $container Контейнер.
+     *
+     * @return DelegatingLoader The loader
+     * @throws Exception Ошибки контейнера.
+     *
+     * @since 06.11.2020
+     */
+    protected function getContainerLoader(ContainerBuilder $container): DelegatingLoader
+    {
+        $locator = new \Symfony\Component\HttpKernel\Config\FileLocator(
+            self::$containerBuilder->get('kernel')
+        );
+
+        $resolver = new LoaderResolver([
+            new XmlFileLoader($container, $locator),
+            new YamlFileLoader($container, $locator),
+            new IniFileLoader($container, $locator),
+            new PhpFileLoader($container, $locator),
+            new GlobFileLoader($container, $locator),
+            new DirectoryLoader($container, $locator),
+            new ClosureLoader($container),
+        ]);
+
+        return new DelegatingLoader($resolver);
     }
 
     /**
