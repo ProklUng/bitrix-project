@@ -54,6 +54,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  * @since 24.10.2020 Загрузка "автономных" бандлов Symfony.
  * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
  * @since 12.11.2020 Значение debug передаются снаружи. Рефакторинг.
+ * @since 14.11.2020 Загрузка конфигураций бандлов.
  */
 class ServiceProvider
 {
