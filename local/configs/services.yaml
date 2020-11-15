@@ -16,6 +16,7 @@ imports:
   - {resource: services/controllers.yaml }
   - {resource: services/custom_properties.yaml }
   - {resource: services/resolvers.yaml }
+  - {resource: services/guzzle.yaml }
 
 parameters:
   namespace.models.infoblocks: 'Local\Models'

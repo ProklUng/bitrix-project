@@ -36,3 +36,5 @@ services:
 
   Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMaker: ~
   Local\SymfonyTools\Framework\Utils\ResolverDependency\ResolveDependencyMakerContainerAware: ~
+
+  public_logger: '@logger'

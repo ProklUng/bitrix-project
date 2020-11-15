@@ -44,6 +44,13 @@ services:
     class: Local\Util\Bitrix\Cacher
     arguments: ['@bitrix.cacher']
 
+  bitrix.cache.engine:
+    class: Bitrix\Main\Data\ICacheEngine
+    factory: ['Bitrix\Main\Data\Cache', 'createCacheEngine']
+
+  Bitrix\Main\Data\Cache:
+    arguments: ['@bitrix.cache.engine']
+
   # Инстанс $APPLICATION
   application:
     class: CMain
