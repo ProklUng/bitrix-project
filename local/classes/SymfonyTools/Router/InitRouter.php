@@ -11,7 +11,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
@@ -30,6 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @since 11.09.2020 Переработка.
  * @since 16.09.2020 Доработка. RequestContext.
  * @since 30.10.2020 ArgumentResolver пробрасывается снаружи.
+ * @since 19.11.2020 RequestStack пробрасывается снаружи.
  */
 class InitRouter
 {
@@ -58,6 +58,11 @@ class InitRouter
      */
     protected $argumentResolver;
 
+    /**
+     * @var RequestStack $requestStack RequestStack.
+     */
+    protected $requestStack;
+
     /** @var array $defaultSubscribers Подписчики на события по умолчанию. */
     private $defaultSubscribers;
 
@@ -69,9 +74,11 @@ class InitRouter
      * @param EventDispatcher             $dispatcher         Event dispatcher.
      * @param ControllerResolverInterface $controllerResolver Controller resolver.
      * @param ArgumentResolverInterface   $argumentResolver   Argument resolver.
+     * @param RequestStack                $requestStack       Request stack.
      * @param Request|null                $request            Request.
      *
      * @since 16.09.2020 Инициализация RequestContext.
+     * @since 19.11.2020 RequestStack пробрасывается снаружи.
      */
     public function __construct(
         RouteCollection $routeCollection,
@@ -79,6 +86,7 @@ class InitRouter
         EventDispatcher $dispatcher,
         ControllerResolverInterface $controllerResolver,
         ArgumentResolverInterface $argumentResolver,
+        RequestStack $requestStack,
         Request $request = null
     ) {
         $this->request = $request ?? Request::createFromGlobals();
@@ -87,6 +95,9 @@ class InitRouter
         $this->controllerResolver = $controllerResolver;
         $this->argumentResolver = $argumentResolver;
 
+        $this->requestStack = $requestStack;
+        $this->requestStack->push($this->request);
+
         // RequestContext init.
         $requestContext = new RequestContext();
         $requestContext->fromRequest($this->request);
@@ -94,7 +105,7 @@ class InitRouter
         $matcher = new UrlMatcher($routeCollection, $requestContext);
         // Подписчики на события по умолчанию.
         $this->defaultSubscribers = [
-            new RouterListener($matcher, new RequestStack()),
+            new RouterListener($matcher, new $this->requestStack),
             new StringResponseListener(),
             new ErrorListener(
                 [$this->errorController, 'exceptionAction']

@@ -83,6 +83,8 @@ services:
     class: Symfony\Component\Routing\RouteCollection
     factory: ['@routes.config', 'routes']
 
+  router.default: '@routes.collection'
+
   Local\SymfonyTools\Router\RouterConfig: '@routes.config'
 
   # Symfony загрузчик аннотированных роутов.
