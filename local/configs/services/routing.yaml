@@ -120,7 +120,7 @@ services:
       - '@event_dispatcher'
       - '@controller_resolver'
       - '@argument_resolver'
-
+      - '@request_stack'
     # Подвязка на битриксовое событие.
     tags:
       - { name: bitrix.events.init, module: main, event: OnProlog, method: handle, sort: 1 }
