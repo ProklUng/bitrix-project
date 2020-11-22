@@ -11,9 +11,9 @@
 
 namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter;
 
-use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\HashNamingStrategy;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\NamingStrategyInterface;
 use GuzzleHttp\Psr7\Response;
+use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\PostHashNamingStrategy;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -25,14 +25,14 @@ class PsrAdapter implements StorageAdapterInterface
     private $ttl;
 
     /**
-     * @param CacheItemPoolInterface $cache
-     * @param int $ttl
+     * @param CacheItemPoolInterface       $cache
+     * @param integer                      $ttl
      * @param NamingStrategyInterface|null $namingStrategy
      */
     public function __construct(CacheItemPoolInterface $cache, $ttl = 0, NamingStrategyInterface $namingStrategy = null)
     {
         $this->cache = $cache;
-        $this->namingStrategy = $namingStrategy ?: new HashNamingStrategy();
+        $this->namingStrategy = $namingStrategy ?: new PostHashNamingStrategy();
         $this->ttl = $ttl;
     }
 

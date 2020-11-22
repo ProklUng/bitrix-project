@@ -16,7 +16,7 @@ csa_guzzle:
     adapter: bitrix.psr.simple.cacher.adapter
 
   logger:
-    enabled: true
+    enabled: false
     # service: ~
     service: 'logger'
     format: '{hostname} {req_header_User-Agent} - [{date_common_log}] "{method} {target} HTTP/{version}" {code} {res_header_Content-Length}'
