@@ -105,7 +105,7 @@ class InitRouter
         $matcher = new UrlMatcher($routeCollection, $requestContext);
         // Подписчики на события по умолчанию.
         $this->defaultSubscribers = [
-            new RouterListener($matcher, new $this->requestStack),
+            new RouterListener($matcher, $this->requestStack),
             new StringResponseListener(),
             new ErrorListener(
                 [$this->errorController, 'exceptionAction']
