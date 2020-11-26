@@ -16,6 +16,8 @@ class DefaultValidationMessages extends AbstractDictionary
         return  [
             'required' => 'Не указано поле :attribute',
             'numeric' => 'Поле :attribute должно содержать числовое значение',
+            'string' => 'Поле :attribute должно содержать строковое значение',
+            'required_without' => 'Поле :attribute не должно быть пусто в такой ситуации',
         ];
     }
 }

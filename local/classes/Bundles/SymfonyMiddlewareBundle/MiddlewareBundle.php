@@ -10,6 +10,12 @@ use Local\Bundles\SymfonyMiddlewareBundle\DependencyInjection\CompilerPass\Globa
 use Local\Bundles\SymfonyMiddlewareBundle\DependencyInjection\CompilerPass\RouteMiddlewarePass;
 use Local\Bundles\SymfonyMiddlewareBundle\Middleware\MiddlewareEnum;
 
+/**
+ * Class MiddlewareBundle
+ * @package Local\Bundles\SymfonyMiddlewareBundle
+ *
+ * @see https://github.com/zholus/symfony-middleware-bundle
+ */
 class MiddlewareBundle extends Bundle
 {
     public function build(ContainerBuilder $container): void
