@@ -6,7 +6,7 @@ parameters:
     enabled: true
     app: cache.adapter.filesystem
     system: cache.adapter.system
-    directory: '%kernel.project_dir%/wp-content/cache/symfony'
+    directory: '%kernel.project_dir%/bitrix/cache/symfony'
     default_memcached_provider: 'memcached://localhost'
 
     pools:
