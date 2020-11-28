@@ -7,6 +7,7 @@ use CMain;
 use Exception;
 use InvalidArgumentException;
 use Local\ServiceProvider\Bundles\BundlesLoader;
+use Local\ServiceProvider\Extra\ExtraFeature;
 use Local\Services\AppKernel;
 use Local\Util\ErrorScreen;
 use Local\Util\LoaderContent;
@@ -78,6 +79,11 @@ class ServiceProvider
      */
     protected $bundlesLoader;
 
+    /**
+     * @var ExtraFeature $frameworkExtension Из FrameworkExtension.
+     */
+    protected $frameworkExtension;
+
     /** @const string SERVICE_CONFIG_FILE Конфигурация сервисов. */
     protected const SERVICE_CONFIG_FILE = 'local/configs/services.yaml';
 
@@ -133,6 +139,7 @@ class ServiceProvider
         );
 
         $this->filesystem = new Filesystem();
+        $this->frameworkExtension = new ExtraFeature();
 
         if (!$filename) {
             $filename = self::SERVICE_CONFIG_FILE;
@@ -328,6 +335,9 @@ class ServiceProvider
                 $this->getContainerLoader(self::$containerBuilder)
             );
 
+            // FrameworkExtension.
+            $this->registerFrameworkExtensions();
+
             return self::$containerBuilder;
         } catch (Exception $e) {
             $this->errorHandler->die('Ошибка загрузки Symfony Container: ' . $e->getMessage());
@@ -343,16 +353,18 @@ class ServiceProvider
      * @return null|ContainerBuilder
      *
      * @since 28.09.2020
-     * @since 13.11.2020 Мета-данные бандлов. Обработка ошибки отсутствия сервиса kernel.
-     *
-     * @throws LogicException Не инициализирован сервис kernel или пустой ParameterBag.
      */
     private function initialize(string $fileName): ?ContainerBuilder
     {
         try {
             $this->loadContainer($fileName);
 
-            $this->updateBundlesMetaData();
+            // Дополнить переменные приложения сведениями о зарегистрированных бандлах.
+            self::$containerBuilder->get('kernel')->registerStandaloneBundles();
+
+            self::$containerBuilder->getParameterBag()->add(
+                self::$containerBuilder->get('kernel')->getKernelParameters()
+            );
 
             // Boot bundles.
             $this->bundlesLoader->boot(self::$containerBuilder);
@@ -368,40 +380,6 @@ class ServiceProvider
         }
 
         return self::$containerBuilder;
-    }
-
-    /**
-     * Дополнить переменные приложения сведениями о зарегистрированных бандлах.
-     *
-     * @return void
-     *
-     * @throws LogicException  Не инициализирован сервис kernel или пустой ParameterBag.
-     * @throws Exception       Ошибки контейнера.
-     *
-     * @since 13.11.2020
-     */
-    private function updateBundlesMetaData() : void
-    {
-        if (!self::$containerBuilder->has('kernel')) {
-            throw new LogicException(
-                'Service kernel not initialized.'
-            );
-        }
-
-        $kernelService = self::$containerBuilder->get('kernel');
-        $parameterBag = self::$containerBuilder->getParameterBag();
-        if ($kernelService && $parameterBag) {
-            // Дополнить переменные приложения сведениями о загруженных бандлах.
-            $kernelService->registerStandaloneBundles();
-
-            $parameterBag->add(
-                $kernelService->getBundlesMetaData()
-            );
-        } else {
-            throw new LogicException(
-                'ParameterBag not initialized.'
-            );
-        }
     }
 
     /**
@@ -594,6 +572,23 @@ class ServiceProvider
         ]);
 
         return new DelegatingLoader($resolver);
+    }
+
+    /**
+     * Регистрация Framework Extensions.
+     *
+     * @return void
+     *
+     * @since 28.11.2020
+     *
+     * @throws LogicException
+     */
+    private function registerFrameworkExtensions() : void
+    {
+        $this->frameworkExtension->registerCacheConfiguration(
+            self::$containerBuilder->getParameter('cache'),
+            self::$containerBuilder
+        );
     }
 
     /**

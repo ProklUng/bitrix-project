@@ -4,6 +4,7 @@ imports:
   - {resource: services/collections.yaml }
   - {resource: services/annotations.yaml }
   - {resource: services/filesystem.yaml }
+  - {resource: services/cache.yaml }
   - {resource: services/validations.yaml }
   - {resource: services/serializer.yaml }
   - {resource: services/sessions.yaml }

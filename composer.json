@@ -23,6 +23,7 @@
     "zeptech/annotations": "^1.1",
     "symfony/property-info": "^4.4",
     "symfony/dependency-injection": "^4.4",
+    "symfony/cache": "^5.1",
     "haydenpierce/class-finder": "^0.4.2",
     "rkr/wildcards": "^1.0",
     "league/flysystem": "^1.0",
@@ -40,7 +41,8 @@
     "tijsverkoyen/css-to-inline-styles": "^2.2",
     "spatie/data-transfer-object": "^2.5",
     "symfony/monolog-bundle": "^3.6",
-    "guzzlehttp/guzzle": "^7.2"
+    "guzzlehttp/guzzle": "^7.2",
+    "webarchitect609/bitrix-cache": "^1.6"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "2.*",
