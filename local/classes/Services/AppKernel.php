@@ -88,7 +88,7 @@ class AppKernel extends Kernel
             'kernel.root_dir' => realpath($this->getProjectDir()) ?: $this->getProjectDir(),
             'kernel.environment' => $this->environment,
             'kernel.debug' => $this->debug,
-            'kernel.cache_dir' => realpath($this->getCacheDir()),
+            'kernel.cache_dir' => $this->getCacheDir(),
             'kernel.http.host' => $_SERVER['HTTP_HOST'],
             'kernel.site.host' => $this->getSiteHost(),
             'kernel.schema' => $this->getSchema(),
