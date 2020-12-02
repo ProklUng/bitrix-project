@@ -18,10 +18,25 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Class PsrAdapter
+ * @package Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter
+ *
+ * @since 02.12.2020 Исключить кэширование PUT & DELETE запросов.
+ */
 class PsrAdapter implements StorageAdapterInterface
 {
+    /**
+     * @var CacheItemPoolInterface $cache Кэшер.
+     */
     private $cache;
+
+    /**
+     * @var NamingStrategyInterface|PostHashNamingStrategy $namingStrategy Формирование ключа кэша.
+     */
     private $namingStrategy;
+
+    /** @var integer $ttl Время жизни кэша. */
     private $ttl;
 
     /**
@@ -41,6 +56,10 @@ class PsrAdapter implements StorageAdapterInterface
      */
     public function fetch(RequestInterface $request)
     {
+        if (!$this->checkValidTypeRequest($request)) {
+            return null;
+        }
+
         $key = $this->namingStrategy->filename($request);
 
         $item = $this->cache->getItem($key);
@@ -57,6 +76,10 @@ class PsrAdapter implements StorageAdapterInterface
      */
     public function save(RequestInterface $request, ResponseInterface $response)
     {
+        if (!$this->checkValidTypeRequest($request)) {
+            return null;
+        }
+
         $key = $this->namingStrategy->filename($request);
 
         $item = $this->cache->getItem($key);
@@ -72,5 +95,23 @@ class PsrAdapter implements StorageAdapterInterface
         $this->cache->save($item);
 
         $response->getBody()->seek(0);
+    }
+
+    /**
+     * PUT и POST запросы исключить из кэширования.
+     *
+     * @param RequestInterface $request
+     *
+     * @return boolean
+     *
+     * @since 02.12.2020
+     */
+    private function checkValidTypeRequest(RequestInterface $request) : bool
+    {
+        if ($request->getMethod() === 'PUT' || $request->getMethod() === 'DELETE') {
+            return false;
+        }
+
+        return true;
     }
 }

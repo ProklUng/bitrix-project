@@ -14,6 +14,7 @@ use Psr\Http\Message\ResponseInterface;
  * @package Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter
  *
  * @simce 14.11.2020
+ * @since 02.12.2020 Исключить кэширование PUT & DELETE запросов.
  */
 class BitrixAdapter implements StorageAdapterInterface
 {
@@ -54,6 +55,10 @@ class BitrixAdapter implements StorageAdapterInterface
      */
     public function fetch(RequestInterface $request)
     {
+        if (!$this->checkValidTypeRequest($request)) {
+            return null;
+        }
+
         $key = $this->namingStrategy->filename($request);
         $cacheId = md5($key);
         $cachePath = '/'.SITE_ID.'/guzzle-bundle/'.$cacheId;
@@ -78,6 +83,10 @@ class BitrixAdapter implements StorageAdapterInterface
      */
     public function save(RequestInterface $request, ResponseInterface $response)
     {
+        if (!$this->checkValidTypeRequest($request)) {
+            return null;
+        }
+
         $key = $this->namingStrategy->filename($request);
         $cacheId = md5($key);
         $cachePath = '/'.SITE_ID.'/guzzle-bundle/'.$cacheId;
@@ -101,5 +110,23 @@ class BitrixAdapter implements StorageAdapterInterface
 
             $response->getBody()->seek(0);
         }
+    }
+
+    /**
+     * PUT и POST запросы исключить из кэширования.
+     *
+     * @param RequestInterface $request
+     *
+     * @return boolean
+     *
+     * @since 02.12.2020
+     */
+    private function checkValidTypeRequest(RequestInterface $request) : bool
+    {
+        if ($request->getMethod() === 'PUT' || $request->getMethod() === 'DELETE') {
+            return false;
+        }
+
+        return true;
     }
 }
