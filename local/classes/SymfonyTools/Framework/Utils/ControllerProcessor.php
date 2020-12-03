@@ -26,6 +26,8 @@ use ReflectionObject;
  * @since 10.09.2020 PSR-2 форматирование.
  * @since 31.10.2020 Фикс ошибки рефлексии параметра, не имеющего значения по умолчанию.
  * @since 08.11.2020 Обработка классов-исключений из автовязи (DTO, например).
+ * @since 03.12.2020 Поддержка аттрибутов, как без $, так и с ним. В routes.yaml можно писать
+ * как угодно. Для совместимости с нативным Symfony.
  */
 class ControllerProcessor implements InjectorControllerInterface
 {
@@ -327,10 +329,13 @@ class ControllerProcessor implements InjectorControllerInterface
     /**
      * Сама механика получения аргументов.
      *
-     * @param Request $request    Запрос.
-     * @param array   $parameters Параметры.
+     * @param Request $request     Запрос.
+     * @param array   $parameters  Параметры.
      *
      * @return array
+     *
+     * @since 03.12.2020 Поддержка аттрибутов, как без $, так и с ним. В routes.yaml можно писать
+     * как угодно. Для совместимости с нативным Symfony.
      */
     protected function doGetArguments(Request $request, array $parameters): array
     {
@@ -338,8 +343,11 @@ class ControllerProcessor implements InjectorControllerInterface
         $arguments = [];
 
         foreach ($parameters as $param) {
-            if (array_key_exists($param->name, $attributes)) {
-                $arguments[$param->name] = $attributes[$param->name];
+            if (array_key_exists($param->name, $attributes)
+                ||
+                array_key_exists('$' . $param->name, $attributes)
+            ) {
+                $arguments[$param->name] = $attributes[$param->name] ?? $attributes['$' . $param->name];
             }
         }
 
