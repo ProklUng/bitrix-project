@@ -5,7 +5,6 @@ namespace Local\SymfonyTools\Events\OnKernelRequest\Subscribers;
 use Local\SymfonyTools\Events\OnKernelRequest\Interfaces\OnKernelRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractSubscriberKernelRequestTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -14,8 +13,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class SetSession implements EventSubscriberInterface, OnKernelRequestHandlerInterface
+class SetSession implements OnKernelRequestHandlerInterface
 {
     use AbstractSubscriberKernelRequestTrait;
 
@@ -47,6 +47,10 @@ class SetSession implements EventSubscriberInterface, OnKernelRequestHandlerInte
      */
     public function handle(RequestEvent $event): void
     {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         $request->setSession(

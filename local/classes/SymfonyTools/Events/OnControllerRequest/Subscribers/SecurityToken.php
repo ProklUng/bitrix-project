@@ -7,7 +7,6 @@ use Local\Controllers\Traits\ValidatorTraits\SecurityTokenTrait;
 use Local\SymfonyTools\Events\Exceptions\WrongSecurityTokenException;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -17,8 +16,9 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class SecurityToken implements EventSubscriberInterface, OnControllerRequestHandlerInterface
+class SecurityToken implements OnControllerRequestHandlerInterface
 {
     use AbstractSubscriberTrait;
 
@@ -36,7 +36,7 @@ class SecurityToken implements EventSubscriberInterface, OnControllerRequestHand
      */
     public function handle(ControllerEvent $event): void
     {
-        if (!$this->useTrait($event, SecurityTokenTrait::class)) {
+        if (!$event->isMasterRequest() || !$this->useTrait($event, SecurityTokenTrait::class)) {
             return;
         }
 

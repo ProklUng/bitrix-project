@@ -4,8 +4,6 @@ namespace Local\SymfonyTools\Events\OnControllerRequest\Subscribers;
 
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
-use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -15,8 +13,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class BootTraits implements EventSubscriberInterface, OnControllerRequestHandlerInterface
+class BootTraits implements OnControllerRequestHandlerInterface
 {
     use AbstractSubscriberTrait;
 

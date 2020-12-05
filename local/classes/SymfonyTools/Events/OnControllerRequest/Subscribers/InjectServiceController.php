@@ -6,7 +6,6 @@ use Exception;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -15,8 +14,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class InjectServiceController implements EventSubscriberInterface, OnControllerRequestHandlerInterface
+class InjectServiceController implements OnControllerRequestHandlerInterface
 {
     use AbstractSubscriberTrait;
 
@@ -43,6 +43,10 @@ class InjectServiceController implements EventSubscriberInterface, OnControllerR
      */
     public function handle(ControllerEvent $event): void
     {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
         $controller = $event->getController();
 
         $action = '';

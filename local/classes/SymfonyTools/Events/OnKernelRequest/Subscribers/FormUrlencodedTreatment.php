@@ -4,7 +4,6 @@ namespace Local\SymfonyTools\Events\OnKernelRequest\Subscribers;
 
 use Local\SymfonyTools\Events\OnKernelRequest\Interfaces\OnKernelRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractSubscriberKernelRequestTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -12,8 +11,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * @package Local\SymfonyTools\Events\OnKernelRequest\Subscribers
  *
  * @since 11.09.2020
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class FormUrlencodedTreatment implements EventSubscriberInterface, OnKernelRequestHandlerInterface
+class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
 {
     use AbstractSubscriberKernelRequestTrait;
 

@@ -6,7 +6,6 @@ use Local\SymfonyTools\Framework\Exceptions\WrongCsrfException;
 use Local\SymfonyTools\Events\OnKernelRequest\Interfaces\OnKernelRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractSubscriberKernelRequestTrait;
 use Local\SymfonyTools\Framework\Utils\CsrfRequestHandler;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -15,8 +14,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class ValidatorRequestCsrfToken implements EventSubscriberInterface, OnKernelRequestHandlerInterface
+class ValidatorRequestCsrfToken implements OnKernelRequestHandlerInterface
 {
     use AbstractSubscriberKernelRequestTrait;
 
@@ -34,6 +34,10 @@ class ValidatorRequestCsrfToken implements EventSubscriberInterface, OnKernelReq
      */
     public function handle(RequestEvent $event): void
     {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         $csrfRequestHandler = new CsrfRequestHandler(

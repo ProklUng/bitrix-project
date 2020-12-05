@@ -6,7 +6,6 @@ use Local\Controllers\Traits\ValidatorTraits\BitrixSecurityTokenTrait;
 use Local\SymfonyTools\Events\Exceptions\WrongSecurityTokenException;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -14,8 +13,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  * @package Local\SymfonyTools\Events\OnControllerRequest\Subscribers
  *
  * @since 11.09.2020
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class CheckBitrixToken implements EventSubscriberInterface, OnControllerRequestHandlerInterface
+class CheckBitrixToken implements OnControllerRequestHandlerInterface
 {
     use AbstractSubscriberTrait;
 
@@ -35,7 +35,7 @@ class CheckBitrixToken implements EventSubscriberInterface, OnControllerRequestH
     {
         $controller = $event->getController();
 
-        if (!is_array($controller)) {
+        if (!is_array($controller) || !$event->isMasterRequest()) {
             return;
         }
 

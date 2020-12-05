@@ -7,7 +7,6 @@ use Local\Controllers\Traits\ValidatorTraits\SecurityAjaxCallTrait;
 use Local\SymfonyTools\Events\Exceptions\InvalidAjaxCallException;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
 use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -16,8 +15,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class AjaxCall implements EventSubscriberInterface, OnControllerRequestHandlerInterface
+class AjaxCall implements OnControllerRequestHandlerInterface
 {
     use AbstractSubscriberTrait;
 
@@ -34,7 +34,7 @@ class AjaxCall implements EventSubscriberInterface, OnControllerRequestHandlerIn
      */
     public function handle(ControllerEvent $event): void
     {
-        if (!$this->useTrait($event, SecurityAjaxCallTrait::class)) {
+        if (!$event->isMasterRequest() || !$this->useTrait($event, SecurityAjaxCallTrait::class)) {
             return;
         }
 

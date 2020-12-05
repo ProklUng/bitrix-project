@@ -6,7 +6,6 @@ use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequest
 use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -15,8 +14,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  *
  * @since 10.09.2020
  * @since 11.09.2020 Упрощение.
+ * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
  */
-class SetContainer implements EventSubscriberInterface, OnControllerRequestHandlerInterface
+class SetContainer implements OnControllerRequestHandlerInterface
 {
     use AbstractSubscriberTrait;
 
@@ -46,7 +46,7 @@ class SetContainer implements EventSubscriberInterface, OnControllerRequestHandl
     {
         $controller = $event->getController();
 
-        if (!is_array($controller)) {
+        if (!is_array($controller) || !$event->isMasterRequest()) {
             return;
         }
 
