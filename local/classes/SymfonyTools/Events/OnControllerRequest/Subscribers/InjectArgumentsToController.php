@@ -3,7 +3,7 @@
 namespace Local\SymfonyTools\Events\OnControllerRequest\Subscribers;
 
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
-use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractListenerTrait;
 use Local\SymfonyTools\Framework\Exceptions\ArgumentsControllersException;
 use Local\SymfonyTools\Framework\Interfaces\InjectorControllerInterface;
 use Local\SymfonyTools\Framework\Utils\ControllerProcessor;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  */
 class InjectArgumentsToController implements OnControllerRequestHandlerInterface
 {
-    use AbstractSubscriberTrait;
+    use AbstractListenerTrait;
 
     /**
      * @var InjectorControllerInterface $controllerProcessor Обработчик контроллеров.

@@ -3,7 +3,7 @@
 namespace Local\SymfonyTools\Events\OnControllerRequest\Subscribers;
 
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
-use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractListenerTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  */
 class SetContainer implements OnControllerRequestHandlerInterface
 {
-    use AbstractSubscriberTrait;
+    use AbstractListenerTrait;
 
     /**
      * @var ContainerInterface $container Сервис-контейнер.

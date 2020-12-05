@@ -4,7 +4,7 @@ namespace Local\SymfonyTools\Events\OnControllerRequest\Subscribers;
 
 use Exception;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
-use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractListenerTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  */
 class InjectServiceController implements OnControllerRequestHandlerInterface
 {
-    use AbstractSubscriberTrait;
+    use AbstractListenerTrait;
 
     /**
      * InjectServiceController constructor.

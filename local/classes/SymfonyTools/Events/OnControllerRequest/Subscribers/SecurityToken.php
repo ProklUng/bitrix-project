@@ -6,7 +6,8 @@ use Exception;
 use Local\Controllers\Traits\ValidatorTraits\SecurityTokenTrait;
 use Local\SymfonyTools\Events\Exceptions\WrongSecurityTokenException;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
-use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractListenerTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\UseTraitChecker;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Csrf\CsrfToken;
 
@@ -20,7 +21,8 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  */
 class SecurityToken implements OnControllerRequestHandlerInterface
 {
-    use AbstractSubscriberTrait;
+    use AbstractListenerTrait;
+    use UseTraitChecker;
 
     /**
      * Обработчик события kernel.controller.

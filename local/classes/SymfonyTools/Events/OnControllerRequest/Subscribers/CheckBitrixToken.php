@@ -5,7 +5,8 @@ namespace Local\SymfonyTools\Events\OnControllerRequest\Subscribers;
 use Local\Controllers\Traits\ValidatorTraits\BitrixSecurityTokenTrait;
 use Local\SymfonyTools\Events\Exceptions\WrongSecurityTokenException;
 use Local\SymfonyTools\Events\OnControllerRequest\Interfaces\OnControllerRequestHandlerInterface;
-use Local\SymfonyTools\Events\OnControllerRequest\Subscribers\Traits\AbstractSubscriberTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\AbstractListenerTrait;
+use Local\SymfonyTools\Events\OnKernelRequest\Traits\UseTraitChecker;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -17,7 +18,8 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  */
 class CheckBitrixToken implements OnControllerRequestHandlerInterface
 {
-    use AbstractSubscriberTrait;
+    use AbstractListenerTrait;
+    use UseTraitChecker;
 
     /**
      * Обработчик события kernel.controller.
