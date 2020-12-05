@@ -26,3 +26,5 @@ hosts.yml
 .history/
 /local/classes/ServiceProvider/cache/
 /bitrix/
+
+/composer.lock
