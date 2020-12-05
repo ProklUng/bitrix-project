@@ -40,6 +40,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
@@ -319,8 +320,14 @@ class ServiceProvider
         // tags:
         //      - { name: kernel.event_listener, event: kernel.request, method: handle }
         self::$containerBuilder->register('event_dispatcher', EventDispatcher::class);
-        self::$containerBuilder->addCompilerPass(new RegisterListenersPass());
-
+        $registerListenersPass = new RegisterListenersPass();
+        $registerListenersPass->setHotPathEvents([
+            KernelEvents::REQUEST,
+            KernelEvents::CONTROLLER,
+            KernelEvents::CONTROLLER_ARGUMENTS,
+            KernelEvents::RESPONSE,
+            KernelEvents::FINISH_REQUEST,
+        ]);
 
         $loader = new YamlFileLoader(self::$containerBuilder, new FileLocator(
             $this->projectRoot
