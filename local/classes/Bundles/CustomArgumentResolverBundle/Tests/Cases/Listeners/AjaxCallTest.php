@@ -5,13 +5,15 @@ namespace Local\Bundles\CustomArgumentResolverBundle\Tests\Cases\Listeners;
 use Exception;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\InvalidAjaxCallException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\AjaxCall;
-use Local\Bundles\CustomArgumentResolverBundle\Tests\Samples\SampleControllerAjaxTrait;
+use Local\Bundles\CustomArgumentResolverBundle\Event\Traits\ValidatorTraits\SecurityAjaxCallTrait;
+use Local\Bundles\CustomArgumentResolverBundle\Tests\Tools\BaseTestCase;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Tests\PhpUnitExtensions\FedyTestCase;
 
 /**
  * Class AjaxCallTest
@@ -21,8 +23,9 @@ use Tests\PhpUnitExtensions\FedyTestCase;
  * @since 10.09.2020
  * @since 28.10.2020 Рефакторинг.
  * @since 05.12.2020 Актуализация.
+ * @since 06.12.2020 Рефакторинг.
  */
-class AjaxCallTest extends FedyTestCase
+class AjaxCallTest extends BaseTestCase
 {
     /**
      * @var AjaxCall $obTestObject Тестируемый объект.
@@ -81,9 +84,9 @@ class AjaxCallTest extends FedyTestCase
         $controller = $controllerResolver->getController($request);
 
         return new ControllerEvent(
-            $this->containerSymfony->get('kernel'),
+            static::$testContainer->get('kernel'),
             $controller,
-            $this->getFakeRequest(),
+            $request,
             HttpKernelInterface::MASTER_REQUEST
         );
     }
@@ -103,11 +106,22 @@ class AjaxCallTest extends FedyTestCase
             []
         );
 
+        $class = new class extends AbstractController{
+            use SecurityAjaxCallTrait;
+
+            public function action(Request $request)
+            {
+                return new Response('OK');
+            }
+        };
+
+        $controllerString = get_class($class) . '::action';
+
         $fakeRequest->attributes->set('_controller',
-            'Local\Bundles\CustomArgumentResolverBundle\Tests\Samples\SampleControllerAjaxTrait::action'
+            $controllerString
         );
 
-        $fakeRequest->attributes->set('obj', SampleControllerAjaxTrait::class);
+        $fakeRequest->attributes->set('obj', get_class($class));
         if ($ajax) {
             $fakeRequest->headers = new HeaderBag(['x-requested-with' => 'XMLHttpRequest']);
         }

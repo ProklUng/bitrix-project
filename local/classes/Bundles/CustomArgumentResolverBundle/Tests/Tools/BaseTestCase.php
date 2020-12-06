@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BaseTestCase extends TestCase
 {
     use ExceptionAsserts;
+    use PHPUnitTrait;
 
     /**
      * @var mixed $obTestObject

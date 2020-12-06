@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * @since 10.09.2020
  * @since 11.09.2020 Доработка.
  * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
+ * @since 06.12.2020 Убрал зависимость от функции WP.
  */
 class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
 {
@@ -29,6 +30,7 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
      *
      * @since 10.09.2020
      * @since 11.09.2020 Доработка.
+     * @since 06.12.2020 Убрал зависимость от функции WP.
      */
     public function handle(RequestEvent $event): void
     {
@@ -39,9 +41,11 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
         $request = $event->getRequest();
 
         $header = $request->headers->get('content-type');
-        if ($header === 'application/x-www-form-urlencoded'
+        if (($header === 'application/x-www-form-urlencoded'
             ||
-            $header === 'application/json'
+            $header === 'application/json')
+            &&
+            !empty($request->getContent())
         ) {
             // $_POST данные в массив.
             $arPostData = (array)json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -69,7 +73,7 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
     {
         $result = [];
         foreach ((array)$array as $key => $item) {
-            $result[$key] = is_array($item) ? $this->arrayOfStrings($item) : sanitize_text_field((string)$item);
+            $result[$key] = is_array($item) ? $this->arrayOfStrings($item) : $item;
         }
 
         return $result;

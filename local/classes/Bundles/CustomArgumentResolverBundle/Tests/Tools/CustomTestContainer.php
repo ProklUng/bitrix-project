@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class CustomTestContainer
- * @package Local\Bundles\CustomArgumentResolverBundle\Tests\Tools
+ * @package Tests\PhpUnitExtensions
  *
  * @since 18.11.2020
  */
@@ -32,7 +32,7 @@ class CustomTestContainer extends TestContainer
      * @return void
      * @throws ReflectionException
      */
-    public function set($id, $service) : void
+    public function set(string $id, $service) : void
     {
         $reflection = new ReflectionObject($this->testContainer);
         $property = $reflection->getProperty('services');
