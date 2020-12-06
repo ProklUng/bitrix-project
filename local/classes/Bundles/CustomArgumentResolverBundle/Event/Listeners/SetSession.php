@@ -30,7 +30,10 @@ class SetSession implements OnKernelRequestHandlerInterface
      */
     public function handle(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMasterRequest()
+            ||
+            !$this->container->has('session.instance')
+        ) {
             return;
         }
 
