@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Bundles\CustomArgumentResolverBundle\Exceptions;
+namespace Local\Bundles\CustomRequestResponserBundle\Exceptions;
 
 use Throwable;
 
@@ -8,8 +8,7 @@ use Throwable;
  * Interface ExceptionInterface
  * Интерфейс исключений.
  *
- * @package Local\Bundles\CustomArgumentResolverBundle\Exceptions
- * @codeCoverageIgnore
+ * @package Local\Bundles\CustomRequestResponserBundle\Exceptions
  *
  * @since 06.09.2020
  */

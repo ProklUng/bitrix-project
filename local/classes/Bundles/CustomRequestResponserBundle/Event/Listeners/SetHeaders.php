@@ -3,8 +3,6 @@
 namespace Local\Bundles\CustomRequestResponserBundle\Event\Listeners;
 
 use Local\Bundles\CustomRequestResponserBundle\Event\Interfaces\OnKernelResponseHandlerInterface;
-use Local\Bundles\CustomRequestResponserBundle\Event\Traits\AbstractSubscriberKernelResponseTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
@@ -15,10 +13,8 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  *
  * @since 20.10.2020
  */
-class SetHeaders implements EventSubscriberInterface, OnKernelResponseHandlerInterface
+class SetHeaders implements OnKernelResponseHandlerInterface
 {
-    use AbstractSubscriberKernelResponseTrait;
-
     /** @var ExpressionLanguage $expressionLanguage */
     private $expressionLanguage;
 

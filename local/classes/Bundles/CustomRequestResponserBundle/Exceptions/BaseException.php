@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Bundles\CustomArgumentResolverBundle\Exceptions;
+namespace Local\Bundles\CustomRequestResponserBundle\Exceptions;
 
 use Exception;
 
@@ -8,7 +8,6 @@ use Exception;
  * Class BaseException
  * Базовые исключения.
  * @package Local\Bundles\CustomArgumentResolverBundle\Exceptions
- * @codeCoverageIgnore
  */
 class BaseException extends Exception implements ExceptionInterface
 {
