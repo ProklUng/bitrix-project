@@ -31,10 +31,7 @@ class CustomArgumentResolverBundleExtension extends Extension
     }
 
     /**
-     * @param array $configs
-     * @param ContainerBuilder $container
-     *
-     * @throws Exception
+     * @inheritDoc
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -48,11 +45,14 @@ class CustomArgumentResolverBundleExtension extends Extension
         $container->setParameter('custom_arguments_resolvers', $config);
 
         $loader = new YamlFileLoader(
-            $container, new FileLocator(__DIR__ . self::DIR_CONFIG)
+            $container,
+            new FileLocator(__DIR__ . self::DIR_CONFIG)
         );
 
         $loader->load('services.yaml');
-        $loader->load('dev/services.yaml');
+        if ($container->getParameter('kernel.environment') === 'dev') {
+            $loader->load('dev/services.yaml');
+        }
 
         $loader->load('listeners.yaml');
     }
