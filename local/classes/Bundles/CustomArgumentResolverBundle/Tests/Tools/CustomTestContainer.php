@@ -32,7 +32,7 @@ class CustomTestContainer extends TestContainer
      * @return void
      * @throws ReflectionException
      */
-    public function set(string $id, $service) : void
+    public function set($id, $service) : void
     {
         $reflection = new ReflectionObject($this->testContainer);
         $property = $reflection->getProperty('services');
