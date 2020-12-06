@@ -1,0 +1,14 @@
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  custom_request_responser.set.headers:
+    class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\SetHeaders
+    arguments: ['@Symfony\Component\ExpressionLanguage\ExpressionLanguage', '%custom_request_responser%']
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+
+  Local\Bundles\CustomRequestResponserBundle\Event\Listeners\SetHeaders: '@custom_request_responser.set.headers'

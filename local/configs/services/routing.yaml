@@ -13,63 +13,6 @@ services:
   # Роутер.
   #####################
 
-  ##########################################
-  # Subscribers Symfony HttpKernel events.
-  ##########################################
-
-  # kernel.controller
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SetContainer:
-    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SetContainer
-    arguments: ['@service_container']
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 50 }
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\BootTraits:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 50 }
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectServiceController:
-    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectServiceController
-    arguments: ['@service_container']
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 45 }
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectArgumentsToController:
-    class: Local\SymfonyTools\Events\OnControllerRequest\Subscribers\InjectArgumentsToController
-    arguments: ['@Local\SymfonyTools\Framework\Utils\ControllerProcessor']
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 40 }
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\CheckBitrixToken:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 35 }
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\SecurityToken:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 30 }
-
-  Local\SymfonyTools\Events\OnControllerRequest\Subscribers\AjaxCall:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 25 }
-
-  # kernel.request
-  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken:
-    class: Local\SymfonyTools\Events\OnKernelRequest\Subscribers\ValidatorRequestCsrfToken
-    arguments: ['@service_container']
-    tags:
-      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 10 }
-
-  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\FormUrlencodedTreatment:
-    tags:
-      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 5 }
-
-  Local\SymfonyTools\Events\OnKernelRequest\Subscribers\SetSession:
-    class: Local\SymfonyTools\Events\OnKernelRequest\Subscribers\SetSession
-    arguments: ['@service_container']
-    tags:
-      - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 5 }
-
   Symfony\Component\HttpKernel\Controller\ControllerResolver:
     class: Symfony\Component\HttpKernel\Controller\ControllerResolver
 
