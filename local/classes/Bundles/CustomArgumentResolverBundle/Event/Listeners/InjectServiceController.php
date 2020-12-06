@@ -33,6 +33,10 @@ class InjectServiceController implements OnControllerRequestHandlerInterface
      */
     public function handle(ControllerEvent $event): void
     {
+        if (!$event->isMasterRequest()) {
+            return;
+        }
+
         $controller = $event->getController();
 
         $action = '';
