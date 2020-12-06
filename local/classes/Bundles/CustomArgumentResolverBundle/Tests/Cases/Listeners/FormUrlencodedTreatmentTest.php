@@ -127,10 +127,10 @@ class FormUrlencodedTreatmentTest extends BaseTestCase
     }
 
     /**
-     * Мок ControllerEvent.
+     * Мок RequestEvent.
      *
-     * @param string|null $contentType
-     * @param array|null $content
+     * @param string|null $contentType Тип MIME.
+     * @param array|null  $content     Контент.
      *
      * @return mixed
      */
@@ -148,8 +148,8 @@ class FormUrlencodedTreatmentTest extends BaseTestCase
     /**
      * Создать фэйковый Request.
      *
-     * @param string|null $contentType
-     * @param array|null  $postData
+     * @param string|null $contentType Тип MIME.
+     * @param array|null  $postData    Данные для POST запроса.
      *
      * @return Request
      */

@@ -27,11 +27,6 @@ class SecurityTokenTest extends BaseTestCase
      */
     protected $obTestObject;
 
-    /**
-     * @var object $class Фэйковый контроллер.
-     */
-    private $class;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -229,15 +224,15 @@ class SecurityTokenTest extends BaseTestCase
             []
         );
 
-        $this->class = $this->getFakeController($traitable);
+        $class = $this->getFakeController($traitable);
 
-        $controllerString = get_class($this->class) . '::action';
+        $controllerString = get_class($class) . '::action';
 
         $fakeRequest->attributes->set('_controller',
             $controllerString
         );
 
-        $fakeRequest->attributes->set('obj', get_class($this->class));
+        $fakeRequest->attributes->set('obj', get_class($class));
 
         return $fakeRequest;
     }

@@ -74,9 +74,9 @@ class SetSessionTest extends BaseTestCase
     }
 
     /**
-     * Мок ControllerEvent.
+     * Мок RequestEvent.
      *
-     * @param boolean $masterRequest
+     * @param boolean $masterRequest MASTER REQUEST?
      *
      * @return mixed
      */
@@ -105,7 +105,6 @@ class SetSessionTest extends BaseTestCase
         );
 
         $class = new class extends AbstractController{
-
             public function action(Request $request)
             {
                 return new Response('OK');

@@ -53,6 +53,8 @@ class ValidatorRequestCsrfToken implements OnKernelRequestHandlerInterface
      */
     public function handle(RequestEvent $event): void
     {
+        $event->getRequest()->attributes->set('security.token.validated', false);
+
         if (!$event->isMasterRequest()) {
             return;
         }
@@ -66,5 +68,7 @@ class ValidatorRequestCsrfToken implements OnKernelRequestHandlerInterface
         );
 
         $csrfRequestHandler->validateCsrfToken();
+
+        $event->getRequest()->attributes->set('security.token.validated', true);
     }
 }
