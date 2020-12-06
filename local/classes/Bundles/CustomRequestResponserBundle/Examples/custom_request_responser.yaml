@@ -1,0 +1,11 @@
+custom_request_responser:
+  defaults:
+    enabled: true
+
+  headers:
+    # Apply a CSP on all the responses
+    - Content-Security-Policy: default-src 'self'
+
+    - name: Cache-Control
+      value: max-age=31536000, public
+      condition: response.headers.get('Content-Type') matches '/^html/'
