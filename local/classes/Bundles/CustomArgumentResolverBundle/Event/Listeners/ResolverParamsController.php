@@ -8,6 +8,7 @@ use Local\Bundles\CustomArgumentResolverBundle\Event\InjectorController\Injector
 use Local\Bundles\CustomArgumentResolverBundle\Event\Interfaces\OnControllerRequestHandlerInterface;
 use ReflectionException;
 use ReflectionMethod;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -21,6 +22,8 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  */
 class ResolverParamsController implements OnControllerRequestHandlerInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var InjectorControllerInterface $processor Процессор.
      */
@@ -114,7 +117,7 @@ class ResolverParamsController implements OnControllerRequestHandlerInterface
 
         // Проверка на соответствие класса одному из приведенных в конфиге
         // Учитывая наследование.
-        foreach ($this->config['params']['classes_controllers'] as $classController) {
+        foreach ((array)$this->config['params']['classes_controllers'] as $classController) {
             if (!class_exists($classController)) {
                 throw new InvalidConfigArgumentException(
                     sprintf(

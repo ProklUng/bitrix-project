@@ -32,6 +32,8 @@ services:
   custom_arguments_resolvers.argument_resolver.params:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\ResolverParamsController
     arguments: ['@custom_arguments_resolvers.controller_argument.processor', '%custom_arguments_resolvers%']
+    calls:
+      - setContainer: ['@service_container']
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 55 }
 
