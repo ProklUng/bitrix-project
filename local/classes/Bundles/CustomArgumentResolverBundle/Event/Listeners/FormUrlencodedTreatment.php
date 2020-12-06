@@ -26,7 +26,7 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
      *
      * @return void
      *
-     * @throws JsonException
+     * @throws JsonException Ошибки JSON.
      *
      * @since 10.09.2020
      * @since 11.09.2020 Доработка.
@@ -65,7 +65,7 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
     /**
      * Рекурсивная очистка массивов
      *
-     * @param array $array Массив.
+     * @param mixed $array Массив.
      *
      * @return array OK or NULL.
      */

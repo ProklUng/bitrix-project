@@ -27,6 +27,9 @@ class SecurityTokenTest extends BaseTestCase
      */
     protected $obTestObject;
 
+    /**
+     * @inheritDoc
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -40,10 +43,10 @@ class SecurityTokenTest extends BaseTestCase
     /**
      * handle(). Без передачи токена. Контроллер с трэйтом или нет.
      *
-     * @param boolean $traitable
+     * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException
+     * @throws WrongSecurityTokenException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -53,7 +56,7 @@ class SecurityTokenTest extends BaseTestCase
 
         if ($traitable) {
             $this->expectException(WrongSecurityTokenException::class);
-            $this->expectExceptionMessage('Security error: Invalid security token');
+            $this->expectExceptionMessage('Security error: empty token.');
         }
 
         $this->obTestObject->handle($event);
@@ -68,10 +71,10 @@ class SecurityTokenTest extends BaseTestCase
     /**
      * handle(). Невалидный токен. Контроллер с трэйтом или нет.
      *
-     * @param boolean $traitable
+     * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException
+     * @throws WrongSecurityTokenException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -97,10 +100,10 @@ class SecurityTokenTest extends BaseTestCase
     /**
      * handle(). Невалидный токен. Контроллер с трэйтом или нет.
      *
-     * @param boolean $traitable
+     * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException
+     * @throws WrongSecurityTokenException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -126,10 +129,10 @@ class SecurityTokenTest extends BaseTestCase
     /**
      * handle(). Валидный токен. Контроллер с трэйтом или нет.
      *
-     * @param boolean $traitable
+     * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException
+     * @throws WrongSecurityTokenException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -163,8 +166,8 @@ class SecurityTokenTest extends BaseTestCase
     public function dataProviderTrueFalse() : array
     {
         return [
-          [true],
-          [false],
+            [true],
+            [false],
         ];
     }
 
@@ -173,7 +176,7 @@ class SecurityTokenTest extends BaseTestCase
      *
      * @return void
      *
-     * @throws WrongSecurityTokenException
+     * @throws WrongSecurityTokenException Ошибка проверки токена.
      */
     public function testHandleNonMasterRequest() : void
     {
@@ -188,8 +191,8 @@ class SecurityTokenTest extends BaseTestCase
     /**
      * Мок ControllerEvent.
      *
-     * @param boolean $masterRequest
-     * @param boolean $traitable
+     * @param boolean $masterRequest MASTER_REQUEST.
+     * @param boolean $traitable     Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return mixed
      */
@@ -212,7 +215,7 @@ class SecurityTokenTest extends BaseTestCase
     /**
      * Создать фэйковый Request.
      *
-     * @param boolean $traitable
+     * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return Request
      */
@@ -228,7 +231,8 @@ class SecurityTokenTest extends BaseTestCase
 
         $controllerString = get_class($class) . '::action';
 
-        $fakeRequest->attributes->set('_controller',
+        $fakeRequest->attributes->set(
+            '_controller',
             $controllerString
         );
 

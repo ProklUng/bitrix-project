@@ -34,7 +34,7 @@ class ResolveDependencyMaker
     /**
      * Сеттер сопоставлений.
      *
-     * @param array $arDepends
+     * @param array $arDepends Зависимости.
      *
      * @return ResolveDependencyMaker
      */
@@ -48,7 +48,7 @@ class ResolveDependencyMaker
     /**
      * Разрешить зависимости callable.
      *
-     * @param string $callable
+     * @param string $callable Callable.
      *
      * @return array|null
      */
@@ -126,7 +126,8 @@ class ResolveDependencyMaker
         // Абстрактные классы.
         if ($reflectionClass->isAbstract()) {
             $realizationAbstractClass = $this->tryResolveAbstractClass(
-                $class, $arDepends
+                $class,
+                $arDepends
             );
 
             return $this->resolveDependencies($realizationAbstractClass, $arDepends);
@@ -198,7 +199,7 @@ class ResolveDependencyMaker
      * @param string $interfaceClass Интерфейс.
      * @param array  $arDepends      Зависимости.
      *
-     * @return bool|mixed|string
+     * @return boolean|mixed|string
      */
     protected function tryResolveInterface(
         string $interfaceClass,
@@ -224,7 +225,7 @@ class ResolveDependencyMaker
      * @param string $abstractClass Абстрактный класс.
      * @param array  $arDepends     Зависимости.
      *
-     * @return bool|mixed|string
+     * @return boolean|mixed|string
      */
     protected function tryResolveAbstractClass(
         string $abstractClass,

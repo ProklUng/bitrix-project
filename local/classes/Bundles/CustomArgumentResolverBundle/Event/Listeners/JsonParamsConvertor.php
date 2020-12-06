@@ -45,7 +45,7 @@ class JsonParamsConvertor implements OnKernelRequestHandlerInterface
     /**
      * Json в запросе?
      *
-     * @param Request $request
+     * @param Request $request Request.
      *
      * @return boolean
      */
@@ -55,6 +55,8 @@ class JsonParamsConvertor implements OnKernelRequestHandlerInterface
     }
 
     /**
+     * Преобразование.
+     *
      * @param Request $request
      *
      * @return bool

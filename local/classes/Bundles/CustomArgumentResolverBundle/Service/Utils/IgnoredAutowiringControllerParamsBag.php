@@ -21,11 +21,15 @@ class IgnoredAutowiringControllerParamsBag
     private static $ignoredClasses = [];
 
     /**
+     * Добавить класс к числу игнорируемых.
+     *
      * @param array $classes Классы.
+     *
+     * @return void
      */
     public function add(array $classes) : void
     {
-        $classes = array_filter($classes, function($item) {
+        $classes = array_filter($classes, function ($item) {
             return class_exists($item) || interface_exists($item);
         });
 
@@ -40,7 +44,7 @@ class IgnoredAutowiringControllerParamsBag
      *
      * @return boolean
      *
-     * @throws ReflectionException
+     * @throws ReflectionException Ошибки рефлексии.
      *
      * @since 08.11.2020
      */
@@ -66,7 +70,7 @@ class IgnoredAutowiringControllerParamsBag
      * @param string $className Класс, подвергающийся обработке.
      *
      * @return array
-     * @throws ReflectionException
+     * @throws ReflectionException Ошибки рефлексии.
      *
      * @since 08.11.2020
      */

@@ -47,7 +47,7 @@ class ValidatorRequestCsrfToken implements OnKernelRequestHandlerInterface
      * @param RequestEvent $event Объект события.
      *
      * @return void
-     * @throws WrongCsrfException
+     * @throws WrongCsrfException Ошибки проверки CSRF токена.
      *
      * @since 10.09.2020
      */

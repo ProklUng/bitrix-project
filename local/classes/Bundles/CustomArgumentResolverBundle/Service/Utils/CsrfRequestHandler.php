@@ -52,9 +52,9 @@ class CsrfRequestHandler
     /**
      * Проверить токен из заголовков Request.
      *
-     * @return bool
+     * @return boolean
      *
-     * @throws WrongCsrfException
+     * @throws WrongCsrfException Ошибки проверки токена.
      */
     public function validateCsrfToken() : bool
     {

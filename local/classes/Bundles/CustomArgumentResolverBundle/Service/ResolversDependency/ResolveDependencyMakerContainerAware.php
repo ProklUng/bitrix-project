@@ -59,7 +59,8 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
         // Абстрактные классы.
         if ($reflectionClass->isAbstract()) {
             $realizationAbstractClass = $this->tryResolveAbstractClass(
-                $class, $arDepends
+                $class,
+                $arDepends
             );
 
             if (is_object($realizationAbstractClass)) {
@@ -93,7 +94,6 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
 
         // Loop over the constructor arguments
         foreach ($params as $param) {
-
             // Here we should perform a bunch of checks, such as:
             // isArray(), isCallable(), isDefaultValueAvailable()
             // isOptional() etc.
@@ -145,7 +145,7 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
      * @param string $interfaceClass Интерфейс.
      * @param array  $arDepends      Зависимости.
      *
-     * @return bool|mixed|string
+     * @return boolean|mixed|string
      */
     protected function tryResolveInterface(
         string $interfaceClass,
@@ -164,7 +164,7 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
      * @param string $abstractClass Абстрактный класс.
      * @param array  $arDepends     Зависимости.
      *
-     * @return bool|mixed|string
+     * @return boolean|mixed|string
      */
     protected function tryResolveAbstractClass(
         string $abstractClass,

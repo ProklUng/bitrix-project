@@ -38,7 +38,7 @@ class ResolverParamsController implements OnControllerRequestHandlerInterface
      * ResolverParamsController constructor.
      *
      * @param InjectorControllerInterface $processor Процессор.
-     * @param array                       $config    Конфигурация
+     * @param array                       $config    Конфигурация.
      */
     public function __construct(
         InjectorControllerInterface $processor,

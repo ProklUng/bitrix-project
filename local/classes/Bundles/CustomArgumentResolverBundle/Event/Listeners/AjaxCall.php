@@ -30,7 +30,7 @@ class AjaxCall implements OnControllerRequestHandlerInterface
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidAjaxCallException Вызов не AJAX.
      */
     public function handle(ControllerEvent $event): void
     {

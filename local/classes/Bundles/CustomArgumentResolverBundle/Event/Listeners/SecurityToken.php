@@ -34,7 +34,6 @@ class SecurityToken implements OnControllerRequestHandlerInterface
      * @return void
      *
      * @throws WrongSecurityTokenException Ошибки по токену.
-     * @throws Exception                   Ошибки сервис-контейнера.
      *
      * @since 05.12.2020 Борьба с повторными запусками. Трэйт SupportCheckerCallResolverTrait.
      */
