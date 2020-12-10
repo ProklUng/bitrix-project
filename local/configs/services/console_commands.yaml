@@ -23,3 +23,8 @@ services:
       - add: [!tagged console.command]
     arguments:
       - '@Symfony\Component\Console\Application'
+
+  # Очистка кэша.
+  Local\Commands\CacheClear:
+    tags:
+      - { name: console.command }
