@@ -50,7 +50,10 @@
     "spatie/data-transfer-object": "^2.5",
     "symfony/monolog-bundle": "^3.6",
     "guzzlehttp/guzzle": "^7.2",
-    "webarchitect609/bitrix-cache": "^1.6"
+    "webarchitect609/bitrix-cache": "^1.6",
+    "symfony/polyfill-php80": "^1.20",
+    "symfony/string": "^5.2",
+    "dragonmantank/cron-expression": "^3.1"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "2.*",

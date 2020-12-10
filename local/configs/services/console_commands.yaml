@@ -1,0 +1,25 @@
+#####################
+# Консольные команды
+#####################
+
+services:
+  # конфигурация по умолчанию в *этом* файле
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  # Компонент управления консольными командами.
+  Symfony\Component\Console\Application: ~
+
+  ###########
+  # Команды
+  ##########
+
+  # Менеджер консольных команд.
+  console.command.manager:
+    class: Local\Services\Console\ConsoleCommandConfigurator
+    calls:
+      - add: [!tagged console.command]
+    arguments:
+      - '@Symfony\Component\Console\Application'
