@@ -57,6 +57,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
  * @since 12.11.2020 Значение debug передаются снаружи. Рефакторинг.
  * @since 14.11.2020 Загрузка конфигураций бандлов.
+ * @since 12.12.2020 Полноценный контейнер в kernel.
  */
 class ServiceProvider
 {
@@ -344,6 +345,14 @@ class ServiceProvider
 
             // FrameworkExtension.
             $this->registerFrameworkExtensions();
+
+            // Контейнер в AppKernel, чтобы соответствовать Symfony.
+            if (self::$containerBuilder->has('kernel')) {
+                $kernelService = self::$containerBuilder->get('kernel');
+                if ($kernelService) {
+                    $kernelService->setContainer(self::$containerBuilder);
+                }
+            }
 
             return self::$containerBuilder;
         } catch (Exception $e) {

@@ -7,6 +7,7 @@ use Bitrix\Main\SystemException;
 use Local\ServiceProvider\Bundles\BundlesLoader;
 use LogicException;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Component\HttpKernel\Kernel;
  * @since 08.10.2020 kernel.site.host
  * @since 22.10.2020 kernel.schema
  * @since 25.10.2020 Наследование от HttpKernel.
+ * @since 12.12.2020 Полноценный контейнер, чтобы соответствовать Symfony.
  */
 class AppKernel extends Kernel
 {
@@ -206,6 +208,20 @@ class AppKernel extends Kernel
         foreach (BundlesLoader::getBundlesMap() as $bundle) {
             $this->registerBundle($bundle);
         }
+    }
+
+    /**
+     * Sets the container.
+     *
+     * @param ContainerInterface|null $container
+     *
+     * @return void
+     *
+     * @since 12.12.2020
+     */
+    public function setContainer(ContainerInterface $container = null) : void
+    {
+        $this->container = $container;
     }
 
     /**
