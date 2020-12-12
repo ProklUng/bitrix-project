@@ -98,6 +98,8 @@ class AppKernel extends Kernel
             'kernel.bundles_metadata' => $bundlesMetaData['kernel.bundles_metadata'],
             'kernel.container_class' => $this->getContainerClass(),
             'kernel.charset' => $this->getCharset(),
+            'kernel.default_locale' => 'ru',
+            'debug.container.dump' => $this->debug ? '%kernel.cache_dir%/%kernel.container_class%.xml' : null
         ];
     }
 
