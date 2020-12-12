@@ -28,3 +28,28 @@ services:
   Local\Commands\CacheClear:
     tags:
       - { name: console.command }
+
+  ##############################
+  # Стандартные команды Symfony
+  ##############################
+
+  console.command.event_dispatcher_debug:
+    class: Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand
+    arguments: ['@event_dispatcher']
+    tags:
+      - { name: console.command, comand: debug:event-dispatcher }
+
+  console.command.container_debug:
+    class: Local\Commands\Fork\ContainerDebugCommand
+    calls:
+      - setContainer: ['@service_container']
+    tags:
+      - { name: console.command, comand: debug:container }
+
+  console.command.debug_autowiring:
+    class: Local\Commands\Fork\DebugAutowiringCommand
+    calls:
+      - setContainer: ['@service_container']
+    arguments: [~, ~]
+    tags:
+      - { name: console.command, comand: debug:autowiring }
