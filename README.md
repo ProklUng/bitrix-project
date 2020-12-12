@@ -4,59 +4,107 @@
 
 ## Создание нового проекта
 
-Стандартно установить или развернуть из бекапа копию Битрикса.
+- Создать папку нового проекта в OSPanel/domains и Клонировать эту базовую сборку
 
-Клонировать репозиторий (за пределами публичной директории веб-сервера).
-
-Переинициализировать репозиторий: удалить директорию `.git` и выполнить `git init`. 
-
-Установить зависимости и "собрать" фронтенд:
+К примеру:
 ```sh
-composer install && npm install && npm run encore -- dev
+git clone www_test:git/bitrix-build.git ./
 ```
 
-Перенести в корень клонированного проекта содержимое директорий `bitrix`, `upload` и `local` 
-(не затирая файл `local/php_interface/init.php`).
+- Настроить вебсервер для работы с директорией `sites/s1` либо сделать симлинк вида
+  
+  ```sh
+  /home/bitrix/www -> /home/bitrix/projectname/sites/s1
+  ```
+  (Настроить локальный домен в OpenServer со ссылкой на sites/s1)
+
+### Зависимости
+
+- Установить зависимости composer (frontend):
+```sh
+composer install
+```
+
+- Установить зависимости npm (backend):
+```sh
+npm install
+```
+
+### Bitrix
+
+- Удалить папку bitrix
+- Инициализировать submodule:
+```sh
+git submodule init
+```
+
+- Запустить submodule (cклонируется bitrix):
+```sh
+git submodule update
+```
+
+### Символьные ссылки
 
 В директорию `sites/s1` перенести публичные файлы сайта.
 
-Настроить вебсервер для работы с директорией `sites/s1` либо сделать симлинк вида
+В виндовом терминале:
 
 ```sh
-/home/bitrix/www -> /home/bitrix/projectname/sites/s1
+mklink "local" "../../local" /j
+mklink "bitrix" "../../bitrix" /j
+mklink "upload" "../../upload" /j
 ```
 
+### База данных и окружение
 
-Создать файл `.env` 
+- Создать базу данных на localhost
+
+- Развернуть бэкап базы из bitrix/backup
+
+- Создать файл `.env` 
 
 ```sh
 touch .env
 ```
 
-Заполнить его данными в соответствии с файлом-образцом `.env.example`
+- Заполнить его данными в соответствии с файлом-образцом `.env.example`
 
-Выполнить команду
+- Развернуть окружение
 
 ```sh
 ./vendor/bin/jedi env:init default
-```
+
+Update: упрощенная локальная версия Jedi - в терминале: php bin/jedi env:init default
 
 Эта команда скопирует в директорию `bitrix` системные файлы настроек сконфигурированные для работы с 
 [переменными окружения](https://github.com/vlucas/phpdotenv), а также настройки 
 [шаблонизатора Twig](https://github.com/maximaster/tools.twig) 
 и [логгера Monolog](https://github.com/bitrix-expert/monolog-adapter)
 
+### Миграции
 
-Установить [модуль миграций](https://github.com/arrilot/bitrix-migrations)
+- Установить [модуль миграций](https://github.com/arrilot/bitrix-migrations)
 
 ```sh
 php migrator install
 ```
 
-Доустановить модуль [Базовых Битрикс компонентов](https://github.com/bitrix-expert/bbc). в административном интефейсе: 
+- Запуск миграций
+
+```sh
+php migrator migrate
+```
+
+** Доустановить модуль [Базовых Битрикс компонентов](https://github.com/bitrix-expert/bbc). в административном интефейсе: 
 
 `Marketplace > Установленные решения > ББК (bex.bbc)`
 
+
+### "Собрать" фронтенд
+
+```sh
+npm run encore -- dev
+```
 
 ## Бэкенд
 
@@ -115,10 +163,16 @@ composer run fix:php
 Основные команды:
 
 ```sh
-npm run encore -- dev          # запустить сборку один раз
-npm run encore -- dev --watch  # запустить сборку в режиме слежения за файлами
+npm run encore -- dev          # запустить сборку для разработчика один раз
+npm run encore -- dev --watch  # запустить сборку для разработчика в режиме слежения за файлами
 npm run encore -- production   # запустить сборку для продакшена
 ```
+
+
+## Доработки Фронтенда
+Папка 'local/assets/script/own-js' - здесь находятся самописные js-модули, которые инклюдятся 
+либо на всех страницах (в файле 'local/assets/script/routes/common.js'), либо на конкретной
+странице (в файле 'local/assets/script/routes/_имя-страницы.js').
 
 
 
@@ -213,20 +267,10 @@ npm run fix:styles   # исправить ошибки
 ```
 mkdir sites/s2             # создать директорию для дополнительного сайта
 cd sites/s2                # перейти в нее
-ln -s ../../bitrix bitrix  # и
-ln -s ../../local local    # добавить 
-ln -s ../../upload upload  # ссылки     
+mklink "local" "../../local" /j
+mklink "bitrix" "../../bitrix" /j
+mklink "upload" "../../upload" /j
+
 ``` 
 
 Далее необходимо настроить веб-сервер для работы с новым сайтом.
-
-## Разное
-
-[Версионирование и деплой](https://github.com/regiomedia/bitrix-project/wiki/%D0%92%D0%B5%D1%80%D1%81%D0%B8%D0%BE%D0%BD%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B8-%D0%B4%D0%B5%D0%BF%D0%BB%D0%BE%D0%B9)
- 
-[Гайдлайн разработки Битрикс-проекта](https://github.com/regiomedia/bitrix-project/wiki/%D0%93%D0%B0%D0%B9%D0%B4%D0%BB%D0%B0%D0%B9%D0%BD)
-
-### Для пользователей [Phabricator](https://www.phacility.com/phabricator/)
-
-В файле [.arclint](.arclint) настроены основные проверки кода, в том числе описанные выше.
-
