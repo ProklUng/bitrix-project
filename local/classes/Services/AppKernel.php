@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Kernel;
  * @since 08.10.2020 kernel.site.host
  * @since 22.10.2020 kernel.schema
  * @since 25.10.2020 Наследование от HttpKernel.
- * @since 12.12.2020 Полноценный контейнер, чтобы соответствовать Symfony.
+ * @since 13.12.2020 Создание директории кэша, если она не существует.
  */
 class AppKernel extends Kernel
 {
@@ -55,10 +55,17 @@ class AppKernel extends Kernel
      * Директория кэша.
      *
      * @return string
+     *
+     * @since 13.12.2020 Создание директории кэша, если она не существует.
      */
     public function getCacheDir(): string
     {
-        return $this->getProjectDir() . '/bitrix/cache/';
+        $cachePath = $this->getProjectDir() . '/bitrix/cache/';
+        if (!@file_exists($cachePath)) {
+            @mkdir($cachePath);
+        }
+
+        return $cachePath;
     }
 
     /**
@@ -127,6 +134,20 @@ class AppKernel extends Kernel
             'kernel.bundles' => $bundles,
             'kernel.bundles_metadata' => $bundlesMetadata
         ];
+    }
+
+    /**
+     * Sets the container.
+     *
+     * @param ContainerInterface|null $container
+     *
+     * @return void
+     *
+     * @since 12.12.2020
+     */
+    public function setContainer(ContainerInterface $container = null) : void
+    {
+        $this->container = $container;
     }
 
     /**
@@ -210,20 +231,6 @@ class AppKernel extends Kernel
         foreach (BundlesLoader::getBundlesMap() as $bundle) {
             $this->registerBundle($bundle);
         }
-    }
-
-    /**
-     * Sets the container.
-     *
-     * @param ContainerInterface|null $container
-     *
-     * @return void
-     *
-     * @since 12.12.2020
-     */
-    public function setContainer(ContainerInterface $container = null) : void
-    {
-        $this->container = $container;
     }
 
     /**
