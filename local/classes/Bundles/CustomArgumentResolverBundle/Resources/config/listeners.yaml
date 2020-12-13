@@ -51,6 +51,12 @@ services:
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 15 }
 
+  # Проверка токена CSRF через аннотацию.
+  custom_arguments_resolvers.argument_resolver.csrf_token_checker_annotation:
+    class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\RequireCsrfToken
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 1 }
+
   # Пропихивание контейнера в контроллер.
   custom_arguments_resolvers.argument_resolver.set_container:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\SetContainer
