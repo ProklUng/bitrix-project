@@ -1,6 +1,7 @@
 <?php
 
 use Local\Commands\Database\DbDrop;
+use Local\Commands\Database\DbExport;
 use Local\Commands\Database\DbImport;
 use Local\Services\Console\ConsoleCommandConfigurator;
 use Symfony\Component\Console\Application;
@@ -18,7 +19,8 @@ require_once $autoloadPath;
 $application = new ConsoleCommandConfigurator(
     new Application(),
     new DbImport(),
-    new DbDrop()
+    new DbDrop(),
+    new DbExport()
 );
 
 $application->init();
