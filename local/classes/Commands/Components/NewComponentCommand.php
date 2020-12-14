@@ -157,7 +157,7 @@ class NewComponentCommand extends Command
      *
      * @return string
      */
-    public function strToCamelCase(string $str, array $delimiter = ['-', '_', '.', ' ']): string
+    private function strToCamelCase(string $str, array $delimiter = ['-', '_', '.', ' ']): string
     {
         foreach ($delimiter as $d) {
             $str = $this->toCamelCase($str, $d);
@@ -172,7 +172,7 @@ class NewComponentCommand extends Command
      *
      * @return string
      */
-    public function toCamelCase(string $string, string $delimiter = '-'): string
+    private function toCamelCase(string $string, string $delimiter = '-'): string
     {
         $result = '';
         $data = explode($delimiter, $string);
