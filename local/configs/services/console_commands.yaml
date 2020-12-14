@@ -29,6 +29,11 @@ services:
     tags:
       - { name: console.command }
 
+  # Создать компонент на базе BBC.
+  Local\Commands\Components\NewComponentCommand:
+    tags:
+      - { name: console.command, command: new:component }
+
   ##############################
   # Стандартные команды Symfony
   ##############################
