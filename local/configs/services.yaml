@@ -40,6 +40,23 @@ parameters:
   # Пути к аннотированным роутам.
   controller.annotations.path: ~
 
+  dbal:
+    enabled: false
+    url: '%env(DATABASE_URL)%'
+    charset: UTF8
+    default_connection: default
+    types: ~
+
+    connections:
+      default:
+        url: "%env(DATABASE_URL)%"
+        dbname:           sitemanager1
+        user:             root
+        password:         null
+        host:             localhost
+        mapping_types:
+          enum: string
+
 services:
   # конфигурация по умолчанию в *этом* файле
   _defaults:

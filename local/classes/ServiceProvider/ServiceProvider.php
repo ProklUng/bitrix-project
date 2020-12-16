@@ -7,6 +7,7 @@ use CMain;
 use Exception;
 use InvalidArgumentException;
 use Local\ServiceProvider\Bundles\BundlesLoader;
+use Local\ServiceProvider\Extra\DoctrineDbalExtension;
 use Local\ServiceProvider\Extra\ExtraFeature;
 use Local\Services\AppKernel;
 use Local\Util\ErrorScreen;
@@ -58,6 +59,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  * @since 12.11.2020 Значение debug передаются снаружи. Рефакторинг.
  * @since 14.11.2020 Загрузка конфигураций бандлов.
  * @since 12.12.2020 Полноценный контейнер в kernel.
+ * @since 12.12.2020 DoctrineDbalExtension.
  */
 class ServiceProvider
 {
@@ -85,6 +87,11 @@ class ServiceProvider
      * @var ExtraFeature $frameworkExtension Из FrameworkExtension.
      */
     protected $frameworkExtension;
+
+    /**
+     * @var DoctrineDbalExtension $doctrineDbalExtension Doctrine DBAL extension.
+     */
+    protected $doctrineDbalExtension;
 
     /** @const string SERVICE_CONFIG_FILE Конфигурация сервисов. */
     protected const SERVICE_CONFIG_FILE = 'local/configs/services.yaml';
@@ -142,6 +149,7 @@ class ServiceProvider
 
         $this->filesystem = new Filesystem();
         $this->frameworkExtension = new ExtraFeature();
+        $this->doctrineDbalExtension = new DoctrineDbalExtension();
 
         if (!$filename) {
             $filename = self::SERVICE_CONFIG_FILE;
@@ -321,6 +329,7 @@ class ServiceProvider
         // tags:
         //      - { name: kernel.event_listener, event: kernel.request, method: handle }
         self::$containerBuilder->register('event_dispatcher', EventDispatcher::class);
+
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->setHotPathEvents([
             KernelEvents::REQUEST,
@@ -329,6 +338,8 @@ class ServiceProvider
             KernelEvents::RESPONSE,
             KernelEvents::FINISH_REQUEST,
         ]);
+
+        self::$containerBuilder->addCompilerPass($registerListenersPass);
 
         $loader = new YamlFileLoader(self::$containerBuilder, new FileLocator(
             $this->projectRoot
@@ -345,6 +356,9 @@ class ServiceProvider
 
             // FrameworkExtension.
             $this->registerFrameworkExtensions();
+
+            // Doctrine DBAL
+            $this->registerDoctrineDbalExtension();
 
             // Контейнер в AppKernel, чтобы соответствовать Symfony.
             if (self::$containerBuilder->has('kernel')) {
@@ -605,6 +619,26 @@ class ServiceProvider
             self::$containerBuilder->getParameter('cache'),
             self::$containerBuilder
         );
+    }
+
+    /**
+     * Инициализация DoctrineDbalExtension.
+     *
+     * @return void
+     * @throws Exception
+     *
+     * @since 16.12.2020
+     */
+    private function registerDoctrineDbalExtension() : void
+    {
+        if (self::$containerBuilder->hasParameter('dbal')) {
+            $dbalConfig = self::$containerBuilder->getParameter('dbal');
+
+            $this->doctrineDbalExtension->dbalLoad(
+                $dbalConfig,
+                self::$containerBuilder
+            );
+        }
     }
 
     /**
