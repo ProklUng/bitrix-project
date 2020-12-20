@@ -10,6 +10,7 @@ use Local\ServiceProvider\PostLoadingPass\TwigExtensionApply;
 use Local\ServiceProvider\CompilePasses\ValidateServiceDefinitions;
 use Local\ServiceProvider\PostLoadingPass\BootstrapServices;
 use Local\ServiceProvider\PostLoadingPass\InitBitrixEvents;
+use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 
 /**
@@ -60,6 +61,12 @@ class CustomCompilePassBag
         // Регистрация Twig extensions.
         [
             'pass' => TwigExtensionTaggedServicesPass::class
+        ],
+
+        // Подключение консольных команд.
+        [
+            'pass' => AddConsoleCommandPass::class,
+            'phase' => PassConfig::TYPE_BEFORE_REMOVING
         ],
     ];
 

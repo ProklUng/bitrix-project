@@ -19,10 +19,9 @@ services:
   # Менеджер консольных команд.
   console.command.manager:
     class: Local\Services\Console\ConsoleCommandConfigurator
-    calls:
-      - add: [!tagged console.command]
     arguments:
       - '@Symfony\Component\Console\Application'
+      - '@service_container'
 
   # Очистка кэша.
   Local\Commands\CacheClear:
