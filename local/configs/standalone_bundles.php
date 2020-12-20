@@ -7,4 +7,5 @@ return [
     Local\Bundles\GuzzleBundle\CsaGuzzleBundle::class => ['all' => true],
     Local\Bundles\SymfonyMiddlewareBundle\MiddlewareBundle::class => ['all' => true],
     Local\Bundles\TaskSchedulerBundle\RewieerTaskSchedulerBundle::class => ['all' => true],
+    Symfony\Bundle\MakerBundle\MakerBundle::class => ['all' => true],
     ];
