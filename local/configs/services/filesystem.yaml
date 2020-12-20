@@ -15,11 +15,16 @@ services:
     arguments: ['%kernel.project_dir%']
 
   # Сервис инициализации абстракции файловой системы.
-  filesystem:
+  filesystem.service:
     class: Local\Services\Filesystem\FilesystemService
     arguments: ['@local.filesystem.adapter']
 
   # Экземпляр League Filesystem.
   filesystem.instance:
     class: League\Flysystem\Filesystem
-    factory: ['@filesystem', 'getFilesystem']
+    factory: ['@filesystem.service', 'getFilesystem']
+
+  filesystem:
+    class:  Symfony\Component\Filesystem\Filesystem
+
+  Symfony\Component\Filesystem\Filesystem: '@filesystem'
