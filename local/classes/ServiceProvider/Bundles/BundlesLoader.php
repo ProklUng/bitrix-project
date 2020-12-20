@@ -3,6 +3,7 @@
 namespace Local\ServiceProvider\Bundles;
 
 use InvalidArgumentException;
+use Local\ServiceProvider\CompilePasses\MakePrivateCommandsPublic;
 use Local\ServiceProvider\CompilePasses\MakePrivateEventsPublic;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfiguration
  * @since 24.10.2020
  * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
  * @since 19.11.2020 Сделать все приватные подписчики событий публичными.
+ * @since 20.12.2020 Сделать все приватные консольные команды публичными.
  */
 class BundlesLoader
 {
@@ -90,7 +92,15 @@ class BundlesLoader
                 // Без этого они почему-то не подхватываются при загрузке бандлов.
                 $this->container->addCompilerPass(
                     new MakePrivateEventsPublic()
+
                 );
+
+                // Сделать все приватные команды публичными.
+                // Без этого они почему-то не подхватываются при загрузке бандлов.
+                $this->container->addCompilerPass(
+                    new MakePrivateCommandsPublic()
+                );
+
                 // Сохраняю инстанцированный бандл в статику.
                 self::$bundlesMap[$bundle->getName()] = $bundle;
             } else {
