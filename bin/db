@@ -3,7 +3,7 @@
 use Local\Commands\Database\DbDrop;
 use Local\Commands\Database\DbExport;
 use Local\Commands\Database\DbImport;
-use Local\Services\Console\ConsoleCommandConfigurator;
+use Local\Services\Console\ConsoleCommandConfiguratorSimple;
 use Symfony\Component\Console\Application;
 
 @set_time_limit(0);
@@ -16,7 +16,7 @@ $autoloadPath = $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
 /** @noinspection PhpIncludeInspection */
 require_once $autoloadPath;
 
-$application = new ConsoleCommandConfigurator(
+$application = new ConsoleCommandConfiguratorSimple(
     new Application(),
     new DbImport(),
     new DbDrop(),
