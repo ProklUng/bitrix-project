@@ -88,19 +88,12 @@ services:
   Symfony\Component\HttpKernel\Controller\ControllerResolver:
     class: Symfony\Component\HttpKernel\Controller\ControllerResolver
 
-  # Загрузчик роутов из Yaml конфига.
-  routes.config:
-    class: Local\SymfonyTools\Router\RouterConfig
-    arguments: ['%kernel.project_dir%', '/local/configs/routes.yaml', '@load.annotated.routes']
-
   # Коллекция загруженных роутов.
   routes.collection:
     class: Symfony\Component\Routing\RouteCollection
     factory: ['@router', 'getRouteCollection']
 
   router.default: '@routes.collection'
-
-  Local\SymfonyTools\Router\RouterConfig: '@routes.config'
 
   # Symfony загрузчик аннотированных роутов.
   symfony.loader.annotated.routes:
