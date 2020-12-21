@@ -9,11 +9,19 @@ services:
     autoconfigure: true
     public: true
 
-  Doctrine\Common\Annotations\Reader: '@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader'
-  annotation_reader: '@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader'
 
-  # Форк симфонического загрузчика аннотаций.
-  Local\SymfonyTools\Router\Annotations\ForkAnnotationReader: ~
+  Doctrine\Common\Annotations\AnnotationReader: '@annotations.reader'
+  annotation_reader: '@Doctrine\Common\Annotations\AnnotationReader'
+
+  annotations.dummy_registry:
+    class: Doctrine\Common\Annotations\AnnotationRegistry
+    calls:
+      - registerUniqueLoader: ['class_exists']
+
+  annotations.reader:
+    class: Doctrine\Common\Annotations\AnnotationReader
+    calls:
+      - addGlobalIgnoredName: ['required', '@annotations.dummy_registry']
 
   # Поисковик классов в директориях.
   class.collector:

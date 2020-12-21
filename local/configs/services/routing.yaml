@@ -1,6 +1,9 @@
 ###########
 # Роутинг
 ###########
+parameters:
+  routing:
+    enabled: true
 
 services:
   # конфигурация по умолчанию в *этом* файле
@@ -98,7 +101,7 @@ services:
   # Symfony загрузчик аннотированных роутов.
   symfony.loader.annotated.routes:
     class: Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader
-    arguments: ['@Local\SymfonyTools\Router\Annotations\ForkAnnotationReader']
+    arguments: ['@annotations.reader']
 
   # Конечный сервис чтения и загрузки анотированных роутов.
   load.annotated.routes:

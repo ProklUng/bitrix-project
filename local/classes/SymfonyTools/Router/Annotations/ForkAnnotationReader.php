@@ -24,6 +24,8 @@ use ReflectionProperty;
  *
  * @since 09.10.2020 Форк локально, чтобы запретить пытаться найти аннотацию required.
  * Из-за этого выскакивало непреодолимое исключение.
+ *
+ * @deprecated since 22.12.2020 Нашел способ использовать нативный AnnotationReader.
  */
 class ForkAnnotationReader implements Reader
 {

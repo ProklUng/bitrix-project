@@ -129,6 +129,45 @@ class ExtraFeature
         }
     }
 
+
+    /**
+     * Аннотированные роуты.
+     *
+     * @param array            $config    Конфиг.
+     * @param ContainerBuilder $container Контейнер.
+     *
+     * @return void
+     *
+     * @since 20.12.2020
+     */
+    public function loadAnnotationRoute(array $config, ContainerBuilder $container)
+    {
+        if (empty($config['enabled'])) {
+            return;
+        }
+
+        $container->register('routing.loader.annotation', AnnotatedRouteControllerLoader::class)
+            ->setPublic(true)
+            ->addTag('routing.loader', ['priority' => -10])
+            ->addArgument(new Reference('annotation_reader'));
+
+        $container->register('routing.loader.annotation.directory', AnnotationDirectoryLoader::class)
+            ->setPublic(true)
+            ->addTag('routing.loader', ['priority' => -10])
+            ->setArguments([
+                new Reference('file_locator'),
+                new Reference('routing.loader.annotation'),
+            ]);
+
+        $container->register('routing.loader.annotation.file', AnnotationFileLoader::class)
+            ->setPublic(true)
+            ->addTag('routing.loader', ['priority' => -10])
+            ->setArguments([
+                new Reference('file_locator'),
+                new Reference('routing.loader.annotation'),
+            ]);
+    }
+
     /**
      * PropertyInfo.
      *

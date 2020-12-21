@@ -610,6 +610,7 @@ class ServiceProvider
      * @return void
      *
      * @since 28.11.2020
+     * @since 21.12.2020 Нативная поддержка нативных аннотированных роутов.
      *
      * @throws LogicException
      */
@@ -619,6 +620,13 @@ class ServiceProvider
             self::$containerBuilder->getParameter('cache'),
             self::$containerBuilder
         );
+
+        if (self::$containerBuilder->hasParameter('routing')) {
+            $this->frameworkExtension->loadAnnotationRoute(
+                self::$containerBuilder->getParameter('routing'),
+                self::$containerBuilder
+            );
+        }
     }
 
     /**
