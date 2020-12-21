@@ -9,7 +9,6 @@ services:
     autoconfigure: true
     public: true
 
-
   Doctrine\Common\Annotations\AnnotationReader: '@annotations.reader'
   annotation_reader: '@Doctrine\Common\Annotations\AnnotationReader'
 
@@ -22,8 +21,3 @@ services:
     class: Doctrine\Common\Annotations\AnnotationReader
     calls:
       - addGlobalIgnoredName: ['required', '@annotations.dummy_registry']
-
-  # Поисковик классов в директориях.
-  class.collector:
-    class: Local\SymfonyTools\Router\Annotations\SearchAnnotatedClasses
-    arguments: ['%kernel.project_dir%', '%controller.annotations.path%']

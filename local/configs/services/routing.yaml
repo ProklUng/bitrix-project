@@ -98,16 +98,6 @@ services:
 
   router.default: '@routes.collection'
 
-  # Symfony загрузчик аннотированных роутов.
-  symfony.loader.annotated.routes:
-    class: Symfony\Bundle\FrameworkBundle\Routing\AnnotatedRouteControllerLoader
-    arguments: ['@annotations.reader']
-
-  # Конечный сервис чтения и загрузки анотированных роутов.
-  load.annotated.routes:
-    class: Local\SymfonyTools\Router\Annotations\LoadAnnotatedRoutes
-    arguments: ['@class.collector', '@symfony.loader.annotated.routes']
-
   # Стандартный контроллер ошибок.
   standart.error.controller:
     class: Local\SymfonyTools\Framework\Controllers\ErrorController
@@ -140,7 +130,6 @@ services:
   route.checker:
     class: Local\ServiceProvider\Utils\RouteChecker
     arguments: ['@routes.collection']
-
 
   # Диспетчер запуска контроллеров.
   dispatcher.controller:

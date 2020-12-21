@@ -37,9 +37,6 @@ parameters:
 
   csrf_protection: false
 
-  # Пути к аннотированным роутам.
-  controller.annotations.path: ~
-
   dbal:
     enabled: false
     url: '%env(DATABASE_URL)%'
