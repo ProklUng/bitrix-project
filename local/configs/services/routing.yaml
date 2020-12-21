@@ -96,7 +96,7 @@ services:
     class: Symfony\Component\Routing\RouteCollection
     factory: ['@router', 'getRouteCollection']
 
-  router.default: '@routes.collection'
+  router.default: '@router'
 
   # Стандартный контроллер ошибок.
   standart.error.controller:

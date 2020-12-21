@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Local\Bundles\SymfonyMiddlewareBundle\Route;
 
-use Illuminate\Support\Facades\Route;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Router;
 
 /**
  * Class RouteFetcher
@@ -22,7 +21,7 @@ class RouteFetcher
     /**
      * RouteFetcher constructor.
      *
-     * @param RequestStack $requestStack
+     * @param RequestStack $requestStack Request Stack.
      */
     public function __construct(
         RequestStack $requestStack
@@ -37,6 +36,10 @@ class RouteFetcher
      */
     public function fetchCurrentRoute($routeCollection): RouteWrapper
     {
+        if ($routeCollection instanceof Router) {
+            $routeCollection = $routeCollection->getRouteCollection();
+        }
+
         $request = $this->requestStack->getCurrentRequest();
 
         if ($request === null) {
@@ -47,10 +50,6 @@ class RouteFetcher
 
         if (!is_string($routeName)) {
             return new RouteWrapper(null, null);
-        }
-
-        if ($routeCollection instanceof Router) {
-            $routeCollection = $routeCollection->getRouteCollection();
         }
 
         $route = $routeCollection->get($routeName);
