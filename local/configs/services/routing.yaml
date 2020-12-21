@@ -67,14 +67,14 @@ services:
     routing.loader:
       class: Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader
       arguments:
-        - ['@routing.resolver']
+        - '@routing.resolver'
         - []
         - []
 
     router:
       class: Symfony\Component\Routing\Router
       arguments:
-        - '@routing.loader.yml'
+        - '@@routing.resolver'
         - '%kernel.project_dir%/local/configs/routes.yaml'
         - []
         - '@request.context'
@@ -96,7 +96,7 @@ services:
   # Коллекция загруженных роутов.
   routes.collection:
     class: Symfony\Component\Routing\RouteCollection
-    factory: ['@routes.config', 'routes']
+    factory: ['@router', 'getRouteCollection']
 
   router.default: '@routes.collection'
 
