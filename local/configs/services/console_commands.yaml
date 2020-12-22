@@ -42,6 +42,12 @@ services:
     tags:
       - { name: console.command, comand: debug:router }
 
+  console.command.router_match:
+    class: Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand
+    arguments: ['@router']
+    tags:
+      - { name: console.command, comand: router:match }
+
   console.command.event_dispatcher_debug:
     class: Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand
     arguments: ['@event_dispatcher']
