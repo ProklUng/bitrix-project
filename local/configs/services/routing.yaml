@@ -83,6 +83,9 @@ services:
         - '@request.context'
 
     Symfony\Component\Routing\RouterInterface: '@router'
+    Symfony\Component\Routing\RequestContextAwareInterface: '@router'
+    Symfony\Component\Routing\Generator\UrlGeneratorInterface: '@router'
+    Symfony\Component\Routing\Matcher\UrlMatcherInterface: '@router'
 
   #####################
   # Роутер.

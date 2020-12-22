@@ -36,6 +36,11 @@ services:
   ##############################
   # Стандартные команды Symfony
   ##############################
+  console.command.router_debug:
+    class: Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand
+    arguments: ['@router']
+    tags:
+      - { name: console.command, comand: debug:router }
 
   console.command.event_dispatcher_debug:
     class: Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand
