@@ -5,6 +5,8 @@ services:
     autoconfigure: true
     public: true
 
+  Symfony\Component\ExpressionLanguage\ExpressionLanguage: ~
+
   custom_request_responser.set.headers:
     class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\SetHeaders
     arguments: ['@Symfony\Component\ExpressionLanguage\ExpressionLanguage', '%custom_request_responser%']
@@ -12,3 +14,9 @@ services:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
 
   Local\Bundles\CustomRequestResponserBundle\Event\Listeners\SetHeaders: '@custom_request_responser.set.headers'
+
+  # Минификация Response для типа txt/html.
+  custom_request_responser.compress_response:
+    class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\CompressHtmlResponse
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
