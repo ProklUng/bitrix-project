@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the CsaGuzzleBundle package
- *
- * (c) Charles Sarrazin <charles@sarraz.in>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code
- */
-
 namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy;
 
 use Psr\Http\Message\RequestInterface;
@@ -18,11 +9,14 @@ use Psr\Http\Message\RequestInterface;
  */
 class LegacyNamingStrategy extends AbstractNamingStrategy
 {
+    /**
+     * @var boolean $withHost
+     */
     private $withHost;
 
     /**
-     * @param bool  $withHost
-     * @param array $blacklist
+     * @param boolean  $withHost
+     * @param array    $blacklist
      */
     public function __construct($withHost, array $blacklist = [])
     {
@@ -34,7 +28,7 @@ class LegacyNamingStrategy extends AbstractNamingStrategy
     /**
      * {@inheritdoc}
      */
-    public function filename(RequestInterface $request)
+    public function filename(RequestInterface $request) : string
     {
         if ($this->withHost) {
             return $this->sanitize(call_user_func_array(
@@ -49,7 +43,12 @@ class LegacyNamingStrategy extends AbstractNamingStrategy
         ));
     }
 
-    private function getPartsWithHost(RequestInterface $request)
+    /**
+     * @param RequestInterface $request
+     *
+     * @return array
+     */
+    private function getPartsWithHost(RequestInterface $request): array
     {
         return [
             str_pad($request->getMethod(), 6, '_'),
@@ -60,7 +59,12 @@ class LegacyNamingStrategy extends AbstractNamingStrategy
         ];
     }
 
-    private function getPartsWithoutHost(RequestInterface $request)
+    /**
+     * @param RequestInterface $request
+     *
+     * @return array
+     */
+    private function getPartsWithoutHost(RequestInterface $request): array
     {
         return [
             str_pad($request->getMethod(), 6, '_'),
@@ -77,7 +81,7 @@ class LegacyNamingStrategy extends AbstractNamingStrategy
      *
      * @return string
      */
-    private function sanitize($filename)
+    private function sanitize($filename): string
     {
         return preg_replace('/[^a-zA-Z0-9_+=@\-\?\.]/', '-', $filename);
     }

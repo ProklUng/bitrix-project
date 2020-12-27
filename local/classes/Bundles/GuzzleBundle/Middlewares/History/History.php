@@ -14,9 +14,19 @@ namespace Local\Bundles\GuzzleBundle\Middlewares\History;
 use GuzzleHttp\TransferStats;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Class History
+ * @package Local\Bundles\GuzzleBundle\Middlewares\History
+ */
 class History extends \SplObjectStorage
 {
-    public function mergeInfo(RequestInterface $request, array $info)
+    /**
+     * @param RequestInterface $request
+     * @param array            $info
+     *
+     * @return void
+     */
+    public function mergeInfo(RequestInterface $request, array $info): void
     {
         $info = array_merge(
             ['response' => null, 'error' => null, 'info' => null],
@@ -27,7 +37,12 @@ class History extends \SplObjectStorage
         $this->attach($request, $info);
     }
 
-    public function addStats(TransferStats $stats)
+    /**
+     * @param TransferStats $stats
+     *
+     * @return void
+     */
+    public function addStats(TransferStats $stats): void
     {
         $this->mergeInfo($stats->getRequest(), ['info' => $stats->getHandlerStats()]);
     }

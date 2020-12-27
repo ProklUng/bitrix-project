@@ -28,10 +28,6 @@
             <tag name="csa_guzzle.middleware" alias="cache" priority="-1500" />
         </service>
 
-        <service id="bitrix.middleware.cache" class="Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter\BitrixAdapter">
-            <argument type="service" id="bitrix.cacher" />
-            <argument>3600</argument>
-        </service>
     </services>
 
 </container>

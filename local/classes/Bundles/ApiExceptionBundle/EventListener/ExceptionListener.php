@@ -13,36 +13,37 @@ use Throwable;
 
 /**
  * Class ExceptionListener
+ * @package Local\Bundles\ApiExceptionBundle\EventListener
  */
 class ExceptionListener
 {
     /**
-     * @var boolean
+     * @var boolean $stackTrace Добавлять stacktrace?
      */
     protected $stackTrace;
 
     /**
-     * @var array
+     * @var array $default Значения по умолчанию.
      */
     protected $default;
 
     /**
-     * @var ExceptionManager
+     * @var ExceptionManager $exceptionManager Менеджер исключений.
      */
     protected $exceptionManager;
 
     /**
-     * @var boolean
+     * @var boolean $matchAll Применять на ВСЕ роуты?
      */
     protected $matchAll;
 
     /**
-     * Constructor
+     * Constructor ExceptionListener
      *
-     * @param ExceptionManager $exceptionManager
-     * @param boolean          $matchAll
-     * @param array            $default
-     * @param boolean          $stackTrace
+     * @param ExceptionManager $exceptionManager Менеджер исключений.
+     * @param boolean          $matchAll         Применять на ВСЕ роуты?
+     * @param array            $default          Значения по умолчанию.
+     * @param boolean          $stackTrace       Добавлять stacktrace?
      */
     public function __construct(
         ExceptionManager $exceptionManager,
@@ -60,15 +61,15 @@ class ExceptionListener
      * Format response exception.
      * Привел к своему кастомному формату.
      *
-     * @param ExceptionEvent $event
+     * @param ExceptionEvent $event Объект события.
+     *
+     * @return void
      */
     public function onKernelException(ExceptionEvent $event) : void
     {
         $exception = $event->getThrowable();
 
-        if (!($event->getRequest())
-            || ($this->matchAll === false && !$this->isApiException($exception))
-        ) {
+        if ($this->matchAll === false && !$this->isApiException($exception)) {
             return;
         }
 
@@ -89,6 +90,7 @@ class ExceptionListener
         $data['message'] = $this->getMessage($exception);
 
         if ($this->isFlattenErrorException($exception)) {
+            // @phpstan-ignore-next-line
             $data['errors'] = $exception->getFlattenErrors();
         }
 
@@ -98,7 +100,7 @@ class ExceptionListener
             // Clean stacktrace to avoid circular reference or invalid type
             array_walk_recursive(
                 $data['stack_trace'],
-                static function (&$item) {
+                static function (&$item) : void {
                     if (is_object($item)) {
                         $item = get_class($item);
                     } elseif (is_resource($item)) {
@@ -110,70 +112,13 @@ class ExceptionListener
 
         $response = new JsonResponse($data, $statusCode, $this->getHeaders($exception));
 
-        $event->setResponse($response);
-    }
-
-    /**
-     * Format response exception. Original bundle event handler.
-     *
-     * @param ExceptionEvent $event
-     *
-     * @backup
-     */
-    public function OriginalBundleonKernelException(ExceptionEvent $event)
-    {
-        $exception = $event->getThrowable();
-
-        if (!($event->getRequest())
-            || ($this->matchAll === false && !$this->isApiException($exception))
-        ) {
-            return;
-        }
-
-        $data = [];
-
-        if ($this->isApiException($exception)) {
-            $exception = $this->exceptionManager->configure($exception);
-        }
-
-        $statusCode = $this->getStatusCode($exception);
-
-        $data['error']['status']  = $statusCode;
-
-        if ($code = $exception->getCode()) {
-            $data['error']['code'] = $code;
-        }
-
-        $data['error']['message'] = $this->getMessage($exception);
-
-        if ($this->isFlattenErrorException($exception)) {
-            $data['error']['errors'] = $exception->getFlattenErrors();
-        }
-
-        if ($this->stackTrace) {
-            $data['error']['stack_trace'] = $exception->getTrace();
-
-            // Clean stacktrace to avoid circular reference or invalid type
-            array_walk_recursive(
-                $data['error']['stack_trace'],
-                static function (&$item) {
-                    if (is_object($item)) {
-                        $item = get_class($item);
-                    } elseif (is_resource($item)) {
-                        $item = get_resource_type($item);
-                    }
-                }
-            );
-        }
-
-        $response = new JsonResponse($data, $statusCode, $this->getHeaders($exception));
         $event->setResponse($response);
     }
 
     /**
      * Get exception status code
      *
-     * @param Throwable $exception
+     * @param Throwable $exception Exception.
      *
      * @return integer
      */
@@ -193,7 +138,7 @@ class ExceptionListener
     /**
      * Get exception message
      *
-     * @param Throwable $exception
+     * @param Throwable $exception Exception.
      *
      * @return mixed
      */
@@ -202,6 +147,7 @@ class ExceptionListener
         $message = $exception->getMessage();
 
         if ($this->isApiException($exception)) {
+            // @phpstan-ignore-next-line
             $message = $exception->getMessageWithVariables();
         }
 
@@ -211,7 +157,7 @@ class ExceptionListener
     /**
      * Get exception headers
      *
-     * @param Throwable $exception
+     * @param Throwable $exception Exception.
      *
      * @return array
      */
@@ -231,7 +177,7 @@ class ExceptionListener
     /**
      * Is api exception
      *
-     * @param Throwable $exception
+     * @param Throwable $exception Exception.
      *
      * @return boolean
      */
@@ -243,11 +189,11 @@ class ExceptionListener
     /**
      * Is flatten error exception
      *
-     * @param Throwable $exception
+     * @param Throwable $exception Exception.
      *
      * @return boolean
      */
-    private function isFlattenErrorException(Throwable $exception)
+    private function isFlattenErrorException(Throwable $exception): bool
     {
         return $exception instanceof FlattenErrorExceptionInterface;
     }

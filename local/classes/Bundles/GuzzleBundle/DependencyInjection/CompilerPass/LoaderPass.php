@@ -22,7 +22,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LoaderPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    /**
+     * @inheritDoc
+     */
+    public function process(ContainerBuilder $container) : void
     {
         $ids = $container->findTaggedServiceIds('csa_guzzle.description_loader');
 

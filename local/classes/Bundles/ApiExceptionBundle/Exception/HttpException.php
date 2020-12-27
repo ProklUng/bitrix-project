@@ -5,17 +5,18 @@ namespace Local\Bundles\ApiExceptionBundle\Exception;
 use Local\Bundles\ApiExceptionBundle\Exception\Interfaces\HttpExceptionInterface;
 
 /**
- * class HttpException
+ * Class HttpException
+ * @package Local\Bundles\ApiExceptionBundle\Exception
  */
 class HttpException extends Exception implements HttpExceptionInterface
 {
     /**
-     * @var integer
+     * @var integer $statusCode
      */
     protected $statusCode;
 
     /**
-     * @var array
+     * @var array $headers
      */
     protected $headers;
 
@@ -39,13 +40,13 @@ class HttpException extends Exception implements HttpExceptionInterface
     }
 
     /**
-     * Set status code
+     * Set status code.
      *
      * @param integer $statusCode
      *
      * @return self
      */
-    public function setStatusCode($statusCode)
+    public function setStatusCode($statusCode) : self
     {
         $this->statusCode = $statusCode;
 
@@ -53,9 +54,9 @@ class HttpException extends Exception implements HttpExceptionInterface
     }
 
     /**
-     * Get status code
+     * Get status code.
      *
-     * @return string
+     * @return integer
      */
     public function getStatusCode()
     {
@@ -63,13 +64,13 @@ class HttpException extends Exception implements HttpExceptionInterface
     }
 
     /**
-     * Set headers
+     * Set headers.
      *
      * @param array $headers
      *
      * @return self
      */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers) : self
     {
         $this->headers = $headers;
 
@@ -77,11 +78,11 @@ class HttpException extends Exception implements HttpExceptionInterface
     }
 
     /**
-     * Get headers
+     * Get headers.
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders() : array
     {
         return $this->headers;
     }

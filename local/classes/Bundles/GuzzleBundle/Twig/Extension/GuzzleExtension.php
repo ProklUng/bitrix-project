@@ -22,7 +22,10 @@ use Twig\TwigFunction;
  */
 class GuzzleExtension extends AbstractExtension
 {
-    public function getFilters()
+    /**
+     * @return TwigFilter[]
+     */
+    public function getFilters() : array
     {
         return [
             new TwigFilter('csa_guzzle_pretty_print', [$this, 'prettyPrint']),
@@ -37,14 +40,19 @@ class GuzzleExtension extends AbstractExtension
      *
      * @return TwigFunction[]
      */
-    public function getFunctions()
+    public function getFunctions() : array
     {
         return [
             new TwigFunction('csa_guzzle_detect_lang', [$this, 'detectLang']),
         ];
     }
 
-    public function detectLang($body)
+    /**
+     * @param string $body
+     *
+     * @return string
+     */
+    public function detectLang(string $body) : string
     {
         switch (true) {
             case 0 === strpos($body, '<?xml'):
@@ -60,12 +68,12 @@ class GuzzleExtension extends AbstractExtension
     /**
      * Pretty print.
      *
-     * @param $code
-     * @param $lang
+     * @param string $code
+     * @param string $lang
      *
      * @return false|string
      */
-    public function prettyPrint($code, $lang)
+    public function prettyPrint(string $code, string $lang)
     {
         switch ($lang) {
             case 'json':
@@ -74,15 +82,20 @@ class GuzzleExtension extends AbstractExtension
                 $xml = new \DomDocument('1.0');
                 $xml->preserveWhiteSpace = false;
                 $xml->formatOutput = true;
-                $xml->loadXml($code, LIBXML_NOWARNING);
+                $xml->loadXML($code, LIBXML_NOWARNING);
 
-                return $xml->saveXml();
+                return $xml->saveXML();
             default:
                 return $code;
         }
     }
 
-    public function statusCodeClass($statusCode)
+    /**
+     * @param integer $statusCode
+     *
+     * @return string
+     */
+    public function statusCodeClass(int $statusCode) : string
     {
         switch (true) {
             case $statusCode >= 500:
@@ -100,7 +113,12 @@ class GuzzleExtension extends AbstractExtension
         }
     }
 
-    public function formatDuration($seconds)
+    /**
+     * @param mixed $seconds
+     *
+     * @return string
+     */
+    public function formatDuration($seconds) : string
     {
         $formats = ['%.2f s', '%d ms', '%d µs'];
 
@@ -115,14 +133,20 @@ class GuzzleExtension extends AbstractExtension
         return sprintf($format, $seconds);
     }
 
-    public function shortenUri($uri)
+    /**
+     * @param string $uri
+     *
+     * @return string
+     */
+    public function shortenUri(string $uri) : string
     {
         $parts = parse_url($uri);
 
         return sprintf(
             '%s://%s%s',
-            isset($parts['scheme']) ? $parts['scheme'] : 'http',
+            $parts['scheme'] ?? 'http',
             $parts['host'],
+            // @phpstan-ignore-next-line
             isset($parts['port']) ? (':'.$parts['port']) : ''
         );
     }
@@ -132,7 +156,7 @@ class GuzzleExtension extends AbstractExtension
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'csa_guzzle';
     }

@@ -11,6 +11,7 @@
 
 namespace Local\Bundles\GuzzleBundle\DependencyInjection;
 
+use Exception;
 use Local\Bundles\GuzzleBundle\DependencyInjection\CompilerPass\MiddlewarePass;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -31,7 +32,10 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class CsaGuzzleExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    /**
+     * @inheritDoc
+     */
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
@@ -54,7 +58,7 @@ class CsaGuzzleExtension extends Extension
             $container->removeDefinition('csa_guzzle.twig.extension');
         }
 
-        if (method_exists($container, 'registerForAutoconfiguration') && $config['autoconfigure']) {
+        if ($config['autoconfigure']) {
             $container->registerForAutoconfiguration(ClientInterface::class)
                 ->addTag('csa_guzzle.client');
         }
@@ -68,7 +72,13 @@ class CsaGuzzleExtension extends Extension
         $this->processClientsConfiguration($config, $container, $config['profiler']['enabled']);
     }
 
-    private function processLoggerConfiguration(array $config, ContainerBuilder $container)
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     *
+     * @return void
+     */
+    private function processLoggerConfiguration(array $config, ContainerBuilder $container): void
     {
         if (!$config['enabled']) {
             $container->removeDefinition('csa_guzzle.middleware.logger');
@@ -93,8 +103,21 @@ class CsaGuzzleExtension extends Extension
         }
     }
 
-    private function processMockConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader, $debug)
-    {
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param LoaderInterface  $loader
+     * @param mixed            $debug
+     *
+     * @return void
+     * @throws Exception
+     */
+    private function processMockConfiguration(
+        array $config,
+        ContainerBuilder $container,
+        LoaderInterface $loader,
+        $debug
+    ): void {
         if (!$config['enabled']) {
             return;
         }
@@ -114,7 +137,14 @@ class CsaGuzzleExtension extends Extension
         $middleware->replaceArgument(2, $debug);
     }
 
-    private function processCacheConfiguration(array $config, ContainerBuilder $container, $debug)
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param mixed            $debug
+     *
+     * @return void
+     */
+    private function processCacheConfiguration(array $config, ContainerBuilder $container, $debug) : void
     {
         if (!$config['enabled']) {
             $container->removeDefinition('csa_guzzle.middleware.cache');
@@ -127,8 +157,16 @@ class CsaGuzzleExtension extends Extension
         $container->setAlias('csa_guzzle.cache_adapter', $config['adapter']);
     }
 
-    private function processClientsConfiguration(array $config, ContainerBuilder $container, $debug)
+    /**
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param mixed            $debug
+     *
+     * @return void
+     */
+    private function processClientsConfiguration(array $config, ContainerBuilder $container, $debug) : void
     {
+        // @phpstan-ignore-next-line
         if (empty($config['default_client'])) {
             $keys = array_keys($config['clients']);
             $config['default_client'] = reset($keys);
@@ -138,15 +176,18 @@ class CsaGuzzleExtension extends Extension
             $client = new Definition($options['class']);
             $client->setLazy($options['lazy']);
 
+            // @phpstan-ignore-next-line
             if (isset($options['config'])) {
                 if (!is_array($options['config'])) {
-                    throw new InvalidArgumentException(sprintf('Config for "csa_guzzle.client.%s" should be an array, but got %s', $name, gettype($options['config'])));
+                    throw new InvalidArgumentException(sprintf('Config for "csa_guzzle.client.%s" should be an array, but got %s',
+                        $name, gettype($options['config'])));
                 }
                 $client->addArgument($this->buildGuzzleConfig($options['config'], $debug));
             }
 
             $attributes = [];
 
+            // @phpstan-ignore-next-line
             if (!empty($options['middleware'])) {
                 if ($debug) {
                     $addDebugMiddleware = true;
@@ -158,7 +199,8 @@ class CsaGuzzleExtension extends Extension
                     }
 
                     if ($addDebugMiddleware) {
-                        $options['middleware'] = array_merge($options['middleware'], ['stopwatch', 'history', 'logger']);
+                        $options['middleware'] = array_merge($options['middleware'],
+                            ['stopwatch', 'history', 'logger']);
                     }
                 }
 
@@ -171,6 +213,7 @@ class CsaGuzzleExtension extends Extension
             $clientServiceId = sprintf('csa_guzzle.client.%s', $name);
             $container->setDefinition($clientServiceId, $client);
 
+            // @phpstan-ignore-next-line
             if (isset($options['alias'])) {
                 $container->setAlias($options['alias'], $clientServiceId);
             }
@@ -182,8 +225,15 @@ class CsaGuzzleExtension extends Extension
         }
     }
 
-    private function buildGuzzleConfig(array $config, $debug)
+    /**
+     * @param array $config
+     * @param mixed $debug
+     *
+     * @return array
+     */
+    private function buildGuzzleConfig(array $config, $debug) : array
     {
+        // @phpstan-ignore-next-line
         if (isset($config['handler'])) {
             $config['handler'] = new Reference($config['handler']);
         }

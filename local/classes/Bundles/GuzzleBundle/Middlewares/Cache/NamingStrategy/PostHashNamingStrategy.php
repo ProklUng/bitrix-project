@@ -15,7 +15,7 @@ class PostHashNamingStrategy implements NamingStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function filename(RequestInterface $request)
+    public function filename(RequestInterface $request): string
     {
         return md5(serialize([
             'method' => $request->getMethod(),

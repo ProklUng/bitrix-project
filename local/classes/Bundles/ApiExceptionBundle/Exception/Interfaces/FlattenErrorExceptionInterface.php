@@ -9,6 +9,8 @@ interface FlattenErrorExceptionInterface
 {
     /**
      * Flatten errors
+     *
+     * @return array
      */
     public function getFlattenErrors();
 }

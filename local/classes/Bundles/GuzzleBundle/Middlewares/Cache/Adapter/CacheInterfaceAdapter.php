@@ -37,7 +37,7 @@ class CacheInterfaceAdapter implements StorageAdapterInterface
      */
     public function __construct(
         CacheInterface $cache,
-        $ttl = 0,
+        int $ttl = 0,
         NamingStrategyInterface $namingStrategy = null
     ) {
         $this->cache = $cache;
@@ -48,7 +48,7 @@ class CacheInterfaceAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(RequestInterface $request)
+    public function fetch(RequestInterface $request) : ?ResponseInterface
     {
         $key = $this->namingStrategy->filename($request);
 
@@ -57,6 +57,8 @@ class CacheInterfaceAdapter implements StorageAdapterInterface
         if ($data) {
             return new Response($data['status'], $data['headers'], $data['body'], $data['version'], $data['reason']);
         }
+
+        return null;
     }
 
     /**

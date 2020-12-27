@@ -15,26 +15,39 @@ use GuzzleHttp\Exception\RequestException;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\CacheMiddleware;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\MockMiddleware;
 use Local\Bundles\GuzzleBundle\Middlewares\History\History;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * Csa Guzzle Collector.
  *
  * @author Charles Sarrazin <charles@sarraz.in>
  */
+// @phpstan-ignore-next-line
 abstract class InternalGuzzleCollector extends DataCollector
 {
-    const MAX_BODY_SIZE = 0x10000;
+    public const MAX_BODY_SIZE = 0x10000;
 
+    /**
+     * @var integer $maxBodySize
+     */
     private $maxBodySize;
 
+    /**
+     * @var History|null $history
+     */
     private $history;
 
-    private $curlFormatter = null;
+    /**
+     * @phpstan-ignore-next-line
+     * @var \Namshi\Cuzzle\Formatter\CurlFormatter|null
+     */
+    private $curlFormatter;
 
     /**
      * Constructor.
@@ -56,13 +69,13 @@ abstract class InternalGuzzleCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    protected function doCollect(Request $request, Response $response, \Throwable $exception = null)
+    protected function doCollect(Request $request, Response $response, \Throwable $exception = null): void
     {
         $data = [];
 
-        foreach ($this->history as $request) {
-            /* @var \Psr\Http\Message\RequestInterface $request */
-            $transaction = $this->history[$request];
+        foreach ($this->history as $requestItem) {
+            /* @var RequestInterface $requestItem */
+            $transaction = $this->history[$requestItem];
             /* @var \Psr\Http\Message\ResponseInterface $response */
             $response = $transaction['response'];
             /* @var \Exception $error */
@@ -72,19 +85,20 @@ abstract class InternalGuzzleCollector extends DataCollector
 
             $req = [
                 'request' => [
-                    'method' => $request->getMethod(),
-                    'version' => $request->getProtocolVersion(),
-                    'headers' => $request->getHeaders(),
-                    'body' => $this->cropContent($request->getBody()),
+                    'method' => $requestItem->getMethod(),
+                    'version' => $requestItem->getProtocolVersion(),
+                    'headers' => $requestItem->getHeaders(),
+                    'body' => $this->cropContent($requestItem->getBody()),
                 ],
                 'info' => $info,
-                'uri' => urldecode($request->getUri()),
+                'uri' => urldecode($requestItem->getUri()),
                 'httpCode' => 0,
                 'error' => null,
             ];
 
-            if ($this->curlFormatter && $request->getBody()->getSize() <= $this->maxBodySize) {
-                $req['curl'] = $this->curlFormatter->format($request);
+            if ($this->curlFormatter && $requestItem->getBody()->getSize() <= $this->maxBodySize) {
+                // @phpstan-ignore-next-line
+                $req['curl'] = $this->curlFormatter->format($requestItem);
             }
 
             if ($response) {
@@ -121,7 +135,12 @@ abstract class InternalGuzzleCollector extends DataCollector
         $this->data = $data;
     }
 
-    private function cropContent(StreamInterface $stream = null)
+    /**
+     * @param StreamInterface|null $stream
+     *
+     * @return string
+     */
+    private function cropContent(StreamInterface $stream = null): string
     {
         if (null === $stream) {
             return '';
@@ -136,34 +155,42 @@ abstract class InternalGuzzleCollector extends DataCollector
         return '(partial content)'.$stream->read($this->maxBodySize).'(...)';
     }
 
+    /**
+     * @return array|Data
+     */
     public function getErrors()
     {
-        return array_filter($this->data, function ($call) {
+        return array_filter($this->data, static function ($call) : bool {
             return 0 === $call['httpCode'] || $call['httpCode'] >= 400;
         });
     }
 
+    /**
+     * @return float|int
+     */
     public function getTotalTime()
     {
         return array_sum(
             array_map(
-                function ($call) {
-                    return isset($call['info']['total_time']) ? $call['info']['total_time'] : 0;
+                static function ($call) {
+                    return $call['info']['total_time'] ?? 0;
                 },
                 $this->data
             )
         );
     }
 
-    public function getCalls()
+    public function getCalls(): array
     {
         return $this->data;
     }
 
     /**
      * @deprecated This method is deprecated since version 2.2. It will be removed in version 3.0
+     *
+     * @return History
      */
-    public function getHistory()
+    public function getHistory() : History
     {
         return $this->history;
     }
@@ -171,7 +198,7 @@ abstract class InternalGuzzleCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset() : void
     {
         $this->data = [];
     }
@@ -179,24 +206,38 @@ abstract class InternalGuzzleCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'guzzle';
     }
 }
 
+// @phpstan-ignore-next-line
 if (Kernel::MAJOR_VERSION >= 5) {
     final class GuzzleCollector extends InternalGuzzleCollector
     {
-        public function collect(Request $request, Response $response, \Throwable $exception = null)
+        /**
+         * @param Request $request
+         * @param Response $response
+         * @param \Throwable|null $exception
+         */
+        public function collect(Request $request, Response $response, \Throwable $exception = null) : void
         {
             parent::doCollect($request, $response, $exception);
         }
     }
-} else {
+}
+// @phpstan-ignore-next-line
+else {
     class GuzzleCollector extends InternalGuzzleCollector
     {
-        public function collect(Request $request, Response $response, \Exception $exception = null)
+        /**
+         * @param Request $request
+         * @param Response $response
+         * @param \Exception|null $exception
+         */
+        // @phpstan-ignore-next-line
+        public function collect(Request $request, Response $response, \Exception $exception = null) : void
         {
             parent::doCollect($request, $response, $exception);
         }

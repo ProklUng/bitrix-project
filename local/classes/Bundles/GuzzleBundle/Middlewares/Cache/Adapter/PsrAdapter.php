@@ -54,7 +54,7 @@ class PsrAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(RequestInterface $request)
+    public function fetch(RequestInterface $request) : ?ResponseInterface
     {
         if (!$this->checkValidTypeRequest($request)) {
             return null;
@@ -69,15 +69,17 @@ class PsrAdapter implements StorageAdapterInterface
 
             return new Response($data['status'], $data['headers'], $data['body'], $data['version'], $data['reason']);
         }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function save(RequestInterface $request, ResponseInterface $response)
+    public function save(RequestInterface $request, ResponseInterface $response) : void
     {
         if (!$this->checkValidTypeRequest($request)) {
-            return null;
+            return;
         }
 
         $key = $this->namingStrategy->filename($request);

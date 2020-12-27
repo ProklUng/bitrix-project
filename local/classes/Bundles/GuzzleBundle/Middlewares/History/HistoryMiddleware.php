@@ -11,6 +11,7 @@
 
 namespace Local\Bundles\GuzzleBundle\Middlewares\History;
 
+use Closure;
 use GuzzleHttp\Promise\RejectedPromise;
 use Psr\Http\Message\RequestInterface;
 
@@ -21,13 +22,26 @@ use Psr\Http\Message\RequestInterface;
  */
 class HistoryMiddleware
 {
+    /**
+     * @var History $container
+     */
     private $container;
 
+    /**
+     * HistoryMiddleware constructor.
+     *
+     * @param History $container
+     */
     public function __construct(History $container)
     {
         $this->container = $container;
     }
 
+    /**
+     * @param callable $handler
+     *
+     * @return Closure
+     */
     public function __invoke(callable $handler)
     {
         return function (RequestInterface $request, array $options) use ($handler) {
@@ -42,7 +56,7 @@ class HistoryMiddleware
 
                     return $response;
                 },
-                function ($reason) use ($request, $options) {
+                function ($reason) use ($request, $options) : RejectedPromise {
                     $this->container->mergeInfo($request, [
                         'response' => null,
                         'error' => $reason,

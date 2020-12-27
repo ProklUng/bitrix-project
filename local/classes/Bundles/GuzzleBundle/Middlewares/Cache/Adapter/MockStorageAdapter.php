@@ -11,6 +11,7 @@
 
 namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter;
 
+use GuzzleHttp\Psr7\Message;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\LegacyNamingStrategy;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\NamingStrategyInterface;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\SubfolderNamingStrategy;
@@ -21,20 +22,30 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Class MockStorageAdapter
+ * @package Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter
+ */
 class MockStorageAdapter implements StorageAdapterInterface
 {
-    private $storagePath;
-    /** @var NamingStrategyInterface[] */
+    /**
+     * @var NamingStrategyInterface[] $namingStrategies
+     */
     private $namingStrategies = [];
+
+    /** @var string $storagePath */
+    private $storagePath;
+
+    /** @var array $responseHeadersBlacklist */
     private $responseHeadersBlacklist = [
         CacheMiddleware::DEBUG_HEADER,
         MockMiddleware::DEBUG_HEADER,
     ];
 
     /**
-     * @param string $storagePath
-     * @param array $requestHeadersBlacklist
-     * @param array $responseHeadersBlacklist
+     * @param string                       $storagePath
+     * @param array                        $requestHeadersBlacklist
+     * @param array                        $responseHeadersBlacklist
      * @param NamingStrategyInterface|null $namingStrategy
      */
     public function __construct($storagePath, array $requestHeadersBlacklist = [], array $responseHeadersBlacklist = [], NamingStrategyInterface $namingStrategy = null)
@@ -49,7 +60,7 @@ class MockStorageAdapter implements StorageAdapterInterface
             $this->namingStrategies[] = new LegacyNamingStrategy(false, $requestHeadersBlacklist);
         }
 
-        if (!empty($responseHeadersBlacklist)) {
+        if ($responseHeadersBlacklist) {
             $this->responseHeadersBlacklist = $responseHeadersBlacklist;
         }
     }
@@ -57,25 +68,27 @@ class MockStorageAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(RequestInterface $request)
+    public function fetch(RequestInterface $request) : ?ResponseInterface
     {
         foreach ($this->namingStrategies as $strategy) {
             if (file_exists($filename = $this->getFilename($strategy->filename($request)))) {
-                return Psr7\parse_response(file_get_contents($filename));
+                return Message::parseResponse(file_get_contents($filename));
             }
         }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function save(RequestInterface $request, ResponseInterface $response)
+    public function save(RequestInterface $request, ResponseInterface $response) : void
     {
         foreach ($this->responseHeadersBlacklist as $header) {
             $response = $response->withoutHeader($header);
         }
 
-        list($strategy) = $this->namingStrategies;
+        [$strategy] = $this->namingStrategies;
 
         $filename = $this->getFilename($strategy->filename($request));
 

@@ -17,7 +17,7 @@ class M6WebApiExceptionExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container) : void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -27,6 +27,8 @@ class M6WebApiExceptionExtension extends Extension
     }
 
     /**
+     * @inheritDoc
+     *
      * @return string
      */
     public function getAlias()
@@ -35,12 +37,12 @@ class M6WebApiExceptionExtension extends Extension
     }
 
     /**
-     * load service exception manager
+     * Load service exception manager
      *
      * @param ContainerBuilder $container
      * @param array            $config
      */
-    protected function loadExceptionManager(ContainerBuilder $container, array $config)
+    protected function loadExceptionManager(ContainerBuilder $container, array $config): void
     {
         $definition = new Definition(
             ExceptionManager::class,
@@ -55,7 +57,7 @@ class M6WebApiExceptionExtension extends Extension
     }
 
     /**
-     * load service exception listener
+     * Load service exception listener
      *
      * @param ContainerBuilder $container
      * @param array            $config

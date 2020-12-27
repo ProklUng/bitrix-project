@@ -23,7 +23,10 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class CsaGuzzleBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    /**
+     * @inheritDoc
+     */
+    public function build(ContainerBuilder $container) : void
     {
         parent::build($container);
 

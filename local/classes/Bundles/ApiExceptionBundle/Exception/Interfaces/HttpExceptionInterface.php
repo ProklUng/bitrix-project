@@ -8,26 +8,34 @@ namespace Local\Bundles\ApiExceptionBundle\Exception\Interfaces;
 interface HttpExceptionInterface
 {
     /**
-     * Set status code
+     * Set status code.
      *
      * @param integer $statusCode
+     *
+     * @return self
      */
-    public function setStatusCode($statusCode);
+    public function setStatusCode($statusCode) : self;
 
     /**
-     * Get status code
+     * Get status code.
+     *
+     * @return mixed
      */
     public function getStatusCode();
 
     /**
-     * Set headers
+     * Set headers.
      *
      * @param array $headers
+     *
+     * @return self
      */
-    public function setHeaders(array $headers);
+    public function setHeaders(array $headers) : self;
 
     /**
-     * Get headers
+     * Get headers.
+     *
+     * @return array
      */
-    public function getHeaders();
+    public function getHeaders() : array;
 }

@@ -11,6 +11,7 @@
 
 namespace Local\Bundles\GuzzleBundle\Middlewares\Cache;
 
+use Closure;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter\StorageAdapterInterface;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\RejectedPromise;
@@ -23,12 +24,22 @@ use Psr\Http\Message\RequestInterface;
  */
 class MockMiddleware extends CacheMiddleware
 {
-    const DEBUG_HEADER = 'X-Guzzle-Mock';
-    const DEBUG_HEADER_HIT = 'REPLAY';
-    const DEBUG_HEADER_MISS = 'RECORD';
+    public const DEBUG_HEADER = 'X-Guzzle-Mock';
+    public const DEBUG_HEADER_HIT = 'REPLAY';
+    public const DEBUG_HEADER_MISS = 'RECORD';
 
+    /**
+     * @var mixed $mode
+     */
     private $mode;
 
+    /**
+     * MockMiddleware constructor.
+     *
+     * @param StorageAdapterInterface $adapter
+     * @param mixed                   $mode
+     * @param boolean                 $debug
+     */
     public function __construct(StorageAdapterInterface $adapter, $mode, $debug = false)
     {
         parent::__construct($adapter, $debug);
@@ -36,6 +47,11 @@ class MockMiddleware extends CacheMiddleware
         $this->mode = $mode;
     }
 
+    /**
+     * @param callable $handler Обработчик.
+     *
+     * @return Closure
+     */
     public function __invoke(callable $handler)
     {
         return function (RequestInterface $request, array $options) use ($handler) {

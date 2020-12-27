@@ -13,7 +13,16 @@ namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy;
 
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Interface NamingStrategyInterface
+ * @package Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy
+ */
 interface NamingStrategyInterface
 {
-    public function filename(RequestInterface $request);
+    /**
+     * @param RequestInterface $request
+     *
+     * @return string
+     */
+    public function filename(RequestInterface $request) : string;
 }

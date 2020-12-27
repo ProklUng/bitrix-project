@@ -7,11 +7,12 @@ use Local\Bundles\ApiExceptionBundle\Exception\Interfaces\FlattenErrorExceptionI
 
 /**
  * Class ValidationFormException
+ * @package Local\Bundles\ApiExceptionBundle\Exception
  */
 class ValidationFormException extends HttpException implements FlattenErrorExceptionInterface
 {
     /**
-     * @var FormInterface
+     * @var FormInterface $form
      */
     protected $form;
 
@@ -76,7 +77,7 @@ class ValidationFormException extends HttpException implements FlattenErrorExcep
         foreach ($form->all() as $key => $child) {
             $childErrors = $this->getFlattenErrors($child, $subForm);
 
-            if (!empty($childErrors)) {
+            if ($childErrors) {
                 $flatten[$key] = $childErrors;
             }
         }

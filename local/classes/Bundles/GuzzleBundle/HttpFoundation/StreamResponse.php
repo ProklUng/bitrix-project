@@ -16,10 +16,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StreamResponse extends Response
 {
-    const BUFFER_SIZE = 4096;
+    /**
+     * @const BUFFER_SIZE
+     */
+    public const BUFFER_SIZE = 4096;
 
+    /**
+     * @var int|mixed $bufferSize
+     */
     private $bufferSize;
 
+    /**
+     * StreamResponse constructor.
+     *
+     * @param ResponseInterface $response
+     * @param integer           $bufferSize
+     */
     public function __construct(ResponseInterface $response, $bufferSize = self::BUFFER_SIZE)
     {
         parent::__construct(null, $response->getStatusCode(), $response->getHeaders());
@@ -28,12 +40,15 @@ class StreamResponse extends Response
         $this->bufferSize = $bufferSize;
     }
 
-    public function sendContent()
+    /**
+     * @return $this
+     */
+    public function sendContent() : self
     {
         $chunked = $this->headers->has('Transfer-Encoding');
         $this->content->seek(0);
 
-        for (; ;) {
+        for (;;) {
             $chunk = $this->content->read($this->bufferSize);
 
             if ($chunked) {
@@ -49,11 +64,16 @@ class StreamResponse extends Response
             flush();
 
             if (!$chunk) {
-                return;
+                return $this;
             }
         }
+
+        return $this;
     }
 
+    /**
+     * @return string|false
+     */
     public function getContent()
     {
         return false;

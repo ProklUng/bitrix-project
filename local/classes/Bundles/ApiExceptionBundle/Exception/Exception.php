@@ -5,7 +5,8 @@ namespace Local\Bundles\ApiExceptionBundle\Exception;
 use Local\Bundles\ApiExceptionBundle\Exception\Interfaces\ExceptionInterface;
 
 /**
- * class Exception
+ * Class Exception
+ * @package Local\Bundles\ApiExceptionBundle\Exception
  */
 class Exception extends \Exception implements ExceptionInterface
 {
@@ -31,7 +32,7 @@ class Exception extends \Exception implements ExceptionInterface
      *
      * @return self
      */
-    public function setCode($code)
+    public function setCode($code) : self
     {
         $this->code = $code;
 
@@ -45,7 +46,7 @@ class Exception extends \Exception implements ExceptionInterface
      *
      * @return self
      */
-    public function setMessage($message)
+    public function setMessage($message) : self
     {
         $this->message = $message;
 
@@ -59,7 +60,7 @@ class Exception extends \Exception implements ExceptionInterface
      *
      * @return string
      */
-    public function getMessageWithVariables()
+    public function getMessageWithVariables(): string
     {
         $message = $this->message;
 
@@ -68,7 +69,7 @@ class Exception extends \Exception implements ExceptionInterface
         foreach ($variables as $variable) {
             $variableName = substr($variable, 1, -1);
 
-            if (!isset($this->$variableName)) {
+            if ($this->$variableName === null) {
                 throw new \Exception(sprintf(
                     'Variable "%s" for exception "%s" not found',
                     $variableName,

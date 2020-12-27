@@ -14,6 +14,10 @@ namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Interface StorageAdapterInterface
+ * @package Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter
+ */
 interface StorageAdapterInterface
 {
     /**
@@ -21,7 +25,7 @@ interface StorageAdapterInterface
      *
      * @return null|ResponseInterface
      */
-    public function fetch(RequestInterface $request);
+    public function fetch(RequestInterface $request): ?ResponseInterface;
 
     /**
      * @param RequestInterface  $request
@@ -29,5 +33,5 @@ interface StorageAdapterInterface
      *
      * @return void
      */
-    public function save(RequestInterface $request, ResponseInterface $response);
+    public function save(RequestInterface $request, ResponseInterface $response) : void;
 }

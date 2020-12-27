@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the CsaGuzzleBundle package
- *
- * (c) Charles Sarrazin <charles@sarraz.in>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code
- */
-
 namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\Adapter;
 
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy\HashNamingStrategy;
@@ -20,8 +11,19 @@ use Psr\Http\Message\ResponseInterface;
 
 class DoctrineAdapter implements StorageAdapterInterface
 {
+    /**
+     * @var Cache $cache
+     */
     private $cache;
+
+    /**
+     * @var HashNamingStrategy|NamingStrategyInterface|null $namingStrategy
+     */
     private $namingStrategy;
+
+    /**
+     * @var integer $ttl
+     */
     private $ttl;
 
     /**
@@ -39,7 +41,7 @@ class DoctrineAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(RequestInterface $request)
+    public function fetch(RequestInterface $request) : ?ResponseInterface
     {
         $key = $this->namingStrategy->filename($request);
 
@@ -48,12 +50,14 @@ class DoctrineAdapter implements StorageAdapterInterface
 
             return new Response($data['status'], $data['headers'], $data['body'], $data['version'], $data['reason']);
         }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function save(RequestInterface $request, ResponseInterface $response)
+    public function save(RequestInterface $request, ResponseInterface $response) : void
     {
         $data = [
             'status' => $response->getStatusCode(),

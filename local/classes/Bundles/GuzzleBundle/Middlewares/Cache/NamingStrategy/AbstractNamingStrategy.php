@@ -14,17 +14,29 @@ namespace Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy;
 use Local\Bundles\GuzzleBundle\Middlewares\Cache\CacheMiddleware;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Class AbstractNamingStrategy
+ * @package Local\Bundles\GuzzleBundle\Middlewares\Cache\NamingStrategy
+ */
 abstract class AbstractNamingStrategy implements NamingStrategyInterface
 {
+    /**
+     * @var array $blacklist
+     */
     private $blacklist = [
         'User-Agent',
         'Host',
         CacheMiddleware::DEBUG_HEADER,
     ];
 
+    /**
+     * AbstractNamingStrategy constructor.
+     *
+     * @param array $blacklist
+     */
     public function __construct(array $blacklist = [])
     {
-        if (!empty($blacklist)) {
+        if ($blacklist) {
             $this->blacklist = $blacklist;
         }
     }

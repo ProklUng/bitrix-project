@@ -13,6 +13,8 @@ namespace Local\Bundles\GuzzleBundle\DependencyInjection;
 
 use Local\Bundles\GuzzleBundle\DataCollector\GuzzleCollector;
 use GuzzleHttp\MessageFormatter;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -29,13 +31,15 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('csa_guzzle');
+        // @phpstan-ignore-next-line
         if (method_exists($treeBuilder, 'getRootNode')) {
             $rootNode = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config < 4.2
+            // @phpstan-ignore-next-line
             $rootNode = $treeBuilder->root('csa_guzzle');
         }
 
@@ -50,12 +54,14 @@ class Configuration implements ConfigurationInterface
                             ->example('65536')
                             ->defaultValue(GuzzleCollector::MAX_BODY_SIZE)
                         ->end()
+                    // @phpstan-ignore-next-line
                     ->end()
                 ->end()
                 ->arrayNode('logger')
                     ->canBeEnabled()
                     ->children()
                         ->scalarNode('service')->defaultNull()->end()
+                        // @phpstan-ignore-next-line
                         ->scalarNode('format')
                             ->beforeNormalization()
                                 ->ifInArray(['clf', 'debug', 'short'])
@@ -90,39 +96,50 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    /**
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
     private function createCacheNode()
     {
         $treeBuilder = new TreeBuilder('cache');
+        // @phpstan-ignore-next-line
         if (method_exists($treeBuilder, 'getRootNode')) {
             $node = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config < 4.2
+            // @phpstan-ignore-next-line
             $node = $treeBuilder->root('cache');
         }
 
         $node
             ->canBeEnabled()
             ->validate()
-                ->ifTrue(function ($v) {
+                ->ifTrue(function ($v) : bool {
                     return $v['enabled'] && null === $v['adapter'];
                 })
                 ->thenInvalid('The \'csa_guzzle.cache.adapter\' key is mandatory if you enable the cache middleware')
             ->end()
             ->children()
                 ->scalarNode('adapter')->defaultNull()->end()
+            // @phpstan-ignore-next-line
             ->end()
         ;
 
         return $node;
     }
 
+    /**
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
     private function createClientsNode()
     {
         $treeBuilder = new TreeBuilder('clients');
+        // @phpstan-ignore-next-line
         if (method_exists($treeBuilder, 'getRootNode')) {
             $node = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config < 4.2
+            // @phpstan-ignore-next-line
             $node = $treeBuilder->root('clients');
         }
 
@@ -144,13 +161,18 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
+    /**
+     * @return ArrayNodeDefinition|NodeDefinition
+     */
     private function createMockNode()
     {
         $treeBuilder = new TreeBuilder('mock');
+        // @phpstan-ignore-next-line
         if (method_exists($treeBuilder, 'getRootNode')) {
             $node = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config < 4.2
+            // @phpstan-ignore-next-line
             $node = $treeBuilder->root('mock');
         }
 
@@ -158,12 +180,16 @@ class Configuration implements ConfigurationInterface
             ->canBeEnabled()
             ->children()
                 ->scalarNode('storage_path')->isRequired()->end()
+                // @phpstan-ignore-next-line
                 ->scalarNode('mode')->defaultValue('replay')->end()
+                // @phpstan-ignore-next-line
                 ->arrayNode('request_headers_blacklist')
                     ->prototype('scalar')->end()
+                // @phpstan-ignore-next-line
                 ->end()
                 ->arrayNode('response_headers_blacklist')
                     ->prototype('scalar')->end()
+                // @phpstan-ignore-next-line
                 ->end()
             ->end()
         ;

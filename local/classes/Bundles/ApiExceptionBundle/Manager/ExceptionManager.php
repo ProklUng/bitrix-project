@@ -8,24 +8,25 @@ use Local\Bundles\ApiExceptionBundle\Exception\Interfaces\ExceptionInterface;
 
 /**
  * Manage exceptions to define public data returned
+ * @package Local\Bundles\ApiExceptionBundle\Manager
  */
 class ExceptionManager
 {
     /**
-     * @var array $defaultConfig
+     * @var array $defaultConfig Конфигурация по-умолчанию.
      */
     protected $defaultConfig;
 
     /**
-     * @var array $exceptions
+     * @var array $exceptions Exceptions.
      */
     protected $exceptions;
 
     /**
      * Constructor.
      *
-     * @param array $defaultConfig
-     * @param array $exceptions
+     * @param array $defaultConfig Конфигурация по-умолчанию.
+     * @param array $exceptions    Exceptions.
      */
     public function __construct(array $defaultConfig, array $exceptions)
     {
@@ -36,7 +37,7 @@ class ExceptionManager
     /**
      * Configure Exception
      *
-     * @param Throwable $exception
+     * @param Throwable $exception Exception.
      *
      * @return Throwable
      */
@@ -46,7 +47,9 @@ class ExceptionManager
 
         $configException = $this->getConfigException($exceptionName);
 
+        // @phpstan-ignore-next-line
         $exception->setCode($configException['code']);
+        // @phpstan-ignore-next-line
         $exception->setMessage($configException['message']);
 
         if ($exception instanceof HttpExceptionInterface) {
@@ -60,7 +63,7 @@ class ExceptionManager
     /**
      * Get config to exception
      *
-     * @param string $exceptionName
+     * @param string $exceptionName Название исключения.
      *
      * @return array
      */
@@ -75,7 +78,10 @@ class ExceptionManager
             $parentConfig = $this->defaultConfig;
         }
 
-        if (isset($this->exceptions[$exceptionName])) {
+        if (array_key_exists($exceptionName, $this->exceptions)
+            &&
+            $this->exceptions[$exceptionName]
+        ) {
             return array_merge($parentConfig, $this->exceptions[$exceptionName]);
         }
 
