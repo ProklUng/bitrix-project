@@ -53,7 +53,7 @@ class BitrixAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch(RequestInterface $request)
+    public function fetch(RequestInterface $request) : ?ResponseInterface
     {
         if (!$this->checkValidTypeRequest($request)) {
             return null;
@@ -81,10 +81,10 @@ class BitrixAdapter implements StorageAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function save(RequestInterface $request, ResponseInterface $response)
+    public function save(RequestInterface $request, ResponseInterface $response) : void
     {
         if (!$this->checkValidTypeRequest($request)) {
-            return null;
+            return;
         }
 
         $key = $this->namingStrategy->filename($request);

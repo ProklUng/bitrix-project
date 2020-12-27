@@ -1,0 +1,21 @@
+parameters:
+    level: 8
+    bootstrapFiles:
+    		- phpstan-bootstrap.php
+    scanDirectories:
+    		- bitrix/modules/main/classes/
+    		- bitrix/modules/main/lib/
+    		- bitrix/modules/iblock/classes/
+    		- bitrix/modules/iblock/lib/
+    		- bitrix/modules/highloadblock/classes/
+    		- bitrix/modules/highloadblock/lib/
+    symfony:
+    	constant_hassers: false
+    checkMissingIterableValueType: false
+    ignoreErrors:
+    		- '# is not subtype of Throwable#'
+    		- '#Call to an undefined static method #'
+    		- '#of class ReflectionClass constructor expects class-string#'
+    		- '#Psr\Container\ContainerInterface::getParameter#'
+    paths:
+        - local
