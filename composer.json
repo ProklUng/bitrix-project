@@ -74,7 +74,8 @@
     "ergebnis/phpstan-rules": "^0.15.3",
     "phpstan/phpstan-strict-rules": "^0.12.7",
     "phpstan/phpstan-phpunit": "^0.12.17",
-    "slam/phpstan-extensions": "^5.1"
+    "slam/phpstan-extensions": "^5.1",
+    "phpstan/phpstan-deprecation-rules": "^0.12.6"
   },
   "scripts": {
     "lint:php": "php ./vendor/bin/phpcs  --encoding=utf-8 --ignore=./local/components/*/templates/*  --standard=ruleset.xml --extensions=php  ./local/classes ./local/components",
