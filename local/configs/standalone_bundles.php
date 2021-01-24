@@ -10,4 +10,5 @@ return [
     Local\Bundles\TaskSchedulerBundle\RewieerTaskSchedulerBundle::class => ['all' => true],
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['all' => true],
     Local\Bundles\BundleMakerBundle\BundleMakerBundle::class => ['all' => true],
+    Local\Bundles\StaticPageMakerBundle\StaticPageMakerBundle::class => ['all' => true],
 ];

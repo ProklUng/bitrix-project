@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Services\Twig\Tools;
+namespace Local\Bundles\StaticPageMakerBundle\Services;
 
 use Twig\Environment;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,7 +10,7 @@ use Twig\Error\SyntaxError;
 
 /**
  * Class TemplateController
- * @package Fedy\Services\Twig\Tools
+ * @package Local\Bundles\StaticPageMakerBundle\Services
  *
  * @since 21.10.2020
  *
