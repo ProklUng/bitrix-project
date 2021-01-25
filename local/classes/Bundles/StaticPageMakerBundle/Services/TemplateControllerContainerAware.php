@@ -148,7 +148,7 @@ class TemplateControllerContainerAware extends TemplateController
                 $resolvedService = $this->container->get(
                     $serviceId
                 );
-            } else if (class_exists($serviceId)){
+            } elseif (class_exists($serviceId)){
                 $resolvedService = new $serviceId;
             }
 
@@ -167,14 +167,19 @@ class TemplateControllerContainerAware extends TemplateController
      */
     private function applyProcessors(array $context) : array
     {
-        if (!array_key_exists('_processors', $context)) {
+        if (!array_key_exists('_processors', $context)
+            &&
+            !$this->contextProcessorsBag->getProcessors()
+        ) {
             return $context;
         }
 
         $processors = (array)$context['_processors'];
 
         // Если задан в конфиге бандла ID инфоблока, то пускать в дело процессоры по умолчанию.
-        if ((int)$this->container->getParameter('static_page_maker.seo_iblock_id') > 0) {
+        if ($this->container->hasParameter('static_page_maker.seo_iblock_id')
+            &&
+            (int)$this->container->getParameter('static_page_maker.seo_iblock_id') > 0) {
             $processors = array_merge($this->contextProcessorsBag->getProcessors(), $processors);
         }
 
