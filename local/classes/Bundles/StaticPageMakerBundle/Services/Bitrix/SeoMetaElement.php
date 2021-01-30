@@ -116,7 +116,7 @@ class SeoMetaElement
      */
     private function searchElementByUrl(string $url) : int
     {
-        $result = $this->ciblockElement::GetList(
+        $result = $this->ciblockElement->GetList(
             [],
             [
                 'IBLOCK_ID' => $this->iblockId,

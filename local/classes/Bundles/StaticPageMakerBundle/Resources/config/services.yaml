@@ -45,3 +45,15 @@ services:
     arguments: ['@static_page_maker.seo_properties_searcher']
     tags:
       - { name: static_page_maker.default.context.processor}
+
+  static_page_maker.twig_utils:
+    public: false
+    class: Local\Bundles\StaticPageMakerBundle\Services\Utils\TwigUtils
+    arguments: ['@twig.instance', '@filesystem']
+
+  static_page_maker.listener_set_last_modified:
+    public: true
+    class: Local\Bundles\StaticPageMakerBundle\Event\SetLastModifiedHeaderListener
+    arguments: ['@static_page_maker.twig_utils', '%static_page_maker.set_last_modified_header%']
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }

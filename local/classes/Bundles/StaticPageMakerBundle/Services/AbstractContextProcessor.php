@@ -29,4 +29,5 @@ abstract class AbstractContextProcessor implements ContextProcessorInterface
      * @inheritDoc
      */
     abstract public function handle() : array;
+
 }

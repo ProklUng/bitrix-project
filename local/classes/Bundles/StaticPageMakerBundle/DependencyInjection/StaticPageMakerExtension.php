@@ -39,6 +39,7 @@ class StaticPageMakerExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter('static_page_maker.seo_iblock_id', $config['seo_iblock_id']);
+        $container->setParameter('static_page_maker.set_last_modified_header', $config['set_last_modified_header']);
     }
 
     /**

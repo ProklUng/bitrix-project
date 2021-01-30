@@ -24,6 +24,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('seo_iblock_id')->defaultValue(0)->end()
+                ->booleanNode('set_last_modified_header')->defaultValue(false)->end()
             ->end();
 
         return $treeBuilder;
