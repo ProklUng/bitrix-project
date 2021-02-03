@@ -19,3 +19,5 @@ services:
   session.instance:
     class: Symfony\Component\HttpFoundation\Session\Session
     factory: ['@session.symfony', 'session']
+
+  Symfony\Component\HttpFoundation\Session\SessionInterface: '@session.instance'

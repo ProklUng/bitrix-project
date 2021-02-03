@@ -58,22 +58,6 @@ class SetSessionTest extends BaseTestCase
     }
 
     /**
-     * handle(). Не MASTER_REQUEST.
-     *
-     * @return void
-     */
-    public function testHandleNonMasterRequest() : void
-    {
-        $event = $this->getMockRequestEvent(false);
-
-        $this->obTestObject->handle($event);
-
-        $this->willSeeException(BadMethodCallException::class);
-
-        $event->getRequest()->getSession();
-    }
-
-    /**
      * Мок RequestEvent.
      *
      * @param boolean $masterRequest MASTER REQUEST?

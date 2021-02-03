@@ -100,22 +100,6 @@ class ResolveDependencyMakerTest extends BaseTestCase
     }
 
     /**
-     * resolve(). Класс с вложенными зависимостями. Углубленный вариант.
-     */
-    public function testClassNestedDependencyTwo() : void
-    {
-        $class = SampleInjectableAutoResolved::class;
-
-        $result = $this->testObject->resolveDependencies($class);
-
-        $this->assertInstanceOf(
-            $class,
-            $result,
-            'Класс без зависимостей и конструктора проскочил.'
-        );
-    }
-
-    /**
      * tryResolveInterface ().
      */
     public function testTryResolveInterface(): void

@@ -30,17 +30,17 @@ class SetSession implements OnKernelRequestHandlerInterface
      */
     public function handle(RequestEvent $event): void
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMasterRequest()
+            ||
+            !$this->container->has('session.instance')
+        ) {
             return;
         }
 
         $request = $event->getRequest();
 
-        $service = $this->container->get('symfony.session');
-        if ($service !== null) {
-            $request->setSession(
-                $service->session()
-            );
-        }
+        $request->setSession(
+            $this->container->get('session.instance')
+        );
     }
 }

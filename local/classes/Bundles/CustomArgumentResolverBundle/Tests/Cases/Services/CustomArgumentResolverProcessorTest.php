@@ -100,6 +100,9 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
 
     /**
      * Разрешение Session.
+     *
+     * @return void
+     * @throws Exception
      */
     public function testSessionResolve(): void
     {
@@ -118,6 +121,8 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
             $event
         );
 
+        // var_dump($event->getRequest()->attributes->get('session'));
+
         $this->assertInstanceOf(
             SessionInterface::class,
             $event->getRequest()->attributes->get('session')
@@ -133,7 +138,7 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
             [],
             [],
             [
-                '_controller' => '\Tests\Events\Samples\SampleController::action3',
+                '_controller' => '\Local\Bundles\CustomArgumentResolverBundle\Tests\Samples\SampleController::action3',
                 'obj' => SampleController::class,
             ]
         );
@@ -254,8 +259,8 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
             [
                 1,
                 2,
-                ['http://' . $_SERVER['HTTP_HOST']],
-                [$this->container->get('symfony.session.instance')],
+                [$_SERVER['HTTP_HOST']],
+                [$this->container->get('session.instance')],
             ],
             $event->getRequest()->attributes->get('array')
         );
@@ -352,6 +357,7 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
     /**
      * @return void
      * @throws Exception
+     *
      */
     public function testArgumentResolver(): void
     {
@@ -374,7 +380,7 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
         $app->getArguments($request, [new SampleController(), 'action5']);
 
         $this->assertSame(
-            [1, 2, ['http://' . $_SERVER['HTTP_HOST']], [$this->container->get('symfony.session.instance')]],
+            [1, 2, [$_SERVER['HTTP_HOST']], [$this->container->get('session.instance')]],
             $request->attributes->get('array')
         );
     }
