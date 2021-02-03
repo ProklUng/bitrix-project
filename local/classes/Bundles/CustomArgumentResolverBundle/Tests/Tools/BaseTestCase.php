@@ -20,7 +20,7 @@ class BaseTestCase extends TestCase
     use PHPUnitTrait;
 
     /**
-     * @var mixed $obTestObject
+     * @var mixed $testObject Тестируемый объект.
      */
     protected $testObject;
 

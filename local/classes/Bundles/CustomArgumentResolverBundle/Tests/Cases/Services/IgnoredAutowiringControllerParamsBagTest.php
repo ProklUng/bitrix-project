@@ -67,8 +67,8 @@ class IgnoredAutowiringControllerParamsBagTest extends BaseTestCase
 
         $this->willSeeException(
             ReflectionException::class,
-            'does not exist',
-            -1
+            'not exist',
+            0
         );
 
         $this->obTestObject->isIgnoredClass($class);

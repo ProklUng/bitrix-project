@@ -19,29 +19,14 @@ use Local\Bundles\CustomArgumentResolverBundle\Tests\Tools\PHPUnitUtils;
 class ResolveDependencyMakerTest extends BaseTestCase
 {
     /**
-     * @var ResolveDependencyMaker $obTestObject
+     * @var ResolveDependencyMaker $testObject
      */
-    protected $obTestObject;
+    protected $testObject;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->obTestObject = new ResolveDependencyMaker();
-    }
-
-    /**
-     * Конструктор.
-     */
-    public function testConstructor() : void
-    {
-        $value = $this->faker->word;
-        $this->obTestObject = new ResolveDependencyMaker($value);
-
-        $this->assertSameProtectedProp(
-            'className',
-            $value,
-            'Конструктор не отработал.'
-        );
+        $this->testObject = new ResolveDependencyMaker();
     }
 
     /**
@@ -49,9 +34,10 @@ class ResolveDependencyMakerTest extends BaseTestCase
     */
     public function testClassWithoutDependencyAndConstructor() : void
     {
-        $class = get_class(new class {});
+        $class = get_class(new class {
+        });
 
-        $result = $this->obTestObject->resolveDependencies($class);
+        $result = $this->testObject->resolveDependencies($class);
 
         $this->assertInstanceOf(
             $class,
@@ -77,7 +63,7 @@ class ResolveDependencyMakerTest extends BaseTestCase
             }
         });
 
-        $result = $this->obTestObject->resolveDependencies($class);
+        $result = $this->testObject->resolveDependencies($class);
 
         $this->assertInstanceOf(
             $class,
@@ -85,10 +71,14 @@ class ResolveDependencyMakerTest extends BaseTestCase
             'Класс без зависимостей и конструктора проскочил.'
         );
 
-        $this->obTestObject = $result;
-        $this->assertSameProtectedProp(
-            'value',
+        $result = PHPUnitUtils::getProtectedProperty(
+            $result,
+            'value'
+        );
+
+        $this->assertSame(
             'test',
+            $result,
             'Параметр value не проскочил.'
         );
     }
@@ -100,7 +90,7 @@ class ResolveDependencyMakerTest extends BaseTestCase
     {
         $class = SampleServiceNested::class;
 
-        $result = $this->obTestObject->resolveDependencies($class);
+        $result = $this->testObject->resolveDependencies($class);
 
         $this->assertInstanceOf(
             $class,
@@ -116,7 +106,7 @@ class ResolveDependencyMakerTest extends BaseTestCase
     {
         $class = SampleInjectableAutoResolved::class;
 
-        $result = $this->obTestObject->resolveDependencies($class);
+        $result = $this->testObject->resolveDependencies($class);
 
         $this->assertInstanceOf(
             $class,
@@ -135,7 +125,7 @@ class ResolveDependencyMakerTest extends BaseTestCase
         ];
 
         $result = PHPUnitUtils::callMethod(
-            $this->obTestObject,
+            $this->testObject,
             'tryResolveInterface',
             [SampleDependencyInterface::class, $value]
         );
@@ -157,7 +147,7 @@ class ResolveDependencyMakerTest extends BaseTestCase
         ];
 
         $result = PHPUnitUtils::callMethod(
-            $this->obTestObject,
+            $this->testObject,
             'tryResolveInterface',
             [SampleDependencyInterfaceUnrealized::class, $value]
         );
@@ -177,7 +167,7 @@ class ResolveDependencyMakerTest extends BaseTestCase
             'test' => 'test'
         ];
 
-        $this->obTestObject->setDepends($value);
+        $this->testObject->setDepends($value);
 
         $this->assertSameProtectedProp(
             'arDepends',

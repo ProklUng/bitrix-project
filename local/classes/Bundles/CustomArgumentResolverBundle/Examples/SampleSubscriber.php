@@ -14,7 +14,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class SampleSubscriber implements EventSubscriberInterface
 {
-    public function handle(RequestEvent $event)
+    /**
+     * @param RequestEvent $event
+     *
+     * @return void
+     */
+    public function handle(RequestEvent $event): void
     {
         // echo 'OK';
     }

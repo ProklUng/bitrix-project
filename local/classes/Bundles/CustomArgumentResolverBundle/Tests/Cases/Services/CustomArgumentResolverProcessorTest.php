@@ -43,7 +43,6 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
 
         $this->testObject = new CustomArgumentResolverProcessor(
             $this->container->get('custom_arguments_resolvers.container.aware.resolver'),
-            $this->container->get('custom_arguments_resolvers.resolver.from.container'),
             $this->container->get('custom_arguments_resolvers.ignored.autowiring.controller.arguments'),
         );
 

@@ -15,7 +15,7 @@ use ReflectionException;
 class IgnoredAutowiringControllerParamsBag
 {
     /**
-     * @var string[] $ignoredBaseClasses Игнорируемые при автовайринге классы (учитывя наследование).
+     * @var string[] $ignoredClasses Игнорируемые при автовайринге классы (учитывя наследование).
      * Например, DTO.
      */
     private static $ignoredClasses = [];
@@ -29,7 +29,7 @@ class IgnoredAutowiringControllerParamsBag
      */
     public function add(array $classes) : void
     {
-        $classes = array_filter($classes, function ($item) {
+        $classes = array_filter($classes, static function ($item) : bool {
             return class_exists($item) || interface_exists($item);
         });
 
@@ -76,6 +76,12 @@ class IgnoredAutowiringControllerParamsBag
      */
     protected function getClassNames(string $className) : array
     {
+        if (!class_exists($className)) {
+            throw new ReflectionException(
+                'Class ' . $className . ' not exist.'
+            );
+        }
+
         $ref = new ReflectionClass($className);
         $parentRef = $ref->getParentClass();
 

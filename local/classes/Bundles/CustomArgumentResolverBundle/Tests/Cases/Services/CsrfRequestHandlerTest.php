@@ -35,9 +35,9 @@ class CsrfRequestHandlerTest extends BaseTestCase
     }
 
     /**
-     * validateCsrfToken().
-     *
-     */
+    * validateCsrfToken().
+    *
+    */
     public function testValidateCsrfToken() : void
     {
         $result = $this->obTestObject->validateCsrfToken(

@@ -24,22 +24,23 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
      * @param array  $arDepends Реализации интерфейсов.
      *
      * @return object|null
+     * @throws ReflectionException
      */
     public function resolveDependencies(string $class, array $arDepends = [])
     {
         // Из контейнера сначала.
-        if ($this->container && $this->container->has($class)) {
+        if ($this->container->has($class)) {
             return $this->container->get($class);
         }
 
         // Реализации - приоритет имеет переданное напрямую.
-        $arDepends = !empty($arDepends) ? $arDepends : $this->arDepends;
+        $arDepends = $arDepends ?: $this->arDepends;
 
-        try {
-            $reflectionClass = new ReflectionClass($class);
-        } catch (ReflectionException $e) {
+        if (!class_exists($class)) {
             return null;
         }
+
+        $reflectionClass = new ReflectionClass($class);
 
         // Интерфейсы.
         if ($reflectionClass->isInterface()) {
@@ -113,11 +114,14 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
                 continue;
             }
 
-            /** Название класса из рефлексии. */
+            /**
+             * Название класса из рефлексии.
+             * @psalm-suppress PossiblyNullReference
+             */
             $className = $param->getClass()->getName();
 
             // Пытаюсь достать из контейнера.
-            if ($this->container && $this->container->has($className)) {
+            if ($this->container->has($className)) {
                 $newInstanceParams[] = $this->container->get($className);
                 continue;
             }
@@ -151,7 +155,7 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
         string $interfaceClass,
         array $arDepends = []
     ) {
-        if ($this->container && $this->container->has($interfaceClass)) {
+        if ($this->container->has($interfaceClass)) {
             return $this->container->get($interfaceClass);
         }
 
@@ -170,7 +174,7 @@ class ResolveDependencyMakerContainerAware extends ResolveDependencyMaker
         string $abstractClass,
         array $arDepends = []
     ) {
-        if ($this->container && $this->container->has($abstractClass)) {
+        if ($this->container->has($abstractClass)) {
             return $this->container->get($abstractClass);
         }
 

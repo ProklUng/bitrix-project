@@ -3,13 +3,14 @@
 namespace Local\Bundles\CustomArgumentResolverBundle\Event\Listeners;
 
 use Exception;
+use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\WrongCsrfException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\WrongSecurityTokenException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Interfaces\OnControllerRequestHandlerInterface;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Traits\UseTraitChecker;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Traits\ValidatorTraits\SecurityTokenTrait;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 /**
  * Class SecurityToken
@@ -21,8 +22,23 @@ use Symfony\Component\Security\Csrf\CsrfToken;
  */
 class SecurityToken implements OnControllerRequestHandlerInterface
 {
-    use ContainerAwareTrait;
     use UseTraitChecker;
+
+    /**
+     * @var CsrfTokenManager $csrfRequestHandler Проверка токена.
+     */
+    private $csrfRequestHandler;
+
+    /**
+     * SecurityToken constructor.
+     *
+     * @param CsrfTokenManager $csrfRequestHandler Проверка токена.
+     */
+    public function __construct(
+        CsrfTokenManager $csrfRequestHandler
+    ) {
+        $this->csrfRequestHandler = $csrfRequestHandler;
+    }
 
     /**
      * Обработчик события kernel.controller.
@@ -45,21 +61,25 @@ class SecurityToken implements OnControllerRequestHandlerInterface
             return;
         }
 
-        if (!$this->container->get('security.csrf.token_manager')) {
-            throw new WrongSecurityTokenException('security.csrf.token_manager not installed.');
+        $token = $event->getRequest()->request->get('security.token');
+
+        if (!$token) {
+            throw new WrongSecurityTokenException('Security error: empty token.');
         }
 
-        if (empty($token = $event->getRequest()->request->get('security.token'))) {
-            throw new WrongSecurityTokenException('Secirity error: empty token.');
-        }
-
-        // Валидировать токен, для примера, так.
-        $bValidToken = $this->container->get('security.csrf.token_manager')->isTokenValid(
+        /**
+         * Валидировать токен, для примера, так.
+         *
+         * @psalm-suppress PossiblyNullReference
+         */
+        $bValidToken = $this->csrfRequestHandler->isTokenValid(
             new CsrfToken('app', $token)
         );
 
         if (!$bValidToken) {
             throw new WrongSecurityTokenException('Security error: Invalid security token.');
         }
+
+        $event->getRequest()->attributes->set('security.token.validated', true);
     }
 }

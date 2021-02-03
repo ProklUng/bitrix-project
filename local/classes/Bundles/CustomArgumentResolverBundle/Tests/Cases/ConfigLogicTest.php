@@ -30,6 +30,7 @@ class ConfigLogicTest extends BaseTestCase
         parent::setUp();
 
         $this->container = new ContainerBuilder();
+        $this->container->setParameter('kernel.environment', 'dev');
 
         $this->testObject = new CustomArgumentResolverBundleExtension();
     }

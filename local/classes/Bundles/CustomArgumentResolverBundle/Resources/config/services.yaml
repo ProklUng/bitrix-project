@@ -23,7 +23,6 @@ services:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\InjectorController\CustomArgumentResolverProcessor
     arguments:
       - '@custom_arguments_resolvers.container.aware.resolver'
-      - '@custom_arguments_resolvers.resolver.from.container'
       - '@custom_arguments_resolvers.ignored.autowiring.controller.arguments'
     calls:
       - setContainer: ['@service_container']

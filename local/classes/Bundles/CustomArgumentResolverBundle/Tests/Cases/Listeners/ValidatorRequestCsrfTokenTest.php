@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Class ValidatorRequestCsrfTokenTest
@@ -39,7 +40,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
             new CsrfRequestHandler(
-                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                static::$testContainer->get(CsrfTokenManagerInterface::class),
                 new ParameterBag(['csrf_protection' => false])
             )
         );
@@ -63,7 +64,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
             new CsrfRequestHandler(
-                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                static::$testContainer->get(CsrfTokenManagerInterface::class),
                 new ParameterBag(['csrf_protection' => true])
             )
         );
@@ -87,7 +88,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
             new CsrfRequestHandler(
-                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                static::$testContainer->get(CsrfTokenManagerInterface::class),
                 new ParameterBag(['csrf_protection' => true])
             )
         );
@@ -111,7 +112,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
             new CsrfRequestHandler(
-                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                static::$testContainer->get(CsrfTokenManagerInterface::class),
                 new ParameterBag(['csrf_protection' => true])
             )
         );
@@ -160,7 +161,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
 
         if ($validToken) {
             $fakeRequest->headers->set(
-                'x-csrf', static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager')->getToken('app')
+                'x-csrf', static::$testContainer->get('security.csrf.token_manager')->getToken('app')
             );
         } else {
             $fakeRequest->headers->set(

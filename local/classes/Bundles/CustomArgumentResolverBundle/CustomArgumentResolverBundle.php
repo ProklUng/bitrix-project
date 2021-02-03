@@ -24,9 +24,9 @@ class CustomArgumentResolverBundle extends Bundle
     }
 
     /**
-     * @param ContainerBuilder $container
+     * @inheritDoc
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container) : void
     {
         parent::build($container);
 

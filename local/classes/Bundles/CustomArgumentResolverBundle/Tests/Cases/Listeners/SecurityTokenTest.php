@@ -2,6 +2,7 @@
 
 namespace Local\Bundles\CustomArgumentResolverBundle\Tests\Cases\Listeners;
 
+use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\WrongCsrfException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\WrongSecurityTokenException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\SecurityToken;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Traits\ValidatorTraits\SecurityTokenTrait;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 /**
  * Class SecurityTokenTest
@@ -34,9 +36,8 @@ class SecurityTokenTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->obTestObject = new SecurityToken();
-        $this->obTestObject->setContainer(
-            static::$testContainer
+        $this->obTestObject = new SecurityToken(
+            static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager')
         );
     }
 
@@ -46,7 +47,7 @@ class SecurityTokenTest extends BaseTestCase
      * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException Ошибка проверки токена.
+     * @throws WrongSecurityTokenException|WrongCsrfException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -74,7 +75,7 @@ class SecurityTokenTest extends BaseTestCase
      * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException Ошибка проверки токена.
+     * @throws WrongSecurityTokenException|WrongCsrfException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -103,7 +104,7 @@ class SecurityTokenTest extends BaseTestCase
      * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException Ошибка проверки токена.
+     * @throws WrongSecurityTokenException|WrongCsrfException Ошибка проверки токена.
      *
      * @dataProvider dataProviderTrueFalse
      */
@@ -132,16 +133,22 @@ class SecurityTokenTest extends BaseTestCase
      * @param boolean $traitable Признак - класс с трэйтом, указывающим на необходимость обработки.
      *
      * @return void
-     * @throws WrongSecurityTokenException Ошибка проверки токена.
      *
+     * @throws WrongSecurityTokenException
+     * @throws WrongCsrfException
      * @dataProvider dataProviderTrueFalse
      */
     public function testHandleValidToken(bool $traitable) : void
     {
-        $validToken = static::$testContainer->get('security.csrf.token_manager')->getToken('app');
+        /**
+         * @var CsrfToken $validToken
+         */
+        $validToken = static::$testContainer->get(
+            'custom_arguments_resolvers.security.csrf.token_manager'
+        )->getToken('app');
 
         $event = $this->getMockControllerEvent(true, $traitable);
-        $event->getRequest()->request->set('security.token', $validToken);
+        $event->getRequest()->request->set('security.token', $validToken->getValue());
 
         $this->obTestObject->handle($event);
 
@@ -166,8 +173,8 @@ class SecurityTokenTest extends BaseTestCase
     public function dataProviderTrueFalse() : array
     {
         return [
-            [true],
-            [false],
+            'true' => [true],
+            'false' => [false],
         ];
     }
 

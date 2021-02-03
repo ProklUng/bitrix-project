@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  *
  * @since 05.12.2020
  */
+// @phpstan-ignore-next-line
 trait UseTraitChecker
 {
     /**
@@ -32,7 +33,8 @@ trait UseTraitChecker
 
         // class_uses_recursive - Laravel helper.
         $traits = class_uses($controller[0]);
-        if (!in_array($trait, $traits, true)) {
+
+        if (!$traits || !in_array($trait, $traits, true)) {
             return false;
         }
 

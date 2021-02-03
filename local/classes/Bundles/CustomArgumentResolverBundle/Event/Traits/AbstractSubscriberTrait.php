@@ -2,8 +2,7 @@
 
 namespace Local\Bundles\CustomArgumentResolverBundle\Event\Traits;
 
-use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -17,7 +16,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 trait AbstractSubscriberTrait
 {
     /**
-     * @var ContainerBuilder $container Сервис-контейнер.
+     * @var ContainerInterface $container Сервис-контейнер.
      */
     private $container;
 
@@ -89,7 +88,7 @@ trait AbstractSubscriberTrait
 
         // class_uses_recursive - Laravel helper.
         $traits = class_uses($controller[0]);
-        if (!in_array($trait, $traits, true)) {
+        if (!$traits || !in_array($trait, $traits, true)) {
             return false;
         }
 

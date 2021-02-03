@@ -24,7 +24,7 @@ class ResolveParamsFromContainer
      */
     public function resolve($argItem)
     {
-        if (!$argItem || is_object($argItem)) {
+        if (!$argItem || is_object($argItem) || is_array($argItem)) {
             return $argItem;
         }
 

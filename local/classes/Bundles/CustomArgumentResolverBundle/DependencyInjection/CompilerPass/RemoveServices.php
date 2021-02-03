@@ -15,10 +15,11 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
  */
 class RemoveServices implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container) : void
     {
         $params = $container->getParameter('custom_arguments_resolvers');
 
+        // @phpstan-ignore-next-line
         if (empty($params['params']['disabled_resolvers'])) {
             return;
         }
@@ -26,14 +27,12 @@ class RemoveServices implements CompilerPassInterface
         $excludedServices = $params['params']['disabled_resolvers'];
         foreach ($excludedServices as $serviceId) {
             try {
-                $definition = $container->findDefinition($serviceId);
+                $container->findDefinition($serviceId);
             } catch (ServiceNotFoundException $e) {
                 continue;
             }
 
-            if ($definition) {
-                $container->removeDefinition($serviceId);
-            }
+            $container->removeDefinition($serviceId);
         }
     }
 }

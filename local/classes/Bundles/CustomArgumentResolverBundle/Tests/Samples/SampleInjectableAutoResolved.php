@@ -71,7 +71,7 @@ class SampleInjectableAutoResolved extends Basis
     }
 
     /**
-     * @return mixed.
+     * @return mixed
      */
     public function getLogger()
     {

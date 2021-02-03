@@ -9,11 +9,6 @@ services:
   # kernel.controller
   ####################
 
-  # Проверка битриксового токена.
-  Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\CheckBitrixToken:
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 35 }
-
   # Bootable traits.
   custom_arguments_resolvers.boot_trait:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\BootTraits
@@ -46,16 +41,9 @@ services:
   # Проверка токена безопасности.
   custom_arguments_resolvers.argument_resolver.security_token_checker:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\SecurityToken
-    calls:
-      - setContainer: ['@service_container']
+    arguments: ['@custom_arguments_resolvers.security.csrf.token_manager']
     tags:
       - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 15 }
-
-  # Проверка токена CSRF через аннотацию.
-  custom_arguments_resolvers.argument_resolver.csrf_token_checker_annotation:
-    class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\RequireCsrfToken
-    tags:
-      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 1 }
 
   # Пропихивание контейнера в контроллер.
   custom_arguments_resolvers.argument_resolver.set_container:

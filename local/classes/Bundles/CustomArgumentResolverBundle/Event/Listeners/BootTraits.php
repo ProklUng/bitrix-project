@@ -44,10 +44,12 @@ class BootTraits implements OnControllerRequestHandlerInterface
 
         $this->booted = [];
 
+        /** @psalm-suppress InvalidArrayAccess */
         foreach (class_uses_recursive($controller[0]) as $trait) {
             // Загрузка (статический метод).
             $method = 'boot' . class_basename($trait);
 
+            /** @psalm-suppress InvalidArrayAccess */
             if ($this->methodExist($controller[0], $method)) {
                 forward_static_call([$controller[0], $method]);
 
@@ -58,6 +60,7 @@ class BootTraits implements OnControllerRequestHandlerInterface
             $method = 'initialize' . class_basename($trait);
 
             if ($this->methodExist($controller[0], $method)) {
+                /** @psalm-suppress InvalidArrayAccess */
                 $controller[0]->{$method}();
 
                 $this->booted[] = $method;

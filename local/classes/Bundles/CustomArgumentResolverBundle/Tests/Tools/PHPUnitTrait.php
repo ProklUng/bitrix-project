@@ -117,7 +117,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -143,7 +143,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -167,7 +167,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -191,7 +191,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -216,7 +216,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -238,7 +238,7 @@ trait PHPUnitTrait
     protected function assertEmptyProtectedProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -263,7 +263,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -288,7 +288,7 @@ trait PHPUnitTrait
         string $message = ''
     ): void {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -309,7 +309,7 @@ trait PHPUnitTrait
     protected function assertNotEmptyProtectedProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -330,7 +330,7 @@ trait PHPUnitTrait
     protected function assertNullProtectedProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -351,7 +351,7 @@ trait PHPUnitTrait
     protected function assertTrueProtectedProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -372,7 +372,7 @@ trait PHPUnitTrait
     protected function assertFalseProtectedProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -393,7 +393,7 @@ trait PHPUnitTrait
     protected function assertNotNullProtectedProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 
@@ -415,7 +415,7 @@ trait PHPUnitTrait
     protected function assertNotNullStaticProp(string $prop, string $message = ''): void
     {
         $result = PHPUnitUtils::getStaticProperty(
-            get_class($this->obTestObject),
+            get_class($this->testObject),
             $prop,
         );
 
@@ -439,14 +439,14 @@ trait PHPUnitTrait
         string $expected,
         string $message = ''
     ) : void {
-        $obTestObject = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+        $testObject = PHPUnitUtils::getProtectedProperty(
+            $this->testObject,
             $prop
         );
 
         $this->assertInstanceOf(
             $expected,
-            $obTestObject,
+            $testObject,
             $message ?: 'Инжекция ' . $expected . ' не прошла.'
         );
     }
@@ -461,14 +461,14 @@ trait PHPUnitTrait
      */
     protected function assertNotInjectionProtectedProp(string $prop, string $expected) : void
     {
-        $obTestObject = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+        $testObject = PHPUnitUtils::getProtectedProperty(
+            $this->testObject,
             $prop
         );
 
         $this->assertNotInstanceOf(
             $expected,
-            $obTestObject,
+            $testObject,
             'Прошла неожиданная инжекция ' . $expected
         );
     }
@@ -485,7 +485,7 @@ trait PHPUnitTrait
     protected function checkSetter(string $method, string $prop, $value): void
     {
         PHPUnitUtils::callMethod(
-            $this->obTestObject,
+            $this->testObject,
             $method,
             [
                 $value
@@ -493,7 +493,7 @@ trait PHPUnitTrait
         );
 
         $settedValue = PHPUnitUtils::getProtectedProperty(
-            $this->obTestObject,
+            $this->testObject,
             $prop
         );
 

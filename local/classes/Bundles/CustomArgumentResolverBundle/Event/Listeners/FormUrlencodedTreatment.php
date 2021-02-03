@@ -45,7 +45,7 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
                 ||
                 $header === 'application/json')
             &&
-            !empty($request->getContent())
+            $request->getContent()
         ) {
             // $_POST данные в массив.
             $arPostData = (array)json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -69,7 +69,7 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
      *
      * @return array OK or NULL.
      */
-    protected function arrayOfStrings($array): array
+    private function arrayOfStrings($array): array
     {
         $result = [];
         foreach ((array)$array as $key => $item) {

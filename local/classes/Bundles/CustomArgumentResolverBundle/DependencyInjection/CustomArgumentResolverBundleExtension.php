@@ -25,7 +25,7 @@ class CustomArgumentResolverBundleExtension extends Extension
      *
      * @return string
      */
-    public function getAlias()
+    public function getAlias() : string
     {
         return 'custom_arguments_resolvers';
     }
@@ -33,7 +33,7 @@ class CustomArgumentResolverBundleExtension extends Extension
     /**
      * @inheritDoc
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container) : void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -50,6 +50,7 @@ class CustomArgumentResolverBundleExtension extends Extension
         );
 
         $loader->load('services.yaml');
+
         if ($container->getParameter('kernel.environment') === 'dev') {
             $loader->load('dev/services.yaml');
         }

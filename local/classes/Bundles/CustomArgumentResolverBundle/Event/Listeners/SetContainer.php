@@ -28,14 +28,12 @@ class SetContainer implements OnControllerRequestHandlerInterface
      * @param ControllerEvent $event Объект события.
      *
      * @return void
-     *
-     * @since 05.12.2020 Борьба с повторными запусками. Трэйт SupportCheckerCallResolverTrait.
      */
     public function handle(ControllerEvent $event): void
     {
         $controller = $event->getController();
 
-        if (!$event->isMasterRequest() || !is_array($controller)) {
+        if (!is_array($controller) || !$event->isMasterRequest()) {
             return;
         }
 

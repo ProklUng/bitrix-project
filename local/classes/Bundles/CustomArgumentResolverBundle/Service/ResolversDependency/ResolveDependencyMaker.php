@@ -5,6 +5,7 @@ namespace Local\Bundles\CustomArgumentResolverBundle\Service\ResolversDependency
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use RuntimeException;
 
 /**
  * Class ResolveDependencyMaker
@@ -13,28 +14,15 @@ use ReflectionMethod;
  */
 class ResolveDependencyMaker
 {
-    /** @var string | null $className Название класса. */
-    protected $className;
-
     /**
      * @var array $arDepends Массив сопоставлений интерфейс - реализация.
      */
     protected $arDepends = [];
 
     /**
-     * ResolveDependencyMaker constructor.
-     *
-     * @param string|null $className Название класса.
-     */
-    public function __construct(string $className = null)
-    {
-        $this->className = $className;
-    }
-
-    /**
      * Сеттер сопоставлений.
      *
-     * @param array $arDepends Зависимости.
+     * @param array $arDepends
      *
      * @return ResolveDependencyMaker
      */
@@ -48,9 +36,10 @@ class ResolveDependencyMaker
     /**
      * Разрешить зависимости callable.
      *
-     * @param string $callable Callable.
+     * @param string|callable $callable
      *
      * @return array|null
+     * @throws RuntimeException
      */
     public function resolveDependenciesCallable(string $callable): ?array
     {
@@ -62,6 +51,15 @@ class ResolveDependencyMaker
 
         // Вычленить метод и класс.
         $arParse = explode('::', $callable);
+
+        if (!class_exists($arParse[0])) {
+            throw new RuntimeException(
+                sprintf(
+                    'Class %s not exist. Try use as callable.',
+                    $arParse[0]
+                )
+            );
+        }
 
         try {
             $reflectionCallable = new ReflectionMethod($arParse[0], $arParse[1]);
@@ -97,6 +95,7 @@ class ResolveDependencyMaker
      * Разрешить зависимости класса автоматически.
      *
      * @param string $class     Название класса.
+     * @psalm-param class-string $class
      * @param array  $arDepends Реализации интерфейсов.
      *
      * @return object|null
@@ -104,7 +103,7 @@ class ResolveDependencyMaker
     public function resolveDependencies(string $class, array $arDepends = [])
     {
         // Реализации - приоритет имеет переданное напрямую.
-        $arDepends = !empty($arDepends) ? $arDepends : $this->arDepends;
+        $arDepends = $arDepends ?: $this->arDepends;
 
         try {
             $reflectionClass = new ReflectionClass($class);
@@ -126,9 +125,12 @@ class ResolveDependencyMaker
         // Абстрактные классы.
         if ($reflectionClass->isAbstract()) {
             $realizationAbstractClass = $this->tryResolveAbstractClass(
-                $class,
-                $arDepends
+                $class, $arDepends
             );
+
+            if (!$realizationAbstractClass) {
+                return null;
+            }
 
             return $this->resolveDependencies($realizationAbstractClass, $arDepends);
         }
@@ -176,11 +178,27 @@ class ResolveDependencyMaker
                 continue;
             }
 
+            $paramClass = $param->getClass();
+            if ($paramClass) {
+                $paramClass = $paramClass->getName();
+            }
+
+            $paramClass = (string)$paramClass;
+
+            if (!class_exists($paramClass)) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Class %s not exist. Try resolve dependencies.',
+                        $paramClass
+                    )
+                );
+            }
+
             // This is where 'the magic happens'. We resolve each
             // of the dependencies, by recursively calling the
             // resolve() method.
             $newInstanceParams[] = $this->resolveDependencies(
-                $param->getClass()->getName(),
+                $paramClass,
                 $arDepends
             );
         }
@@ -199,19 +217,19 @@ class ResolveDependencyMaker
      * @param string $interfaceClass Интерфейс.
      * @param array  $arDepends      Зависимости.
      *
-     * @return boolean|mixed|string
+     * @return bool|mixed|string
      */
     protected function tryResolveInterface(
         string $interfaceClass,
         array $arDepends = []
     ) {
-        if (empty($arDepends)) {
+        if (!$arDepends) {
             return false;
         }
 
         foreach ($arDepends as $realization) {
             $interfaces = class_implements($realization);
-            if (in_array($interfaceClass, $interfaces, true)) {
+            if ($interfaces && in_array($interfaceClass, $interfaces, true)) {
                 return $realization;
             }
         }
@@ -225,14 +243,14 @@ class ResolveDependencyMaker
      * @param string $abstractClass Абстрактный класс.
      * @param array  $arDepends     Зависимости.
      *
-     * @return boolean|mixed|string
+     * @return mixed|string
      */
     protected function tryResolveAbstractClass(
         string $abstractClass,
         array $arDepends = []
     ) {
-        if (empty($arDepends)) {
-            return false;
+        if (!$arDepends) {
+            return '';
         }
 
         foreach ($arDepends as $realization) {

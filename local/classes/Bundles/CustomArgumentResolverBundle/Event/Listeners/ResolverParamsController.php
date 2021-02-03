@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  * @since 03.12.2020 Выпилил фабрику процессоров. За ненадобностью - полгода показало, что метод себя
  * не оправдал. Плюс мелкие доработки. Нужно ли обрабатывать этот контроллер вынесено в отдельную функцию.
  * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
+ * @since 05.01.2021 Рефакторинг.
  */
 class ResolverParamsController implements OnControllerRequestHandlerInterface
 {
@@ -68,11 +69,12 @@ class ResolverParamsController implements OnControllerRequestHandlerInterface
         // На случай, если придут сведения о контроллере в виде контроллер::action.
         if (is_string($controller)) {
             if (strpos($controller, '::') !== false) {
-                $controller = explode('::', $controller,2);
+                $controller = explode('::', $controller, 2);
             } else {
                 // Invoked controller.
                 try {
-                    $reflection = new ReflectionMethod($controller, '__invoke');
+                    /** @psalm-suppress ArgumentTypeCoercion */
+                    new ReflectionMethod($controller, '__invoke');
                     $controller = [$controller, '__invoke'];
                 } catch (ReflectionException $e) {
                 }
@@ -105,12 +107,16 @@ class ResolverParamsController implements OnControllerRequestHandlerInterface
     {
         // Эксперимент: если класс объявлен сервисом, то положиться на нативные средства Symfony.
         if ($this->config['params']['process_only_non_service_controller']) {
+            /**
+             * @var string|object $class Класс контроллера.
+             */
             $class = $controller;
             if (is_object($controller)) {
                 $class = get_class($controller);
             }
 
-            if ($this->container->has($class)) {
+            /** @psalm-suppress PossiblyInvalidArgument */
+            if (!$class || $this->container->has($class)) {
                 return false;
             }
         }

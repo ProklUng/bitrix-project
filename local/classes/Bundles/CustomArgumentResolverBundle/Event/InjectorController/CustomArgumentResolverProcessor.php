@@ -6,7 +6,6 @@ use Closure;
 use Exception;
 use Local\Bundles\CustomArgumentResolverBundle\Service\ResolversDependency\ResolveDependencyMakerContainerAware;
 use Local\Bundles\CustomArgumentResolverBundle\Service\Utils\IgnoredAutowiringControllerParamsBag;
-use Local\Bundles\CustomArgumentResolverBundle\Service\Utils\ResolveParamsFromContainer;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
@@ -31,6 +30,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
  * @since 08.11.2020 Обработка классов-исключений из автовязи (DTO, например).
  * @since 03.12.2020 Поддержка аттрибутов, как без $, так и с ним. В routes.yaml можно писать
  * как угодно. Для совместимости с нативным Symfony.
+ * @since 02.02.2021 Выпиливание ResolveParamsFromContainer.
  */
 class CustomArgumentResolverProcessor implements InjectorControllerInterface
 {
@@ -42,11 +42,6 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
     private $resolveDependencyMaker;
 
     /**
-     * @var ResolveParamsFromContainer $resolveParamsFromContainer Ресолвер параметров и сервисов из контейнера.
-     */
-    private $resolveParamsFromContainer;
-
-    /**
      * @var IgnoredAutowiringControllerParamsBag $autowiringControllerParamsBag Игнорируемые при автовайринге классы
      *  (учитывя наследование).
      */
@@ -56,16 +51,13 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      * CommonProcessor constructor.
      *
      * @param ResolveDependencyMakerContainerAware $resolveDependencyMaker
-     * @param ResolveParamsFromContainer           $resolveParamsFromContainer
      * @param IgnoredAutowiringControllerParamsBag $autowiringControllerParamsBag
      */
     public function __construct(
         ResolveDependencyMakerContainerAware $resolveDependencyMaker,
-        ResolveParamsFromContainer $resolveParamsFromContainer,
         IgnoredAutowiringControllerParamsBag $autowiringControllerParamsBag
     ) {
         $this->resolveDependencyMaker = $resolveDependencyMaker;
-        $this->resolveParamsFromContainer = $resolveParamsFromContainer;
         $this->autowiringControllerParamsBag = $autowiringControllerParamsBag;
     }
 
@@ -93,9 +85,8 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      * @since 03.10.2020 Долгожданное исправление ошибки с разрешением сервисов из контейнера.
      * @since 12.10.2020 Разрешитель зависимостей заменен на ResolveDependencyMakerContainerAware.
      */
-    protected function injectArgumentsToController(ControllerEvent $event): ControllerEvent
+    private function injectArgumentsToController(ControllerEvent $event): ControllerEvent
     {
-        $this->resolveDependencyMaker->setContainer($this->container);
         /** @var array $arArguments Аргументы контроллера. */
         try {
             $arArguments = $this->getArguments(
@@ -103,6 +94,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
                 $event->getController(),
             );
         } catch (ReflectionException $e) {
+            /** @psalm-suppress PossiblyNullReference */
             $this->container->get('die_text')->die(
                 'Ошибка в инжекции данных в конструктор контроллера ' . static::class
             );
@@ -139,7 +131,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
             }
 
             // Ресолвинг всего чего можно из контейнера.
-            $resolvedFromContainer = $this->resolveParamsFromContainer->resolve($argItem);
+            $resolvedFromContainer = $this->resolve($argItem);
             if ($resolvedFromContainer !== null) {
                 $event->getRequest()->attributes->set($param, $resolvedFromContainer);
                 continue;
@@ -147,9 +139,9 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
 
             // Всегда в начале пытаться достать из контейнера.
             // Не вынес в метод, потому что дело касается только основного цикла инжекции.
-            if (!is_object($event->getRequest()->attributes->get($param)) // На всякий случай!
+            if ($this->container->has($argItem) // На всякий случай!
                 &&
-                $this->container->has($argItem)
+                !is_object($event->getRequest()->attributes->get($param))
             ) {
                 $event->getRequest()->attributes->set($param, $this->container->get($argItem));
                 continue;
@@ -191,7 +183,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      *
      * @since 28.10.2020
      */
-    protected function resolveParamsInArrayRecursively(array $array) : array
+    private function resolveParamsInArrayRecursively(array $array) : array
     {
         $result = [];
 
@@ -203,7 +195,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
 
             if (is_string($argItem)) {
                 // Ресолвинг всего чего можно из контейнера.
-                $resolvedFromContainer = $this->resolveParamsFromContainer->resolve($argItem);
+                $resolvedFromContainer = $this->resolve($argItem);
                 $argItem = $resolvedFromContainer ?? $argItem;
             }
 
@@ -221,14 +213,14 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      *
      * @return array
      */
-    protected function compareArrayByKeys(
+    private function compareArrayByKeys(
         array $arTypesArguments,
         array $arArguments
     ) : array {
         $arResult = [];
         foreach ($arTypesArguments as $key => $item) {
             // Request нужно исключить!
-            if (empty($arArguments[$key])
+            if ((!array_key_exists($key, $arArguments) || !$arArguments[$key])
                 &&
                 $item !== 'Symfony\Component\HttpFoundation\Request') {
                 $arResult[$key] = $item;
@@ -247,7 +239,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      * @return array
      * @throws ReflectionException
      */
-    protected function getArguments(Request $request, $controller): array
+    private function getArguments(Request $request, $controller): array
     {
         $reflection = $this->reflectionController($controller);
 
@@ -266,7 +258,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      * @since 28.10.2020 Обработка значений по умолчанию.
      * @since 31.10.2020 Фикс ошибки рефлексии параметра, не имеющего значения по умолчанию.
      */
-    protected function getTypesArguments($controller) : array
+    private function getTypesArguments($controller) : array
     {
         $arResult = [];
 
@@ -290,10 +282,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
             }
 
             // Не дать проскочить абстрактным классам.
-            if (!$class
-                ||
-                (!$class->isInterface() && $class->isAbstract())
-            ) {
+            if (!$class->isInterface() && $class->isAbstract()) {
                 continue;
             }
 
@@ -311,7 +300,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      * @return ReflectionFunction|ReflectionMethod
      * @throws ReflectionException
      */
-    protected function reflectionController($controller)
+    private function reflectionController($controller)
     {
         if (is_array($controller)) {
             $reflection = new ReflectionMethod($controller[0], $controller[1]);
@@ -336,7 +325,7 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
      * @since 03.12.2020 Поддержка аттрибутов, как без $, так и с ним. В routes.yaml можно писать
      * как угодно. Для совместимости с нативным Symfony.
      */
-    protected function doGetArguments(Request $request, array $parameters): array
+    private function doGetArguments(Request $request, array $parameters): array
     {
         $attributes = $request->attributes->all();
         $arguments = [];
@@ -351,5 +340,53 @@ class CustomArgumentResolverProcessor implements InjectorControllerInterface
         }
 
         return $arguments;
+    }
+
+    /**
+     * Разрешить все, что можно из контейнера.
+     *
+     * @param mixed $argItem Аргумент.
+     *
+     * @return mixed
+     *
+     */
+    private function resolve($argItem)
+    {
+        if (!$argItem || is_object($argItem) || is_array($argItem)) {
+            return $argItem;
+        }
+
+        $resolvedVariable = false;
+
+        if (strpos($argItem, '%') === 0) {
+            $containerVar = str_replace('%', '', $argItem);
+
+            // Есть такой параметр в контейнере - действуем.
+            if ($this->container->hasParameter($containerVar)) {
+                $resolvedVarValue = $this->container->getParameter($containerVar);
+                $resolvedVariable = true;
+
+                if ($this->container->has((string)$resolvedVarValue)) {
+                    $resolvedVarValue = '@' . $resolvedVarValue;
+                }
+
+                $argItem = $resolvedVarValue;
+            }
+
+            // Продолжаем дальше, потому что в переменной может быть алиас сервиса.
+        }
+
+        // Если использован алиас сервиса, то попробовать получить его из контейнера.
+        if (strpos($argItem, '@') === 0) {
+            $resolvedService = $this->container->get(
+                ltrim($argItem, '@')
+            );
+
+            if ($resolvedService !== null) {
+                return $resolvedService;
+            }
+        }
+
+        return !$resolvedVariable ? null : $argItem;
     }
 }
