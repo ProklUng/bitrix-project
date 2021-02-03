@@ -80,9 +80,7 @@ services:
   # Валидатор CSRF токена.
   custom_arguments_resolvers.argument_resolver.validator_csrf_token:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\ValidatorRequestCsrfToken
-    calls:
-      - setContainer: ['@service_container']
-    arguments: ['@parameter_bag']
+    arguments: ['@custom_arguments_resolvers.csrf_checker']
     tags:
       - { name: kernel.event_listener, event: kernel.request, method: handle, priority: 10 }
 

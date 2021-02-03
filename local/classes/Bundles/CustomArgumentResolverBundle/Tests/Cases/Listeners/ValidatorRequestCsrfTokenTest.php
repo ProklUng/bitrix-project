@@ -4,6 +4,7 @@ namespace Local\Bundles\CustomArgumentResolverBundle\Tests\Cases\Listeners;
 
 use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\WrongCsrfException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\ValidatorRequestCsrfToken;
+use Local\Bundles\CustomArgumentResolverBundle\Service\Utils\CsrfRequestHandler;
 use Local\Bundles\CustomArgumentResolverBundle\Tests\Tools\BaseTestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * @coversDefaultClass ValidatorRequestCsrfToken
  *
  * @since 06.12.2020
+ * @since 03.02.2021 Актуализация.
  */
 class ValidatorRequestCsrfTokenTest extends BaseTestCase
 {
@@ -36,11 +38,10 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     public function testHandleNoCsrfProtection() : void
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
-            new ParameterBag(['csrf_protection' => false])
-        );
-
-        $this->obTestObject->setContainer(
-            static::$testContainer
+            new CsrfRequestHandler(
+                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                new ParameterBag(['csrf_protection' => false])
+            )
         );
 
         $event = $this->getMockRequestEvent(true, false);
@@ -61,11 +62,10 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     public function testHandleValidCsrfToken() : void
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
-            new ParameterBag(['csrf_protection' => true])
-        );
-
-        $this->obTestObject->setContainer(
-            static::$testContainer
+            new CsrfRequestHandler(
+                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                new ParameterBag(['csrf_protection' => true])
+            )
         );
 
         $event = $this->getMockRequestEvent(true, true);
@@ -86,12 +86,12 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     public function testHandleInvalidCsrfToken() : void
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
-            new ParameterBag(['csrf_protection' => true])
+            new CsrfRequestHandler(
+                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                new ParameterBag(['csrf_protection' => true])
+            )
         );
 
-        $this->obTestObject->setContainer(
-            static::$testContainer
-        );
 
         $event = $this->getMockRequestEvent(true, false);
 
@@ -110,11 +110,10 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     public function testHandleNonMasterRequest() : void
     {
         $this->obTestObject = new ValidatorRequestCsrfToken(
-            new ParameterBag(['csrf_protection' => true])
-        );
-
-        $this->obTestObject->setContainer(
-            static::$testContainer
+            new CsrfRequestHandler(
+                static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
+                new ParameterBag(['csrf_protection' => true])
+            )
         );
 
         $event = $this->getMockRequestEvent(false, false);
@@ -161,7 +160,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
 
         if ($validToken) {
             $fakeRequest->headers->set(
-                'x-csrf', static::$testContainer->get('security.csrf.token_manager')->getToken('app')
+                'x-csrf', static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager')->getToken('app')
             );
         } else {
             $fakeRequest->headers->set(
@@ -188,7 +187,7 @@ class ValidatorRequestCsrfTokenTest extends BaseTestCase
     private function getFakeController()
     {
         return new class extends AbstractController {
-            public function action(Request $request)
+            public function action(Request $request): Response
             {
                 return new Response('OK');
             }

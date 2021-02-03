@@ -5,8 +5,6 @@ namespace Local\Bundles\CustomArgumentResolverBundle\Event\Listeners;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Exceptions\WrongCsrfException;
 use Local\Bundles\CustomArgumentResolverBundle\Event\Interfaces\OnKernelRequestHandlerInterface;
 use Local\Bundles\CustomArgumentResolverBundle\Service\Utils\CsrfRequestHandler;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -18,25 +16,24 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * @since 24.09.2020 Рефакторинг.
  * @since 04.12.2020 Параметры контейнера пробрасываются снаружи.
  * @since 05.12.2020 Убрал EventSubscriberInterface, чтобы предотвратить дублирующий запуск листенера.
+ * @since 03.02.2021 Сервис проверки токена пробрасывается снаружи.
  */
 class ValidatorRequestCsrfToken implements OnKernelRequestHandlerInterface
 {
-    use ContainerAwareTrait;
-
     /**
-     * @var ParameterBagInterface $parameterBag Параметры контейнера.
+     * @var CsrfRequestHandler $csrfRequestHandler Проверка токена.
      */
-    private $parameterBag;
+    private $csrfRequestHandler;
 
     /**
      * ValidatorRequestCsrfToken constructor.
      *
-     * @param ParameterBagInterface $parameterBag Параметры контейнера.
+     * @param CsrfRequestHandler $csrfRequestHandler Проверка токена.
      */
     public function __construct(
-        ParameterBagInterface $parameterBag
+        CsrfRequestHandler $csrfRequestHandler
     ) {
-        $this->parameterBag = $parameterBag;
+        $this->csrfRequestHandler = $csrfRequestHandler;
     }
 
     /**
@@ -59,15 +56,7 @@ class ValidatorRequestCsrfToken implements OnKernelRequestHandlerInterface
             return;
         }
 
-        $request = $event->getRequest();
-
-        $csrfRequestHandler = new CsrfRequestHandler(
-            $request,
-            $this->container,
-            $this->parameterBag
-        );
-
-        $csrfRequestHandler->validateCsrfToken();
+        $this->csrfRequestHandler->validateCsrfToken($event->getRequest());
 
         $event->getRequest()->attributes->set('security.token.validated', true);
     }

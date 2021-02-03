@@ -15,6 +15,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
  * @coversDefaultClass CsrfRequestHandler
  *
  * @since 05.12.2020 Актуализация.
+ * @since 03.02.2021 Актуализация.
  */
 class CsrfRequestHandlerTest extends BaseTestCase
 {
@@ -28,19 +29,20 @@ class CsrfRequestHandlerTest extends BaseTestCase
         parent::setUp();
 
         $this->obTestObject = new CsrfRequestHandler(
-            $this->getRequest($this->getValidToken()),
-            static::$testContainer,
+            static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
             static::$testContainer->getParameterBag()
         );
     }
 
     /**
-    * validateCsrfToken().
-    *
-    */
+     * validateCsrfToken().
+     *
+     */
     public function testValidateCsrfToken() : void
     {
-        $result = $this->obTestObject->validateCsrfToken();
+        $result = $this->obTestObject->validateCsrfToken(
+            $this->getRequest($this->getValidToken())
+        );
 
         $this->assertTrue(
             $result,
@@ -54,14 +56,13 @@ class CsrfRequestHandlerTest extends BaseTestCase
     public function testValidateCsrfTokenInvalid() : void
     {
         $this->obTestObject = new CsrfRequestHandler(
-            $this->getRequest(''),
-            static::$testContainer,
+            static::$testContainer->get('custom_arguments_resolvers.security.csrf.token_manager'),
             new ParameterBag(['csrf_protection' => true])
         );
 
         $this->expectException(WrongCsrfException::class);
 
-        $this->obTestObject->validateCsrfToken();
+        $this->obTestObject->validateCsrfToken($this->getRequest(''));
     }
 
     /**

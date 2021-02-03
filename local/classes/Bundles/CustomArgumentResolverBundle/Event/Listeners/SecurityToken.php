@@ -42,7 +42,7 @@ class SecurityToken implements OnControllerRequestHandlerInterface
         if (!$this->useTrait($event, SecurityTokenTrait::class)
             ||
             !$event->isMasterRequest()) {
-                return;
+            return;
         }
 
         if (!$this->container->get('security.csrf.token_manager')) {

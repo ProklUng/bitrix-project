@@ -45,3 +45,13 @@ services:
       - add: [['Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\BaseDTOInterface']]
 
   Local\Bundles\CustomArgumentResolverBundle\Service\Utils\IgnoredAutowiringControllerParamsBag: '@custom_arguments_resolvers.ignored.autowiring.controller.arguments'
+
+  custom_arguments_resolvers.security.csrf.token_manager:
+    class: Symfony\Component\Security\Csrf\CsrfTokenManager
+
+  # Проверка CSRF токена.
+  custom_arguments_resolvers.csrf_checker:
+    class: Local\Bundles\CustomArgumentResolverBundle\Service\Utils\CsrfRequestHandler
+    arguments:
+      - '@custom_arguments_resolvers.security.csrf.token_manager'
+      - '@parameter_bag'

@@ -42,8 +42,8 @@ class FormUrlencodedTreatment implements OnKernelRequestHandlerInterface
 
         $header = $request->headers->get('content-type');
         if (($header === 'application/x-www-form-urlencoded'
-            ||
-            $header === 'application/json')
+                ||
+                $header === 'application/json')
             &&
             !empty($request->getContent())
         ) {
