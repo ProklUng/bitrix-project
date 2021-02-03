@@ -40,11 +40,6 @@ class BaseTestCase extends TestCase
         static::$testContainer = container()->get('custom_arguments_resolvers.test.service_container')
             ?: container();
 
-        $currentHttpHost = container()->getParameter('local.http.host');
-
-        $_SERVER['HTTP_HOST'] = $currentHttpHost;
-        $_SERVER['SERVER_NAME'] = $currentHttpHost;
-
         Mockery::resetContainer();
         parent::setUp();
 

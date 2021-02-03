@@ -51,6 +51,9 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
 
     /**
      * inject().
+     *
+     * @return void
+     * @throws Exception
      */
     public function testInject(): void
     {
@@ -120,8 +123,6 @@ class CustomArgumentResolverProcessorTest extends BaseTestCase
         $this->testObject->inject(
             $event
         );
-
-        // var_dump($event->getRequest()->attributes->get('session'));
 
         $this->assertInstanceOf(
             SessionInterface::class,

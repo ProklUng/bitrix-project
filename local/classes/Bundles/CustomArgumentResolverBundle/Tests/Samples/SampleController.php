@@ -49,7 +49,7 @@ class SampleController extends AbstractController
     public function action5(
         Request $request,
         string $value = self::TEST_CONSTANT,
-        array $array = [1, 2, ['%local.http.host%'], ['@session.instance']]
+        array $array = [1, 2, ['%kernel.http.host%'], ['@session.instance']]
     ) {
         return new Response('OK');
     }
