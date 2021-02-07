@@ -55,7 +55,7 @@ class CFormValidatorUnique extends AbstractCustomBitrixWebformValidator
 
         // Попытка избежать трудностей с обновлением формы в админке.
         $request = Application::getInstance()->getContext()->getRequest();
-        if ($request->getQuery('RESULT_ID')) {
+        if ($request->isAdminSection()) {
             return true;
         }
 

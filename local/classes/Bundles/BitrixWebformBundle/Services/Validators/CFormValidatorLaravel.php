@@ -45,7 +45,7 @@ class CFormValidatorLaravel extends AbstractCustomBitrixWebformValidator
      *
      * @param string $name         Код валидатора.
      * @param string $description  Описание валидатора.
-     * @param string $rules        Правила валидации. @see https://laravel.com/docs/6.x/validation#available-validation-rules
+     * @param string $rules        Правила валидации. @see https://laravel.com/docs/6.x/validation#available-validation-rules.
      * @param string $errorMessage Сообщение об ошибке, если валидация обломалась.
      * @param array  $typesFields  Типы полей, к которым применяется валидатор.
      */
@@ -72,7 +72,7 @@ class CFormValidatorLaravel extends AbstractCustomBitrixWebformValidator
             'NAME' => $this->name, // validator string ID
             'DESCRIPTION' => $this->description, // validator description
             'TYPES' => $this->typesFields, //  list of types validator can be applied.
-            'HANDLER' => [$this, "DoValidate"] // main validation method
+            'HANDLER' => [$this, 'DoValidate'] // main validation method
         ];
     }
 
@@ -83,8 +83,7 @@ class CFormValidatorLaravel extends AbstractCustomBitrixWebformValidator
     {
         global $APPLICATION;
 
-        foreach ($arValues as $value)
-        {
+        foreach ($arValues as $value) {
             try {
                 $this->validateAttribute($value, $this->rules);
             } catch (WebFormValidateErrorException $e) {

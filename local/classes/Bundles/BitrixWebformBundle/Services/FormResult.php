@@ -92,7 +92,7 @@ class FormResult
 
         $arValuesForm['web_form_submit'] = 'Отправить';
 
-        if (($idResult = $this->formResult->Add($idWebform, $arValuesForm)) && $idResult) {
+        if ($idResult = $this->formResult->Add($idWebform, $arValuesForm)) {
             $this->notifyByEmail($idWebform, $idResult);
 
             return $idResult;

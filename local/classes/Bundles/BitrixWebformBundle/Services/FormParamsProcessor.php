@@ -49,6 +49,7 @@ class FormParamsProcessor
     public function getParameters(int $idForm) : array
     {
         $arDataForm = [];
+        $arQuestions = $arAnswers = $arAnswersVarname = [];
 
         $this->form::GetResultAnswerArray(
             $idForm,
@@ -60,7 +61,7 @@ class FormParamsProcessor
 
         foreach ($arQuestions as $questionID => $questionItem) {
             $rsAnswers = $this->formManager->getAnswersForm($questionID);
-            if (!$rsAnswers) {
+            if ($rsAnswers === false) {
                 continue;
             }
 

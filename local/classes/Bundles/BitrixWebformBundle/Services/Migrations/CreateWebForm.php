@@ -52,7 +52,7 @@ class CreateWebForm
     private $sort = 100;
 
     /**
-     * @var string $nameForm
+     * @var string $buttonText
      */
     private $buttonText = 'Отправить';
 
@@ -77,9 +77,9 @@ class CreateWebForm
     /**
      * CreateWebForm constructor.
      *
-     * @param CForm       $cForm
-     * @param CFormStatus $cFormStatus
-     * @param CFormField  $cFormField
+     * @param CForm       $cForm       Битриксовый CForm.
+     * @param CFormStatus $cFormStatus Битриксовый CFormStatus.
+     * @param CFormField  $cFormField  Битриксовый CFormField.
      */
     public function __construct(CForm $cForm, CFormStatus $cFormStatus, CFormField $cFormField)
     {
@@ -116,7 +116,7 @@ class CreateWebForm
      * @return void
      * @throws RuntimeException
      */
-    public function deleteFormByCode(string $sidForm)
+    public function deleteFormByCode(string $sidForm): void
     {
         $result = $this->cForm::Delete(
             $this->getFormIdBySID($sidForm)
@@ -320,7 +320,7 @@ class CreateWebForm
      */
     public function addQuestions() : CreateWebForm
     {
-        if (!$this->idForm) {
+        if ($this->idForm === 0) {
             throw new LogicException(
                 'Не задано ID формы. Забыли задать или создать?'
             );
@@ -341,7 +341,7 @@ class CreateWebForm
                 'RESULTS_TABLE_TITLE' => $questionData['TITLE'],
             ];
 
-            if (!empty($questionData['arANSWER'])) {
+            if (array_key_exists('arANSWER', $questionData)) {
                 $arFiledNew['arANSWER'] = $questionData['arANSWER'];
                 $arFiledNew['arFILTER_ANSWER_TEXT'] = $questionData['arFILTER_ANSWER_TEXT'];
             } else {
@@ -374,7 +374,7 @@ class CreateWebForm
      */
     public function createEmailTemplate() : CreateWebForm
     {
-        if (!$this->idForm) {
+        if ($this->idForm === 0) {
             throw new LogicException(
                 'Не задано ID формы. Забыли задать или создать?'
             );
@@ -382,8 +382,10 @@ class CreateWebForm
 
         $templates = $this->cForm::SetMailTemplate($this->idForm);
 
-        // приписываем вновь созданные почтовые шаблоны данной веб-форме
-        $this->cForm::Set(["arMAIL_TEMPLATE" => $templates], $this->idForm);
+        $this->cForm::Set(
+            ['arMAIL_TEMPLATE' => $templates],
+            $this->idForm
+        );
 
         return $this;
     }

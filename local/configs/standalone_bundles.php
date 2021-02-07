@@ -13,4 +13,5 @@ return [
     Local\Bundles\StaticPageMakerBundle\StaticPageMakerBundle::class => ['all' => true],
     Local\Bundles\ModelBundle\ModelBundle::class => ['all' => true],
     Local\Bundles\BitrixWebformBundle\BitrixWebformBundle::class => ['all' => true],
+    Local\Bundles\BitrixIblockElementValidatorBundle\BitrixIblockElementValidatorBundle::class => ['all' => true],
 ];

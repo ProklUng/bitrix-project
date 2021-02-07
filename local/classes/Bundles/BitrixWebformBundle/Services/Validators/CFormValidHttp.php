@@ -22,7 +22,7 @@ class CFormValidHttp extends AbstractCustomBitrixWebformValidator
             "SETTINGS" => [$this, "GetSettings"],
             "CONVERT_TO_DB" => [$this, "ToDB"],
             "CONVERT_FROM_DB" => [$this, "FromDB"],
-            "HANDLER" => [$this, "DoValidate"]
+            "HANDLER" => [$this, "DoValidate"],
         ];
     }
 
@@ -55,9 +55,9 @@ class CFormValidHttp extends AbstractCustomBitrixWebformValidator
      */
     public function ToDB($arParams)
     {
-        $arParams["CHECK_HTTP"] = $arParams["CHECK_HTTP"] == "Y" ? "Y" : "N";
-        $arParams["CHECK_URL"] = $arParams["CHECK_URL"] == "Y" ? "Y" : "N";
-        $arParams["CHECK_LinkHrefUrl"] = $arParams["CHECK_LinkHrefUrl"] == "Y" ? "Y" : "N";
+        $arParams['CHECK_HTTP'] = $arParams['CHECK_HTTP'] === "Y" ? "Y" : "N";
+        $arParams['CHECK_URL'] = $arParams['CHECK_URL'] === "Y" ? "Y" : "N";
+        $arParams['CHECK_LinkHrefUrl'] = $arParams["CHECK_LinkHrefUrl"] === "Y" ? "Y" : "N";
 
         return serialize($arParams);
     }
@@ -78,26 +78,25 @@ class CFormValidHttp extends AbstractCustomBitrixWebformValidator
                 continue;
             }
 
-            if ($arParams["CHECK_HTTP"] == "Y" && preg_match($urlPattern, $value)) {
+            if ($arParams["CHECK_HTTP"] === "Y" && preg_match($urlPattern, $value)) {
                 $APPLICATION->ThrowException("#FIELD_NAME#: Поле содержит ссылку");
 
                 return false;
             }
 
-            if ($arParams["CHECK_URL"] == "Y" && preg_match($justURL, $value)) {
+            if ($arParams["CHECK_URL"] === "Y" && preg_match($justURL, $value)) {
                 // вернем ошибку
                 $APPLICATION->ThrowException("#FIELD_NAME#: Поле содержит ссылку");
 
                 return false;
             }
 
-            if ($arParams["CHECK_LinkHrefUrl"] == "Y" && preg_match($notLinkHrefUrl, $value)) {
+            if ($arParams["CHECK_LinkHrefUrl"] === "Y" && preg_match($notLinkHrefUrl, $value)) {
                 // вернем ошибку
                 $APPLICATION->ThrowException("#FIELD_NAME#: Поле содержит недопустимые символы");
 
                 return false;
             }
-
         }
 
         return true;

@@ -44,7 +44,7 @@ class FormManager
 
     /** ID формы
      *
-     * @param string $formSid
+     * @param string $formSid Символьный код формы.
      *
      * @return integer
      */
@@ -111,6 +111,8 @@ class FormManager
      */
     public function getAllAnswersByIdQuestion(string $formCode, string $codeQuestion)
     {
+        $form = $questions = $answers = $multiselect = [];
+
         $idForm = $this->getFormIdBySID($formCode);
 
         $arForm = $this->cForm::GetDataByID(

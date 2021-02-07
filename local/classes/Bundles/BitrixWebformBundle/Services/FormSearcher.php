@@ -103,7 +103,7 @@ class FormSearcher
 
         $rsResults = $this->query();
 
-        if ($rsResults === null) {
+        if (!$rsResults) {
             return [];
         }
 
@@ -124,7 +124,7 @@ class FormSearcher
     public function exist() : bool
     {
         $rsResults = $this->query();
-        if ($rsResults === null) {
+        if (!$rsResults) {
             return false;
         }
 
@@ -199,7 +199,7 @@ class FormSearcher
      */
     protected function query()
     {
-        if (!$this->idForm) {
+        if ($this->idForm === 0) {
             throw new InvalidArgumentException('ID формы не инициализировано.');
         }
 

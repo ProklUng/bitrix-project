@@ -40,7 +40,7 @@ class FormProcessor
     /** @var integer $idForm ID формы. */
     private $idForm;
 
-    /** @var array $inboudData */
+    /** @var array $inboundData */
     private $inboundData = [];
 
     /**
