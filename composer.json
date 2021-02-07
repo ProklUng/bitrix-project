@@ -75,7 +75,11 @@
     "phpstan/phpstan-strict-rules": "^0.12.7",
     "phpstan/phpstan-phpunit": "^0.12.17",
     "slam/phpstan-extensions": "^5.1",
-    "phpstan/phpstan-deprecation-rules": "^0.12.6"
+    "phpstan/phpstan-deprecation-rules": "^0.12.6",
+    "vimeo/psalm": "^4.3",
+    "psalm/plugin-symfony": "^2.1",
+    "phpstan/phpstan-doctrine": "^0.12.26",
+    "psalm/plugin-mockery": "^0.7.0"
   },
   "scripts": {
     "lint:php": "php ./vendor/bin/phpcs  --encoding=utf-8 --ignore=./local/components/*/templates/*  --standard=ruleset.xml --extensions=php  ./local/classes ./local/components",
