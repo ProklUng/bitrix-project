@@ -1,8 +1,9 @@
 <?php
 
-namespace Local\Bitrix\CustomProperties;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties;
 
-use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
+
+use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
 
 /**
  * Class YesNoType
@@ -11,7 +12,7 @@ use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
  * значение свойства ещё не определено. Это должно помочь избежать ситуации, когда в админке отображалось бы "Нет", а
  * при фильтрации по значению 0 требуемые элементы не попадают в выборку.
  *
- * @package Local\Bitrix\CustomProperties
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties
  */
 class YesNoType extends IblockPropertyTypeBase
 {

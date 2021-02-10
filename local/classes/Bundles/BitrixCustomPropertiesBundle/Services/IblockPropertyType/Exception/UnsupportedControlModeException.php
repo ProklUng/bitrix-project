@@ -1,10 +1,14 @@
 <?php
 
-namespace Local\Util\IblockPropertyType\Exception;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Exception;
 
 use Exception;
 use Throwable;
 
+/**
+ * Class UnsupportedControlModeException
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Exception
+ */
 class UnsupportedControlModeException extends Exception
 {
     /**

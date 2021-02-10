@@ -1,25 +1,24 @@
 <?php
 
-namespace Local\Bitrix\CustomProperties;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties;
 
 use Bitrix\Main\Loader;
 use Bitrix\Main\LoaderException;
 use CForm;
-use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
+use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
 
 /**
  * Class BitrixFormType
- * Кастомное поле привящка к форме.
- * @package Local\Bitrix\CustomProperties
+ * Привязка к форме
  *
- * @since 17.10.2020
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties
  */
-class BitrixFormType extends IblockPropertyTypeBase
+class FormType extends IblockPropertyTypeBase
 {
     /**
-     * @var array $formsCache
+     * @var array
      */
-    private static $formsCache;
+    private static $formsList;
 
     /**
      * @inheritdoc
@@ -45,40 +44,42 @@ class BitrixFormType extends IblockPropertyTypeBase
         return [
             'GetAdminListViewHTML' => [$this, 'getAdminListViewHTML'],
             'GetPropertyFieldHtml' => [$this, 'getPropertyFieldHtml'],
-            'GetAdminFilterHTML' => [$this, 'getAdminFilterHTML'],
-            "GetUIFilterProperty" => [$this, "getUIFilterProperty"],
+            'GetAdminFilterHTML'   => [$this, 'getAdminFilterHTML'],
+            'GetUIFilterProperty'  => [$this, 'getUIFilterProperty'],
         ];
     }
 
     /**
      * @inheritdoc
+     *
+     * @throws LoaderException
      */
     public function getAdminListViewHTML(array $property, array $value, array $control)
     {
-        return self::getFormName($value['VALUE'], $value['VALUE']);
+        return self::getFormName($value['VALUE']);
     }
 
     /**
      * @inheritdoc
+     * @throws LoaderException
      */
     public function getPropertyFieldHtml(array $property, array $value, array $control)
     {
+        if (!Loader::includeModule('form')) {
+            return $value['VALUE'];
+        }
+
         return self::getFormFieldHtml($control['VALUE'], $value['VALUE']);
     }
 
     /**
-     * Отображение фильтра в виде списка для новых гридов
-     *
-     * @param $arProperty
-     * @param $strHTMLControlName
-     * @param $fields
+     * @inheritdoc
+     * @throws LoaderException
      */
-    public function getUIFilterProperty($arProperty, $strHTMLControlName, &$fields)
+    public function getUIFilterProperty(array $property, $controlName, array &$filter)
     {
-        $items = array_column($this->getFormList(), 'NAME', 'SID');
-
-        $fields["type"] = "list";
-        $fields["items"] = $items;
+        $filter["type"] = "list";
+        $filter["items"] = array_column(self::getFormList(), 'NAME', 'SID');
     }
 
     /**
@@ -94,16 +95,16 @@ class BitrixFormType extends IblockPropertyTypeBase
             $curValue = $GLOBALS[$control['VALUE']];
         }
 
-        return $this->getFormFieldHtml($control['VALUE'], $curValue);
+        return self::getFormFieldHtml($control['VALUE'], $curValue);
     }
 
     /**
-     * @param mixed $inputName
+     * @param $inputName
      * @param string $selectedValue
-     * @param boolean $addEmpty
+     * @param bool $addEmpty
      *
-     * @return string
      * @throws LoaderException
+     * @return string
      */
     protected function getFormFieldHtml($inputName, $selectedValue = '', $addEmpty = true)
     {
@@ -116,45 +117,43 @@ class BitrixFormType extends IblockPropertyTypeBase
             $selected = ($item['SID'] == $selectedValue) ? 'selected="selected"' : '';
             $input .= '<option ' . $selected . ' value="' . $item['SID'] . '">' . $item['NAME'] . '</option>';
         }
-
         $input .= '</select>';
 
         return $input;
     }
 
     /**
-     * Название формы.
-     *
-     * @param $sid
-     * @param string $default
-     *
-     * @return mixed|string
+     * @param string $sid
      *
      * @throws LoaderException
+     * @return string
      */
-    protected function getFormName($sid, $default = '')
+    protected function getFormName($sid)
     {
-        if (!empty($sid)) {
-            $forms = self::getFormList();
-            return isset($forms[$sid]) ? $forms[$sid]['NAME'] : $default;
+        $sid = trim($sid);
+        if ($sid == '') {
+            return '';
         }
-        return $default;
+
+        $forms = self::getFormList();
+        if (array_key_exists($sid, $forms) && array_key_exists('NAME', $forms[$sid])) {
+            return trim($forms[$sid]['NAME']);
+        }
+
+        return trim($sid);
     }
 
     /**
-     * Список форм.
-     *
-     * @return array
-     *
      * @throws LoaderException
+     * @return array
      */
-    protected function getFormList()
+    protected static function getFormList()
     {
-        if (is_array(self::$formsCache)) {
-            return self::$formsCache;
+        if (is_array(self::$formsList)) {
+            return self::$formsList;
         }
 
-        self::$formsCache = [];
+        self::$formsList = [];
         if (Loader::includeModule('form')) {
             $by = 's_name';
             $order = 'asc';
@@ -163,11 +162,11 @@ class BitrixFormType extends IblockPropertyTypeBase
             $dbres = CForm::GetList($by, $order, [], $isFiltered);
             while ($item = $dbres->Fetch()) {
                 if (!empty($item['SID'])) {
-                    self::$formsCache[$item['SID']] = $item;
+                    self::$formsList[$item['SID']] = $item;
                 }
             }
         }
 
-        return self::$formsCache;
+        return self::$formsList;
     }
 }

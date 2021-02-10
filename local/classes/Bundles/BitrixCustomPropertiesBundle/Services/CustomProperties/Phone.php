@@ -1,14 +1,14 @@
 <?php
 
-namespace Local\Bitrix\CustomProperties;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties;
 
 use Illuminate\Contracts\Validation\Rule;
-use Local\Util\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
+use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction\IblockPropertyTypeBase;
 
 /**
  * Class Phone
  * Кастомное поле типа телефон.
- * @package Local\Bitrix\CustomProperties
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties
  *
  * @since 17.10.2020
  */

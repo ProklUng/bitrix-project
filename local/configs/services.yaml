@@ -15,7 +15,6 @@ imports:
   - {resource: services/csrf.yaml }
   - {resource: services/seo.yaml }
   - {resource: services/controllers.yaml }
-  - {resource: services/custom_properties.yaml }
   - {resource: services/resolvers.yaml }
   - {resource: services/guzzle.yaml }
   - {resource: services/console_commands.yaml }

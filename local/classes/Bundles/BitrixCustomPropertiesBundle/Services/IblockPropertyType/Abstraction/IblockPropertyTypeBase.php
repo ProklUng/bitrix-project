@@ -1,13 +1,13 @@
-<?php /** @noinspection PhpUnused */
+<?php
 
-namespace Local\Util\IblockPropertyType\Abstraction;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction;
 
 use Local\Util\IblockPropertyType\Exception\NotImplementedMethodException;
 use Local\Util\IblockPropertyType\Exception\UnsupportedControlModeException;
 
 /**
  * Class IblockPropertyTypeBase
- * @package Local\Util\IblockPropertyType\Abstraction
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction
  */
 abstract class IblockPropertyTypeBase implements IblockPropertyTypeInterface
 {
@@ -43,7 +43,7 @@ abstract class IblockPropertyTypeBase implements IblockPropertyTypeInterface
      */
     public function init()
     {
-        AddEventHandler(
+        return AddEventHandler(
             'iblock',
             'OnIBlockPropertyBuildList',
             [$this, 'getUserTypeDescription']

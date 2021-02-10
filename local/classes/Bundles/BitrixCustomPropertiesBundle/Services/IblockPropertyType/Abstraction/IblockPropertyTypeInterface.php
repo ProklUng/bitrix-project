@@ -1,6 +1,6 @@
 <?php
 
-namespace Local\Util\IblockPropertyType\Abstraction;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction;
 
 /**
  * Interface IblockPropertyTypeInterface
@@ -11,7 +11,7 @@ namespace Local\Util\IblockPropertyType\Abstraction;
  * Также интерфейс помогает понять и следовать подходу с отказом от статических методов в пользу классического ООП и
  * полиморфизма.
  *
- * @package Local\Util\IblockPropertyType\Abstraction
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction
  */
 interface IblockPropertyTypeInterface
 {

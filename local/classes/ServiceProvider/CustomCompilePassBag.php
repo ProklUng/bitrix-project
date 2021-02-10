@@ -5,7 +5,6 @@ namespace Local\ServiceProvider;
 use Local\ServiceProvider\CompilePasses\TwigExtensionTaggedServicesPass;
 use Local\ServiceProvider\CompilePasses\BaseAggregatedTaggedServicesPass;
 use Local\ServiceProvider\CompilePasses\ContainerAwareCompilerPass;
-use Local\ServiceProvider\PostLoadingPass\InitCustomPropertiesType;
 use Local\ServiceProvider\PostLoadingPass\TwigExtensionApply;
 use Local\ServiceProvider\CompilePasses\ValidateServiceDefinitions;
 use Local\ServiceProvider\PostLoadingPass\BootstrapServices;
@@ -77,7 +76,6 @@ class CustomCompilePassBag
         ['pass' => InitBitrixEvents::class, 'priority' => 10],
         ['pass' => BootstrapServices::class, 'priority' => 20],
         ['pass' => TwigExtensionApply::class, 'priority' => 20],
-        ['pass' => InitCustomPropertiesType::class, 'priority' => 20],
     ];
 
     /**

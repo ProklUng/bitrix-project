@@ -1,10 +1,15 @@
 <?php
 
-namespace Local\Util\IblockPropertyType\Exception;
+namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Exception;
 
 use Exception;
 use Throwable;
 
+/**
+ * Class NotImplementedMethodException
+ * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Exception
+ *
+ */
 class NotImplementedMethodException extends Exception
 {
     /**
