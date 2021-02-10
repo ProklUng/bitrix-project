@@ -3,6 +3,7 @@
 namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\PropertiesProcessor;
 
 use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction\IblockPropertyTypeInterface;
+use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction\IblockPropertyTypeNativeInterface;
 use RuntimeException;
 
 /**
@@ -45,7 +46,10 @@ class CustomIblockPropertiesProcessor
         /** @var IblockPropertyTypeInterface $processor */
         foreach ($this->processors as $processor) {
             $interfaces = class_implements($processor);
-            if (!in_array(IblockPropertyTypeInterface::class, $interfaces, true)) {
+            if (!in_array(IblockPropertyTypeInterface::class, $interfaces, true)
+                &&
+                !in_array(IblockPropertyTypeNativeInterface::class, $interfaces, true)
+            ) {
                 throw new RuntimeException(
                     sprintf(
                         'Custom property type error. Class %s not implement IblockPropertyTypeInterface',

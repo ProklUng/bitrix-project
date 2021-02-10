@@ -40,6 +40,21 @@ services:
     tags:
       - { name: bitrix.custom.property.type }
 
+  # Кастомное свойство "Привязка к группе пользователей".
+  Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\GroupUser:
+    tags:
+      - { name: bitrix.custom.property.type }
+
+  # Кастомное свойство "Привязка к элементу с описанием".
+  Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\ListElementWithDescription:
+    tags:
+      - { name: bitrix.custom.property.type }
+
+  # Комплексное свойство инфоблока.
+  Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\CIBlockPropertyCProp:
+    tags:
+      - { name: bitrix.custom.property.type }
+
   # Кастомное пользовательское свойство "Привязка к пользователю".
   Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\CUserTypeUserId:
     tags:
