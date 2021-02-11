@@ -2,6 +2,7 @@
 
 namespace Local\Bundles\BitrixIblockElementValidatorBundle\Services;
 
+use Bitrix\Main\Context;
 use CIBlockProperty;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -26,7 +27,8 @@ class BitrixPropertiesValidator
     private $config;
 
     /**
-     * @var ServiceLocator $customValidators Кастомные валидаторы, помеченные тэгом bitrix_iblock_element_validator.custom_validator.
+     * @var ServiceLocator $customValidators Кастомные валидаторы, помеченные тэгом
+     *                                       bitrix_iblock_element_validator.custom_validator.
      */
     private $customValidators;
 
@@ -38,7 +40,8 @@ class BitrixPropertiesValidator
     /**
      * BitrixPropertiesValidator constructor.
      *
-     * @param ServiceLocator     $serviceLocator Кастомные валидаторы, помеченные тэгом bitrix_iblock_element_validator.custom_validator.
+     * @param ServiceLocator     $serviceLocator Кастомные валидаторы, помеченные тэгом
+     *                                           bitrix_iblock_element_validator.custom_validator.
      * @param SanitizerInterface $sanitizer      Санитайзер.
      * @param array              $config         Конфигурация бандла.
      */
@@ -148,14 +151,29 @@ class BitrixPropertiesValidator
 
             $propertyId = $this->getPropertyIdByCode($item['id_iblock'], $item['code_property']);
 
-            // Неверное свойство в конфиге. Или свойство есть, а его значений - нет.
-            if (!$propertyId || !array_key_exists($item['code_property'], $arFields['PROPERTY_VALUES'])) {
+            // Неверное свойство в конфиге.
+            if (!$propertyId) {
                 throw new RuntimeException(
                   sprintf(
                       'Не смог найти свойство %s в инфоблоке %s.',
                       $item['code_property'],
                       $item['id_iblock']
                   )
+                );
+            }
+
+            $request = Context::getCurrent()->getRequest();
+
+            //  Или свойство есть, а его значений - нет.
+            if (!$request->isAdminSection()
+                &&
+                !array_key_exists($item['code_property'], $arFields['PROPERTY_VALUES'])) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Не смог найти свойство %s в инфоблоке %s.',
+                        $item['code_property'],
+                        $item['id_iblock']
+                    )
                 );
             }
 
