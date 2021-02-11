@@ -13,13 +13,19 @@ use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstr
  * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\ORM\EnumProperty
  *
  * @since 10.02.2021
+ *
+ * Параметры: модуль - модуль, который автоматически подключится (опционально).
+ * ORM класс, из которого будут получаться данные, а так же два поля: одно будет записываться в БД,
+ * а другое показываться пользователю.
+ *
+ * Пример ORM класса: \Bitrix\Main\GroupTable
  */
 class Base implements IblockPropertyTypeNativeInterface
 {
     /**
-     * @const USER_TYPE_ID
+     * @const USER_TYPE_ID Тип пользовательского поля.
      */
-    public const USER_TYPE_ID = "customList";
+    public const USER_TYPE_ID = 'customList';
 
     /**
      * @var mixed|null $property
@@ -28,6 +34,7 @@ class Base implements IblockPropertyTypeNativeInterface
 
     /**
      * Base constructor.
+     *
      * @param mixed $property
      */
     public function __construct($property = null)
@@ -57,11 +64,11 @@ class Base implements IblockPropertyTypeNativeInterface
             "USER_TYPE_ID" => static::USER_TYPE_ID,
             "CLASS_NAME" => __CLASS__,
             "DESCRIPTION" => "Кастомный список",
-            "BASE_TYPE" => CUserTypeManager::BASE_TYPE_STRING,
-            "GetPropertyFieldHtml" => [__CLASS__, 'GetEditFormHTML'],
-            "GetEditFormHTML" => [__CLASS__, "GetEditFormHTML"],
-            "PrepareSettings" => [__CLASS__, 'PrepareSettings'],
-            "GetSettingsHTML" => [__CLASS__, 'GetSettingsHTML'],
+            'BASE_TYPE' => CUserTypeManager::BASE_TYPE_STRING,
+            'GetPropertyFieldHtml' => [__CLASS__, 'GetEditFormHTML'],
+            'GetEditFormHTML' => [__CLASS__, "GetEditFormHTML"],
+            'PrepareSettings' => [__CLASS__, 'PrepareSettings'],
+            'GetSettingsHTML' => [__CLASS__, 'GetSettingsHTML'],
         ];
     }
 
@@ -75,15 +82,15 @@ class Base implements IblockPropertyTypeNativeInterface
     {
         global $DB;
         switch (strtolower($DB->type)) {
-            case "mysql":
-                return "text";
-            case "oracle":
-                return "varchar2(2000 char)";
-            case "mssql":
-                return "varchar(2000)";
+            case 'mysql':
+                return 'text';
+            case 'oracle':
+                return 'varchar2(2000 char)';
+            case 'mssql':
+                return 'varchar(2000)';
         }
 
-        return "text";
+        return 'text';
     }
 
     /**
@@ -308,12 +315,12 @@ class Base implements IblockPropertyTypeNativeInterface
         $items = static::getEnumList($arUserField);
 
         return [
-            "id" => $arHtmlControl['ID'],
+            'id' => $arHtmlControl['ID'],
             'NAME' => $arHtmlControl['NAME'],
             "type" => 'list',
-            "items" => $items,
-            "params" => ['multiple' => 'Y'],
-            "filterable" => '',
+            'items' => $items,
+            'params' => ['multiple' => 'Y'],
+            'filterable' => '',
         ];
     }
 
@@ -370,12 +377,13 @@ class Base implements IblockPropertyTypeNativeInterface
      */
     protected static function getEmptyCaption(array $arUserField)
     {
-        return $arUserField["SETTINGS"]['CAPTION_NO_VALUE'] !== ''
-            ? $arUserField["SETTINGS"]['CAPTION_NO_VALUE']
-            : "не задано";
+        return $arUserField['SETTINGS']['CAPTION_NO_VALUE'] !== ''
+            ? $arUserField['SETTINGS']['CAPTION_NO_VALUE']
+            : 'не задано';
     }
 
     /**
+     * @param array $enum
      * @param mixed $propertyValue
      * @param mixed $propertyFormCfg
      */
