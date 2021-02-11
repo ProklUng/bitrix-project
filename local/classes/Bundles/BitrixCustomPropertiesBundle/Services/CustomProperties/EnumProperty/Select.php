@@ -30,7 +30,7 @@ class Select extends Base
         if ($arProperty['SETTINGS']['LIST_HEIGHT'] > 1) {
             $size = ' size="' . $arProperty['SETTINGS']['LIST_HEIGHT'] . '"';
         } else {
-            $propertyValue["VALIGN"] = "middle";
+            $propertyValue['VALIGN'] = 'middle';
             $size = '';
         }
 

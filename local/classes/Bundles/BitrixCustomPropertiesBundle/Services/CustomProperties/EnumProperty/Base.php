@@ -61,12 +61,12 @@ class Base implements IblockPropertyTypeNativeInterface
     {
         return [
             'USER_TYPE' => static::USER_TYPE_ID,
-            "USER_TYPE_ID" => static::USER_TYPE_ID,
-            "CLASS_NAME" => __CLASS__,
-            "DESCRIPTION" => "Кастомный список",
+            'USER_TYPE_ID' => static::USER_TYPE_ID,
+            'CLASS_NAME' => __CLASS__,
+            'DESCRIPTION' => 'Кастомный список',
             'BASE_TYPE' => CUserTypeManager::BASE_TYPE_STRING,
             'GetPropertyFieldHtml' => [__CLASS__, 'GetEditFormHTML'],
-            'GetEditFormHTML' => [__CLASS__, "GetEditFormHTML"],
+            'GetEditFormHTML' => [__CLASS__, 'GetEditFormHTML'],
             'PrepareSettings' => [__CLASS__, 'PrepareSettings'],
             'GetSettingsHTML' => [__CLASS__, 'GetSettingsHTML'],
         ];
@@ -164,7 +164,7 @@ class Base implements IblockPropertyTypeNativeInterface
 
         $result .= '
 		<tr>
-			<td>'."Код поля для ID".':</td>
+			<td>Код поля для ID:</td>
 			<td>
 				<input type="text" name="'.$strHTMLControlName['NAME'].'[ORM_FIELD_CODE_ID]" size="10" value="'.htmlspecialcharsbx($value).'">
 			</td>
@@ -178,7 +178,7 @@ class Base implements IblockPropertyTypeNativeInterface
 
         $result .= '
 		<tr>
-			<td>'."Код поля для отображения".':</td>
+			<td>Код поля для отображения:</td>
 			<td>
 				<input type="text" name="'.$strHTMLControlName['NAME'].'[ORM_FIELD_CODE_NAME]" size="10" value="'.htmlspecialcharsbx($value).'">
 			</td>
@@ -222,9 +222,10 @@ class Base implements IblockPropertyTypeNativeInterface
 
         $result .= '
 		<tr>
-			<td>'."Подпись при отсутствии значения".':</td>
+			<td>Подпись при отсутствии значения:</td>
 			<td>
-				<input type="text" name="'.$strHTMLControlName['NAME'].'[CAPTION_NO_VALUE]" size="10" value="'.htmlspecialcharsbx($value).'">
+				<input type="text" 
+				    name="'.$strHTMLControlName['NAME'].'[CAPTION_NO_VALUE]" size="10" value="'.htmlspecialcharsbx($value).'">
 			</td>
 		</tr>
 		';
@@ -237,10 +238,11 @@ class Base implements IblockPropertyTypeNativeInterface
 
         $result .= '
 		<tr>
-			<td>'."Показывать пустое значение для обязательного поля".':</td>
+			<td>Показывать пустое значение для обязательного поля:</td>
 			<td>
-				<input type="hidden" name="'.$strHTMLControlName['NAME'].'[SHOW_NO_VALUE]" value="N" />
-				<label><input type="checkbox" name="'.$strHTMLControlName['NAME'].'[SHOW_NO_VALUE]" value="Y" '.($value === 'N' ? '' : ' checked="checked"').' /> '.GetMessage('MAIN_YES').'</label>
+				<input type="hidden" name="' . $strHTMLControlName['NAME'] . '[SHOW_NO_VALUE]" value="N" />
+				<label><input type="checkbox" 
+				    name="' . $strHTMLControlName['NAME'] . '[SHOW_NO_VALUE]" value="Y" '.($value === 'N' ? '' : ' checked="checked"').' />Да</label>
 			</td>
 		</tr>
 		';
@@ -286,8 +288,8 @@ class Base implements IblockPropertyTypeNativeInterface
             return '';
         }
 
-        $size = ' size="'.$arUserField["SETTINGS"]['LIST_HEIGHT'].'"';
-        if ($arUserField["SETTINGS"]['LIST_HEIGHT'] < 5) {
+        $size = ' size="'.$arUserField['SETTINGS']['LIST_HEIGHT'].'"';
+        if ($arUserField['SETTINGS']['LIST_HEIGHT'] < 5) {
             $size = ' size="5"';
         }
 
@@ -296,7 +298,7 @@ class Base implements IblockPropertyTypeNativeInterface
         Главное</option>';
         foreach ($enum as $idEnum => $enumName) {
             $result .= '<option value="'.$idEnum.'"'.(in_array($idEnum,
-                    $arHtmlControl["VALUE"]) ? ' selected' : '').'>'.$enumName.'</option>';
+                    $arHtmlControl['VALUE']) ? ' selected' : '').'>'.$enumName.'</option>';
         }
 
         $result .= '</select>';
@@ -317,7 +319,7 @@ class Base implements IblockPropertyTypeNativeInterface
         return [
             'id' => $arHtmlControl['ID'],
             'NAME' => $arHtmlControl['NAME'],
-            "type" => 'list',
+            'type' => 'list',
             'items' => $items,
             'params' => ['multiple' => 'Y'],
             'filterable' => '',
@@ -330,10 +332,10 @@ class Base implements IblockPropertyTypeNativeInterface
      *
      * @return array
      */
-    protected static function getEnumList(&$arUserField, $arParams = []) : array
+    protected static function getEnumList(array &$arUserField, array $arParams = []) : array
     {
         $enum = [];
-        $showNoValue = $arUserField["MANDATORY"] !== 'Y'
+        $showNoValue = $arUserField['MANDATORY'] !== 'Y'
             || $arUserField['SETTINGS']['SHOW_NO_VALUE'] !== 'N'
             || (isset($arParams['SHOW_NO_VALUE']) && $arParams['SHOW_NO_VALUE'] === true);
 
@@ -385,9 +387,9 @@ class Base implements IblockPropertyTypeNativeInterface
     /**
      * @param array $enum
      * @param mixed $propertyValue
-     * @param mixed $propertyFormCfg
+     * @param array $propertyFormCfg
      */
-    protected function getEditHTML($enum, $propertyValue, $propertyFormCfg)
+    protected function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg)
     {
 
     }

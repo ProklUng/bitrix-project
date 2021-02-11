@@ -21,9 +21,10 @@ class Checkbox extends Base
         $result = '';
 
         foreach ($enum as $idEnum => $valEnum) {
-            $bSelected = $propertyValue["VALUE"] == $idEnum;
+            $bSelected = $propertyValue['VALUE'] == $idEnum;
             $bWasSelect = $bWasSelect || $bSelected;
-            $result .= '<label><input type="radio" value="'.$idEnum.'" name="'.$propertyFormCfg['VALUE'].'"'.($bSelected ? ' checked' : '').'>'.$valEnum.'</label><br>';
+            $result .= '<label>
+                            <input type="radio" value="'.$idEnum.'" name="'.$propertyFormCfg['VALUE'].'"'.($bSelected ? ' checked' : '').'>'.$valEnum.'</label><br>';
         }
 
         return $result;
