@@ -74,7 +74,7 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
         self::showJs();
 
         if (!empty($arProperty['USER_TYPE_SETTINGS'])) {
-            $arFields = self::prepareSetting($arProperty['USER_TYPE_SETTINGS']);
+            $arFields = self::prepareSetting((array)$arProperty['USER_TYPE_SETTINGS']);
         } else {
             return '<span>Не заполнен список полей в настройках свойства</span>';
         }
@@ -119,7 +119,7 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
         $result = '';
 
         if (!empty($arProperty['USER_TYPE_SETTINGS'])) {
-            $arFields = self::prepareSetting($arProperty['USER_TYPE_SETTINGS']);
+            $arFields = self::prepareSetting((array)$arProperty['USER_TYPE_SETTINGS']);
         }
 
         if (!empty($value['VALUE'])) {
@@ -186,7 +186,7 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
                 </tr>';
 
 
-        $arSetting = self::prepareSetting($arProperty['USER_TYPE_SETTINGS']);
+        $arSetting = self::prepareSetting((array)$arProperty['USER_TYPE_SETTINGS']);
 
         if (!empty($arSetting)) {
             foreach ($arSetting as $code => $arItem) {
@@ -280,7 +280,7 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
      */
     public function ConvertToDB(array $arProperty, array $arValue) : array
     {
-        $arFields = self::prepareSetting($arProperty['USER_TYPE_SETTINGS']);
+        $arFields = self::prepareSetting((array)$arProperty['USER_TYPE_SETTINGS']);
 
         foreach ($arValue['VALUE'] as $code => $value) {
             if ($arFields[$code]['TYPE'] === 'file') {
@@ -795,18 +795,13 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
             }
         }
 
-        if (!function_exists('cmp')) {
-            function cmp($a, $b)
-            {
-                if ($a['SORT'] == $b['SORT']) {
-                    return 0;
-                }
-
-                return ($a['SORT'] < $b['SORT']) ? -1 : 1;
+        uasort($arResult, static function ($a, $b)
+        {
+            if ($a['SORT'] === $b['SORT']) {
+                return 0;
             }
-        }
-
-        uasort($arResult, 'cmp');
+            return ($a['SORT'] < $b['SORT']) ? -1 : 1;
+        });
 
         return $arResult;
     }
