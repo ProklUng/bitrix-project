@@ -15,4 +15,5 @@ return [
     Local\Bundles\BitrixWebformBundle\BitrixWebformBundle::class => ['all' => true],
     Local\Bundles\BitrixCustomPropertiesBundle\BitrixCustomPropertiesBundle::class => ['all' => true],
     Local\Bundles\BitrixIblockElementValidatorBundle\BitrixIblockElementValidatorBundle::class => ['all' => true],
+    Local\Bundles\UrlSignedBundle\UrlSignedBundle::class => ['all' => true],
 ];

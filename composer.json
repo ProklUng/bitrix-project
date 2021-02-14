@@ -60,7 +60,8 @@
     "symfony/polyfill-php80": "^1.20",
     "symfony/string": "^5.2",
     "dragonmantank/cron-expression": "^3.1",
-    "ifsnop/mysqldump-php": "^2.9"
+    "ifsnop/mysqldump-php": "^2.9",
+    "spatie/url-signer": "^1.2"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "2.*",
