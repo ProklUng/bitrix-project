@@ -21,7 +21,6 @@
 
         <service id="Local\Bundles\UrlSignedBundle\Controller\ExampleSignedController" class="Local\Bundles\UrlSignedBundle\Controller\ExampleSignedController" public="true">
             <argument type="service" id="url_signer.signer" />
-            <argument type="service" id="twig.instance" />
         </service>
 
     </services>
