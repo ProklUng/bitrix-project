@@ -45,6 +45,10 @@ services:
     tags:
       - { name: bitrix.custom.property.type }
 
+  Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\EnumProperty\Base:
+    tags:
+      - { name: bitrix.custom.property.type }
+
   # Кастомное свойство "Привязка к элементу с описанием".
   Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\ListElementWithDescription:
     tags:

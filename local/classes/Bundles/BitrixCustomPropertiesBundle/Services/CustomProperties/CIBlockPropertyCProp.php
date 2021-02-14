@@ -59,9 +59,9 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
     }
 
     /**
-     * @param array  $arProperty
-     * @param mixed  $value
-     * @param mixed  $strHTMLControlName
+     * @param array $arProperty
+     * @param mixed $value
+     * @param mixed $strHTMLControlName
      *
      * @return string
      */
@@ -132,8 +132,6 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
 
                 if ($type === 'string') {
                     $result .= $title.': '.$value.'<br>';
-                } elseif ($type === 'text') {
-                    $result .= $title.': '.$value.'<br>';
                 } elseif ($type === 'date') {
                     $result .= $title.': '.$value.'<br>';
                 }
@@ -144,9 +142,9 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
     }
 
     /**
-     * @param array  $arProperty
+     * @param array $arProperty
      * @param array $strHTMLControlName
-     * @param array  $arPropertyFields
+     * @param array $arPropertyFields
      *
      * @return string
      */
