@@ -31,6 +31,7 @@
     "symfony/property-info": "^4.4",
     "symfony/dependency-injection": "^4.4",
     "symfony/cache": "^5.1",
+    "symfony/twig-bridge": "4.*",
     "symfony/maker-bundle": "^1.26",
     "symfony/expression-language": "^5.2",
     "haydenpierce/class-finder": "^0.4.2",
