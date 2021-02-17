@@ -44,6 +44,7 @@ services:
       - [setRequestStack, ['@request_stack']]
 
   Symfony\Bridge\Twig\AppVariable: '@native.app.twig.variable'
+
   ##################
   # Twig extensions
   ##################
@@ -51,6 +52,11 @@ services:
     class: Twig_Extension_Debug
     tags:
       - {name: twig.extension}
+
+  # Расширенный var_dump.
+  Local\Services\Twig\Extensions\VarDumpExtension:
+    tags:
+      - { name: twig.extension }
 
   # Супер-глобалы.
   Maximaster\Tools\Twig\PhpGlobalsExtension:
