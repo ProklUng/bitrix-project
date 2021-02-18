@@ -2,6 +2,14 @@ custom_request_responser:
   defaults:
     enabled: true
 
+  middlewares_disabled:
+    custom_request_responser.middleware.inline_css: true
+    custom_request_responser.middleware.dns_prefetch: false
+    custom_request_responser.middleware.remove_comments: false
+    custom_request_responser.middleware.collapse_whitespace: false
+    custom_request_responser.middleware.remove_quotes: false
+    custom_request_responser.middleware.elide_attributes: false
+
   headers:
     # Apply a CSP on all the responses
     - Content-Security-Policy: default-src 'self'

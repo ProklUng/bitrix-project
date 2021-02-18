@@ -20,3 +20,19 @@ services:
     class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\CompressHtmlResponse
     tags:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+
+  # Управление индексацией роута.
+  custom_request_responser.robots:
+    class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\Robots
+    calls:
+      - setContainer: ['@service_container']
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+
+  # Запуск пачки middlewares PageSpeed.
+  custom_request_responser.pagespeed_middlewares:
+    class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\PageSpeedMiddlewares
+    arguments: ['@service_container', '%custom_request_responser%', !tagged_iterator response.middleware]
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+

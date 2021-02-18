@@ -3,6 +3,7 @@
 namespace Local\Bundles\CustomRequestResponserBundle;
 
 use Local\Bundles\CustomRequestResponserBundle\DependencyInjection\CustomRequestResponserExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**

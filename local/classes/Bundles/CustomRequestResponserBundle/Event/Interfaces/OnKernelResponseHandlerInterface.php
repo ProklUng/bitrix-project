@@ -16,6 +16,8 @@ interface OnKernelResponseHandlerInterface
      * Обработчик события kernel.request.
      *
      * @param ResponseEvent $event Объект события.
+     *
+     * @return void
      */
     public function handle(ResponseEvent $event): void;
 }

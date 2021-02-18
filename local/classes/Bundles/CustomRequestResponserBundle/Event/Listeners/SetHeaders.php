@@ -13,7 +13,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
  *
  * @since 20.10.2020
  */
-class SetHeaders implements OnKernelResponseHandlerInterface
+final class SetHeaders implements OnKernelResponseHandlerInterface
 {
     /** @var ExpressionLanguage $expressionLanguage */
     private $expressionLanguage;
@@ -25,7 +25,7 @@ class SetHeaders implements OnKernelResponseHandlerInterface
      * SetHeaders constructor.
      *
      * @param ExpressionLanguage $expressionLanguage
-     * @param array $headers
+     * @param array              $headers
      */
     public function __construct(ExpressionLanguage $expressionLanguage, array $headers)
     {
@@ -34,18 +34,11 @@ class SetHeaders implements OnKernelResponseHandlerInterface
     }
 
     /**
-     * Событие kernel.response.
-     *
-     * Установка заголовков Response по условию.
-     *
-     * @param ResponseEvent $event Объект события.
-     *
-     * @return void
-     *
+     * @inheritDoc
      */
     public function handle(ResponseEvent $event): void
     {
-        // Фильтрация Wordpress обычных маршрутов.
+        // Фильтрация внешних нативных маршрутов.
         if (!$event->isMasterRequest()
             ||
             $event->getResponse()->getStatusCode() === 404

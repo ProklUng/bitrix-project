@@ -36,6 +36,13 @@ class Configuration implements ConfigurationInterface
             ->end()
 
             ->children()
+                ->arrayNode('middlewares_disabled')
+                ->useAttributeAsKey('name')
+                ->prototype('boolean')->defaultValue(true)->end()
+            ->end()
+            ->end()
+
+            ->children()
             ->arrayNode('headers')
             ->arrayPrototype()
             ->beforeNormalization()

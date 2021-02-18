@@ -33,7 +33,7 @@ class CustomRequestResponserExtension extends Extension
     /**
      * @inheritDoc
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container) : void
     {
 
         $configuration = new Configuration();
@@ -46,12 +46,11 @@ class CustomRequestResponserExtension extends Extension
         $container->setParameter('custom_request_responser', $config);
 
         $loader = new YamlFileLoader(
-            $container, new FileLocator(__DIR__ . self::DIR_CONFIG)
+            $container,
+            new FileLocator(__DIR__ . self::DIR_CONFIG)
         );
 
         $loader->load('services.yaml');
-
         $loader->load('listeners.yaml');
-
     }
 }
