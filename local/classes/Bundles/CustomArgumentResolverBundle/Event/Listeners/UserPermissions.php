@@ -89,14 +89,12 @@ class UserPermissions implements OnControllerRequestHandlerInterface
         $grantedGroupUsers = (array)$isGranted;
         $userGroupsCode = $this->getUserGroupCodes($userId);
 
-        foreach ($grantedGroupUsers as $group) {
-            if (array_key_exists($group, $userGroupsCode)) {
-                return;
-            }
+        if (array_intersect($grantedGroupUsers, $userGroupsCode)) {
+            return;
         }
 
         throw new UserDenyAccessException(
-          'Access denied.'
+            'Access denied.'
         );
     }
 
@@ -151,6 +149,6 @@ class UserPermissions implements OnControllerRequestHandlerInterface
         $groups = array_unique($groups);
         sort($groups);
 
-        return array_flip($groups);
+        return $groups;
     }
 }
