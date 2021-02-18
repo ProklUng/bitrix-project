@@ -9,6 +9,13 @@ services:
   # kernel.controller
   ####################
 
+  # Проверка прав на роут.
+  custom_arguments_resolvers.argument_resolver.user_permission_check:
+    arguments: ['@CUser', '@Bitrix\Main\UserTable']
+    class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\UserPermissions
+    tags:
+      - { name: kernel.event_listener, event: kernel.controller, method: handle, priority: 1 }
+
   # Bootable traits.
   custom_arguments_resolvers.boot_trait:
     class: Local\Bundles\CustomArgumentResolverBundle\Event\Listeners\BootTraits

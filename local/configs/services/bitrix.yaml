@@ -64,7 +64,7 @@ services:
   CFile: ~
   CUser: ~
   CMain: ~
-
+  Bitrix\Main\UserTable: ~
   Bitrix\Main\Mail\Event: ~
 
   # Работа с почтовыми событиями.
