@@ -2,27 +2,24 @@
 
 namespace Local\Services;
 
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 
 /**
  * Class SymfonySession
  * @package Local\Services
+ *
+ * @since 28.10.2020 Change to SessionInterface.
+ * @since 18.02.2021 Support flash messages.
  */
 class SymfonySession
 {
     /**
-     * @var Session $session Сессии Symfony.
+     * @var Session|null $session Сессии Symfony.
      */
-    protected $session;
-
-    /**
-     * SymfonySessions constructor.
-     */
-    public function __construct()
-    {
-        $this->init();
-    }
+    private $session;
 
     /**
      * Инициализация.
@@ -42,11 +39,47 @@ class SymfonySession
     /**
      * Объект Session.
      *
-     * @return Session
+     * @return SessionInterface
+     *
+     * @since 28.10.2020 Change to interface.
      */
-    public function session(): Session
+    public function session(): SessionInterface
     {
+        if ($this->session === null) {
+            $this->init();
+        }
+
         return $this->session;
+    }
+
+    /**
+     * FlashBag.
+     *
+     * @return FlashBagInterface
+     */
+    public function getFlashBag() : FlashBagInterface
+    {
+        if ($this->session === null) {
+            $this->init();
+        }
+
+        return $this->session->getFlashBag();
+    }
+
+    /**
+     * Флэш сообщения из сессии.
+     *
+     * @param string $message ID сообщения.
+     *
+     * @return array
+     */
+    public function getFlashMessages(string $message): array
+    {
+        if ($this->session === null) {
+            $this->init();
+        }
+
+        return $this->session->getFlashBag()->get($message);
     }
 
     /**
@@ -55,10 +88,14 @@ class SymfonySession
      * @param string $key   Ключ.
      * @param mixed  $value Значение.
      *
-     * @return mixed
+     * @return null|mixed
      */
     public function value(string $key, $value = null)
     {
+        if ($this->session === null) {
+            $this->init();
+        }
+
         if ($value === null) {
             return $this->session->get($key);
         }
@@ -87,6 +124,10 @@ class SymfonySession
      */
     public function csrfTokenApp() : string
     {
+        if ($this->session === null) {
+            $this->init();
+        }
+
         return (string)$this->session->get('csrf_token');
     }
 }
