@@ -13,6 +13,11 @@ use Spatie\UrlSigner\UrlSigner;
 interface UrlSignerInterface extends UrlSigner
 {
     /**
+     * @inheritDoc
+     */
+    public function sign($url, $expiration = null) : string;
+
+    /**
      * @return string
      */
     public static function getName(): string;
