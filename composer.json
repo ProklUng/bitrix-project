@@ -62,7 +62,9 @@
     "symfony/string": "^5.2",
     "dragonmantank/cron-expression": "^3.1",
     "ifsnop/mysqldump-php": "^2.9",
-    "spatie/url-signer": "^1.2"
+    "spatie/url-signer": "^1.2",
+    "symfony/twig-bridge": "4.*",
+    "astrotomic/php-open-graph": "^0.5.2"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "2.*",

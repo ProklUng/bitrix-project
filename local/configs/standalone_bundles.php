@@ -16,4 +16,6 @@ return [
     Local\Bundles\BitrixCustomPropertiesBundle\BitrixCustomPropertiesBundle::class => ['all' => true],
     Local\Bundles\BitrixIblockElementValidatorBundle\BitrixIblockElementValidatorBundle::class => ['all' => true],
     Local\Bundles\UrlSignedBundle\UrlSignedBundle::class => ['all' => true],
+    Local\Bundles\BitrixOgGraphBundle\BitrixOgGraphBundle::class => ['all' => true],
+
 ];
