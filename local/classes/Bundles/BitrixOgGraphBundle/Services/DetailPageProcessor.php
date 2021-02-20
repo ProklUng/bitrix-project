@@ -130,7 +130,9 @@ class DetailPageProcessor extends AbstractProcessor
             $values = $ipropValues->queryValues();
 
             $arResult['title'] = $values['ELEMENT_META_TITLE']['VALUE'] ?? $ob['NAME'];
-            $arResult['description'] = $values['ELEMENT_META_DESCRIPTION']['VALUE'] ?? $ob['PREVIEW_TEXT'];
+            $arResult['description'] = $this->cutDescription(
+                $values['ELEMENT_META_DESCRIPTION']['VALUE'] ?? $ob['PREVIEW_TEXT']
+            );
             $arResult['type'] = 'article';
             $arResult['timePublished'] = $ob['TIMESTAMP_X'];
             $arResult['url'] = $this->getFullUrl((string)$ob['DETAIL_PAGE_URL']) ?? '';
@@ -140,11 +142,15 @@ class DetailPageProcessor extends AbstractProcessor
                 $idPicture = (int)$ob['DETAIL_PICTURE'];
             }
 
-            // ToDo - сделать ресайз под 1200 x 627.
-
             if ($idPicture) {
+                $resizedPicture = $this->fileWrapper::ResizeImageGet(
+                    $idPicture,
+                    ['WIDTH' => self::OG_IMAGE_WIDTH, 'HEIGHT' => self::OG_IMAGE_HEIGHT],
+                    BX_RESIZE_IMAGE_PROPORTIONAL
+                );
+
                 $arResult['img'] = $this->getFullUrl(
-                    $this->fileWrapper->path($idPicture)
+                    (string)$resizedPicture['src']
                 );
             }
         }

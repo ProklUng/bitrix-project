@@ -33,9 +33,9 @@ class StaticPageProcessor extends AbstractProcessor
     /**
      * StaticPageProcessor constructor.
      *
-     * @param string      $documentRoot DOCUMENT_ROOT.
-     * @param Application $application  Битриксовый Application.
-     * @param CacheInterface $cacher    Кэшер.
+     * @param string         $documentRoot DOCUMENT_ROOT.
+     * @param Application    $application  Битриксовый Application.
+     * @param CacheInterface $cacher       Кэшер.
      */
     public function __construct(
         string $documentRoot,
@@ -74,12 +74,22 @@ class StaticPageProcessor extends AbstractProcessor
     {
         $timestamp = @filemtime($this->documentRoot . $uri . '/index.php');
 
-        return [
+        $result = [
             'title' => $GLOBALS['APPLICATION']->GetPageProperty('title') ?: '',
-            'description' => $GLOBALS['APPLICATION']->GetPageProperty('description') ?: '',
+            'description' => $this->cutDescription(
+                $GLOBALS['APPLICATION']->GetPageProperty('description') ?: ''
+            ),
             'type' => 'website',
-            'timePublished' => date('Y-m-d H:i:s', $timestamp),
+            'timePublished' => $timestamp ? date('Y-m-d H:i:s', $timestamp) : '',
             'url' => $this->getFullUrl($uri)
         ];
+
+        if ($GLOBALS['APPLICATION']->GetPageProperty('og:image')) {
+            $result['img'] = $this->getFullUrl(
+                $GLOBALS['APPLICATION']->GetPageProperty('og:image')
+            );
+        }
+
+        return $result;
     }
 }

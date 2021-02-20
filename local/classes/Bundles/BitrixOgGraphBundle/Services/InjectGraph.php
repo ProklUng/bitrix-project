@@ -13,12 +13,12 @@ use Bitrix\Main\Page\Asset;
 class InjectGraph
 {
     /**
-     * @var OpenGraphManager $openGraphManager
+     * @var OpenGraphManager $openGraphManager OG менеджер.
      */
     private $openGraphManager;
 
     /**
-     * @var Asset $assetHandler
+     * @var Asset $assetHandler Битриксовый Asset.
      */
     private Asset $assetHandler;
 
@@ -26,7 +26,7 @@ class InjectGraph
      * InjectGraph constructor.
      *
      * @param OpenGraphManager $openGraphManager OG менеджер.
-     * @param Asset            $assetHandler
+     * @param Asset            $assetHandler     Битриксовый Asset.
      */
     public function __construct(
         OpenGraphManager $openGraphManager,

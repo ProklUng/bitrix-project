@@ -11,6 +11,7 @@ use Astrotomic\OpenGraph\Type;
  *
  * @since 13.10.2020
  * @since 15.01.2021 Избавление от венгерской нотации.
+ * @since 20.02.2021 Доработка.
  */
 class OpenGraphManager
 {
@@ -68,12 +69,27 @@ class OpenGraphManager
             $this->ogEntity->addProperty('fb', 'admins', $this->dtoOpenGraph->fb_admins);
         }
 
-        return $this->ogEntity->siteName($this->dtoOpenGraph->site_name)
-                              ->title($this->dtoOpenGraph->title)
-                              ->url($this->dtoOpenGraph->url)
-                              ->image($this->dtoOpenGraph->img)
-                              ->description($this->dtoOpenGraph->description)
-                              ->locale('ru');
+        if ($this->dtoOpenGraph->site_name) {
+            $this->ogEntity->siteName($this->dtoOpenGraph->site_name);
+        }
+
+        if ($this->dtoOpenGraph->title) {
+            $this->ogEntity->title($this->dtoOpenGraph->title);
+        }
+
+        if ($this->dtoOpenGraph->url) {
+            $this->ogEntity->url($this->dtoOpenGraph->url);
+        }
+
+        if ($this->dtoOpenGraph->img) {
+            $this->ogEntity->image($this->dtoOpenGraph->img);
+        }
+
+        if ($this->dtoOpenGraph->description) {
+            $this->ogEntity->description($this->dtoOpenGraph->description);
+        }
+
+        return $this->ogEntity->locale('ru');
     }
 
     /**

@@ -128,18 +128,24 @@ class SectionsProcessor extends AbstractProcessor
             $values = $ipropValues->queryValues();
 
             $arResult['title'] = $values['SECTION_META_TITLE']['VALUE'] ?? $ob['NAME'];
-            $arResult['description'] = $values['SECTION_META_DESCRIPTION']['VALUE'] ?? $ob['DESCRIPTION'];
+            $arResult['description'] = $this->cutDescription(
+                $values['SECTION_META_DESCRIPTION']['VALUE'] ?? $ob['DESCRIPTION']
+            );
             $arResult['type'] = 'website';
             $arResult['timePublished'] = $ob['TIMESTAMP_X'];
             $arResult['url'] = $this->getFullUrl((string)$ob['SECTION_PAGE_URL']) ?? '';
 
             $idPicture = (int)$ob['PICTURE'];
 
-            // ToDo - сделать ресайз под 1200 x 627.
-
             if ($idPicture) {
+                $resizedPicture = $this->fileWrapper::ResizeImageGet(
+                    $idPicture,
+                    ['WIDTH' => self::OG_IMAGE_WIDTH, 'HEIGHT' => self::OG_IMAGE_HEIGHT],
+                    BX_RESIZE_IMAGE_PROPORTIONAL
+                );
+
                 $arResult['img'] = $this->getFullUrl(
-                    $this->fileWrapper->path($idPicture)
+                    (string)$resizedPicture['src']
                 );
             }
         }
