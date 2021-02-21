@@ -5,7 +5,7 @@ namespace Local\Bundles\BitrixOgGraphBundle\Tests;
 use CFile;
 use CIBlockElement;
 use Faker\Factory;
-use League\FactoryMuffin\Faker\Faker;
+use Faker\Generator;
 use Local\Bundles\BitrixOgGraphBundle\Services\DetailPageProcessor;
 use Local\Bundles\BitrixOgGraphBundle\Services\Utils\CFileWrapper;
 use Local\Bundles\BitrixOgGraphBundle\Tests\Tools\MockerBitrixBlocks;
@@ -33,7 +33,7 @@ class DetailPageProcessorTest extends TestCase
     private $obTestObject;
 
     /**
-     * @var Faker
+     * @var Generator
      */
     private $faker;
 

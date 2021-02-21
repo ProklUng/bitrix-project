@@ -5,6 +5,7 @@ namespace Local\Bundles\BitrixOgGraphBundle\Services\Facades;
 use Local\Bundles\BitrixOgGraphBundle\Services\DetailPageProcessor;
 use Local\Bundles\BitrixOgGraphBundle\Services\InjectGraph;
 use Local\Bundles\BitrixOgGraphBundle\Services\OgDTO;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * Class FacadeOgGraphDetailPage
@@ -15,7 +16,7 @@ use Local\Bundles\BitrixOgGraphBundle\Services\OgDTO;
 class FacadeOgGraphDetailPage
 {
     /**
-     * @var DetailPageProcessor $detailProcessor
+     * @var DetailPageProcessor $detailProcessor Процессор элементов.
      */
     private $detailProcessor;
 
@@ -25,16 +26,16 @@ class FacadeOgGraphDetailPage
     private $ogDTO;
 
     /**
-     * @var InjectGraph $injector
+     * @var InjectGraph $injector Процессор элементов.
      */
     private $injector;
 
     /**
      * FacadeOgGraphDetailPage constructor.
      *
-     * @param DetailPageProcessor $detailProcessor
-     * @param InjectGraph         $injectGraph
-     * @param OgDTO               $ogDTO            DTO.
+     * @param DetailPageProcessor $detailProcessor Процессор элементов.
+     * @param InjectGraph         $injectGraph     Инжектор.
+     * @param OgDTO               $ogDTO           DTO.
      */
     public function __construct(
         DetailPageProcessor $detailProcessor,
@@ -51,6 +52,7 @@ class FacadeOgGraphDetailPage
      * @param integer $idElement ID элемента.
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     public function make(int $iblockId, int $idElement): void
     {

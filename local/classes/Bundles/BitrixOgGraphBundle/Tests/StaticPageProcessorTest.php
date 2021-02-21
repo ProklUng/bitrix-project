@@ -4,7 +4,7 @@ namespace Local\Bundles\BitrixOgGraphBundle\Tests;
 
 use Bitrix\Main\Application;
 use Faker\Factory;
-use League\FactoryMuffin\Faker\Faker;
+use Faker\Generator;
 use Local\Bundles\BitrixOgGraphBundle\Services\OgDTO;
 use Local\Bundles\BitrixOgGraphBundle\Services\StaticPageProcessor;
 use Mockery;
@@ -27,7 +27,7 @@ class StaticPageProcessorTest extends TestCase
     protected $obTestObject;
 
     /**
-     * @var Faker
+     * @var Generator
      */
     private $faker;
 

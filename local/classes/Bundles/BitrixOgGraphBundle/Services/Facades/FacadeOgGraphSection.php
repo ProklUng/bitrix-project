@@ -5,6 +5,7 @@ namespace Local\Bundles\BitrixOgGraphBundle\Services\Facades;
 use Local\Bundles\BitrixOgGraphBundle\Services\InjectGraph;
 use Local\Bundles\BitrixOgGraphBundle\Services\OgDTO;
 use Local\Bundles\BitrixOgGraphBundle\Services\SectionsProcessor;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * Class FacadeOgGraphSection
@@ -15,7 +16,7 @@ use Local\Bundles\BitrixOgGraphBundle\Services\SectionsProcessor;
 class FacadeOgGraphSection
 {
     /**
-     * @var SectionsProcessor $sectionProcessor
+     * @var SectionsProcessor $sectionProcessor Процессор подразделов.
      */
     private $sectionProcessor;
 
@@ -25,15 +26,15 @@ class FacadeOgGraphSection
     private $ogDTO;
 
     /**
-     * @var InjectGraph $injector
+     * @var InjectGraph $injector Инжектор.
      */
     private $injector;
 
     /**
      * FacadeOgGraphDetailPage constructor.
      *
-     * @param SectionsProcessor $sectionProcessor
-     * @param InjectGraph       $injectGraph
+     * @param SectionsProcessor $sectionProcessor Процессор подразделов.
+     * @param InjectGraph       $injectGraph      Инжектор.
      * @param OgDTO             $ogDTO            DTO.
      */
     public function __construct(
@@ -51,6 +52,7 @@ class FacadeOgGraphSection
      * @param integer $idSection ID подраздела.
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     public function make(int $iblockId, int $idSection): void
     {

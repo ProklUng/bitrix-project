@@ -5,6 +5,7 @@ namespace Local\Bundles\BitrixOgGraphBundle\Services\Facades;
 use Local\Bundles\BitrixOgGraphBundle\Services\InjectGraph;
 use Local\Bundles\BitrixOgGraphBundle\Services\OgDTO;
 use Local\Bundles\BitrixOgGraphBundle\Services\StaticPageProcessor;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * Class FacadeOgGraphStatic
@@ -49,6 +50,7 @@ class FacadeOgGraphStatic
     /**
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     public function make(): void
     {
