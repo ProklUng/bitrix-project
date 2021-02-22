@@ -27,6 +27,10 @@ class InstagramParserRapidApiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        if (!$config['defaults']['enabled']) {
+            return;
+        }
+
         $container->setParameter('instagram_parser_rapid_api.instagram_user_id', $config['instagram_user_id']);
         $container->setParameter('instagram_parser_rapid_api.rapid_api_key', $config['rapid_api_key']);
         $container->setParameter('instagram_parser_rapid_api.cache_ttl', $config['cache_ttl']);

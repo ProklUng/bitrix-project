@@ -26,6 +26,11 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     private const RAPID_API_URL = 'instagram40.p.rapidapi.com';
 
     /**
+     * @const string CACHE_KEY Ключ кэша.
+     */
+    private const CACHE_KEY = 'instagram_parser_rapid_api.parser_cache_key';
+
+    /**
      * @var CacheInterface $cacher Кэшер.
      */
     private $cacher;
@@ -87,13 +92,14 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
      */
     public function query(): array
     {
-        $result = $this->cacher->get('instagram_parser_rapid_api.parser_cache_key', function (ItemInterface $item) {
+        $result = $this->cacher->get(self::CACHE_KEY, function (ItemInterface $item) {
 
             $response = $this->getCurlData($this->userId, $this->count);
             return json_decode($response, true);
         });
 
         if (!$result) {
+            $this->cacher->delete(self::CACHE_KEY);
             throw new InstagramTransportExceptions(
                 'Get Request Error: answer not json!',
                 400
