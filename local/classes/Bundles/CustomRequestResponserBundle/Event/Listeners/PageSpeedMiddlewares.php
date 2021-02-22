@@ -13,13 +13,14 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  * @package Local\Bundles\CustomRequestResponserBundle\Event\Listeners
  *
  * @since 18.02.2021
+ * @since 21.02.2021 Новый параметр - ключ конфига, отвечающий за исключенные middlewares.
  */
-final class PageSpeedMiddlewares implements OnKernelResponseHandlerInterface
+class PageSpeedMiddlewares implements OnKernelResponseHandlerInterface
 {
     /**
      * @var AbstractPageSpeed[] $middlewaresBag Middlewares.
      */
-    private $middlewaresBag = [];
+    protected $middlewaresBag = [];
 
     /**
      * @var AbstractPageSpeed[] $reserveMiddlewaresBag Резервное хранилище Middlewares.
@@ -39,19 +40,21 @@ final class PageSpeedMiddlewares implements OnKernelResponseHandlerInterface
     /**
      * PageSpeedMiddlewares constructor.
      *
-     * @param ContainerInterface $container      Контейнер.
-     * @param array              $params         Параметры бандла.
-     * @param mixed              ...$middlewares Middlewares.
+     * @param ContainerInterface $container           Контейнер.
+     * @param array              $params              Параметры бандла.
+     * @param string             $keyConfigMiddleware Ключ конфига, отвечающий за исключенные middlewares.
+     * @param mixed              ...$middlewares      Middlewares.
      *
      */
     public function __construct(
         ContainerInterface $container,
         array $params,
+        string $keyConfigMiddleware,
         ...$middlewares
     ) {
         $this->container = $container;
-        $this->enabledDisabledMiddlewares = array_key_exists('middlewares_disabled', $params)
-                              ? $params['middlewares_disabled'] : [];
+        $this->enabledDisabledMiddlewares = array_key_exists($keyConfigMiddleware, $params)
+                              ? $params[$keyConfigMiddleware] : [];
 
         $handlers = [];
 

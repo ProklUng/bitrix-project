@@ -2,6 +2,7 @@
 
 namespace Local\Bundles\CustomRequestResponserBundle\Services\PageSpeed;
 
+use Local\Bundles\CustomRequestResponserBundle\Services\Contracts\PageSpeedMiddlewareInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -9,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Class AbstractPageSpeed
  * @package Local\Bundles\CustomRequestResponserBundle\Services\PageSpeed
  */
-abstract class AbstractPageSpeed
+abstract class AbstractPageSpeed implements PageSpeedMiddlewareInterface
 {
     /**
      * Apply rules.
@@ -19,6 +20,24 @@ abstract class AbstractPageSpeed
      * @return string
      */
     abstract public function apply(string $buffer) : string;
+
+    /**
+     * Should Process?
+     *
+     * @param Request  $request  Request.
+     * @param Response $response Response.
+     *
+     * @return boolean
+     */
+    public function shouldProcessPageSpeed(Request $request, Response $response) : bool
+    {
+        $typeRequest = $request->server->get('REQUEST_METHOD');
+        if ($typeRequest !== 'GET' || !is_string($response->getContent())) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Replace content response.
@@ -70,23 +89,5 @@ abstract class AbstractPageSpeed
         }
 
         return $buffer;
-    }
-
-    /**
-     * Should Process?
-     *
-     * @param Request  $request  Request.
-     * @param Response $response Response.
-     *
-     * @return boolean
-     */
-    public function shouldProcessPageSpeed(Request $request, Response $response) : bool
-    {
-        $typeRequest = $request->server->get('REQUEST_METHOD');
-        if ($typeRequest !== 'GET' || !is_string($response->getContent())) {
-            return false;
-        }
-
-        return true;
     }
 }

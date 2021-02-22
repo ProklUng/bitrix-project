@@ -28,15 +28,22 @@ class Configuration implements ConfigurationInterface
             ->children()
             ->arrayNode('defaults')
             ->useAttributeAsKey('name')
-            ->prototype('boolean')->end()
-            ->defaultValue([
-                'enabled' => false,
-            ])
-            ->end()
+                ->prototype('boolean')->end()
+                ->defaultValue([
+                    'enabled' => false,
+                ])
+                ->end()
             ->end()
 
             ->children()
                 ->arrayNode('middlewares_disabled')
+                ->useAttributeAsKey('name')
+                ->prototype('boolean')->defaultValue(true)->end()
+            ->end()
+            ->end()
+
+            ->children()
+                ->arrayNode('bitrix_middlewares_disabled')
                 ->useAttributeAsKey('name')
                 ->prototype('boolean')->defaultValue(true)->end()
             ->end()

@@ -12,6 +12,7 @@ services:
     arguments: ['@Symfony\Component\ExpressionLanguage\ExpressionLanguage', '%custom_request_responser%']
     tags:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+      - { name: custom_request_responser.handler, priority: 10 }
 
   Local\Bundles\CustomRequestResponserBundle\Event\Listeners\SetHeaders: '@custom_request_responser.set.headers'
 
@@ -20,6 +21,7 @@ services:
     class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\CompressHtmlResponse
     tags:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+      - { name: custom_request_responser.handler, priority: 10 }
 
   # Управление индексацией роута.
   custom_request_responser.robots:
@@ -28,11 +30,26 @@ services:
       - setContainer: ['@service_container']
     tags:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
+      - { name: custom_request_responser.handler, priority: 10 }
 
   # Запуск пачки middlewares PageSpeed.
   custom_request_responser.pagespeed_middlewares:
     class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\PageSpeedMiddlewares
-    arguments: ['@service_container', '%custom_request_responser%', !tagged_iterator response.middleware]
+    arguments:
+      - '@service_container'
+      - '%custom_request_responser%'
+      - 'middlewares_disabled'
+      - !tagged_iterator response.middleware
     tags:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
 
+  # Подвязка middlewares PageSpeed на битриксовые роуты.
+  custom_request_responser.pagespeed_middlewares_bitrix_bridge:
+    class: Local\Bundles\CustomRequestResponserBundle\Services\BitrixEventBridge\Bridge
+    arguments:
+      - '@service_container'
+      - '%custom_request_responser%'
+      - 'bitrix_middlewares_disabled'
+      - !tagged_iterator response.middleware
+    tags:
+      - { name: bitrix.events.init, module: main, event: OnEndBufferContent, method: handleEvent, sort: 1 }
