@@ -93,6 +93,10 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
      */
     public function query(): array
     {
+        if ($this->useMock && $this->fixture) {
+            return json_decode($this->fixture, true);;
+        }
+
         $result = $this->cacher->get(self::CACHE_KEY,
             /**
              * @param CacheItemInterface $item
@@ -129,11 +133,7 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
         string $userId,
         int $count = 12
     ): string {
-        if ($this->useMock) {
-            return $this->fixture;
-        }
-
-        // Опциональный параметр after.
+         // Опциональный параметр after.
         $queryString = 'https://' . self::RAPID_API_URL . '/account-medias?userid=' . $userId . '&first=' . $count;
         if ($this->queryId) {
             $queryString = $queryString . '&after=' . $this->queryId;
