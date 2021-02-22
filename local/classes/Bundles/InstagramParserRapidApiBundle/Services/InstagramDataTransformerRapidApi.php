@@ -25,9 +25,7 @@ class InstagramDataTransformerRapidApi implements InstagramDataTransformerInterf
         $data = $arDataFeed['edges'] ?? [];
 
         if (count($data) === 0) {
-            throw new RuntimeException(
-              'Ничего не получили из Инстаграма.'
-            );
+            throw new RuntimeException('Ничего не получили из Инстаграма.');
         }
 
         foreach ($data as $item) {
