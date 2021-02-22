@@ -11,6 +11,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * @package Local\Bundles\InstagramParserRapidApiBundle\DependencyInjection
  *
  * @since 04.12.2020
+ *
+ * @psalm-suppress PossiblyUndefinedMethod
  */
 class Configuration implements ConfigurationInterface
 {
@@ -21,8 +23,6 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('rapid_api_instagram_parser');
         $rootNode    = $treeBuilder->getRootNode();
-
-        \assert($rootNode instanceof ArrayNodeDefinition);
 
         $rootNode
             ->children()
@@ -46,7 +46,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('cache_path')->defaultValue('cache/instagram-parser')->end()
                 ->scalarNode('cache_ttl')->defaultValue(86400)->end()
             ->end();
-
 
         return $treeBuilder;
     }

@@ -3,8 +3,9 @@
 namespace Local\Bundles\InstagramParserRapidApiBundle\Services;
 
 use Exception;
-use Local\Bundles\InstagramParserRapidApiBundle\Services\Exceptions\InstagramTransportExceptions;
+use Local\Bundles\InstagramParserRapidApiBundle\Services\Exceptions\InstagramTransportException;
 use Local\Bundles\InstagramParserRapidApiBundle\Services\Interfaces\RetrieverInstagramDataInterface;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -87,20 +88,26 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
 
     /**
      * @inheritDoc
-     * @throws InstagramTransportExceptions Ошибки транспорта.
+     * @throws InstagramTransportException Ошибки транспорта.
      * @throws InvalidArgumentException     Ошибки кэшера.
      */
     public function query(): array
     {
-        $result = $this->cacher->get(self::CACHE_KEY, function (ItemInterface $item) {
+        $result = $this->cacher->get(self::CACHE_KEY,
+            /**
+             * @param CacheItemInterface $item
+             * @return mixed
+             */
+            function (CacheItemInterface $item) {
+                $response = $this->getCurlData($this->userId, $this->count);
 
-            $response = $this->getCurlData($this->userId, $this->count);
-            return json_decode($response, true);
-        });
+                return json_decode($response, true);
+            }
+        );
 
         if (!$result) {
             $this->cacher->delete(self::CACHE_KEY);
-            throw new InstagramTransportExceptions(
+            throw new InstagramTransportException(
                 'Get Request Error: answer not json!',
                 400
             );
@@ -122,7 +129,6 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
         string $userId,
         int $count = 12
     ): string {
-
         if ($this->useMock) {
             return $this->fixture;
         }
@@ -157,10 +163,10 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
         curl_close($curl);
 
         if ($err) {
-            throw new InstagramTransportExceptions('Get Request Error: ' . $err, 400);
+            throw new InstagramTransportException('Get Request Error: ' . $err, 400);
         }
 
-        return $response;
+        return (string)$response;
     }
 
     /**
@@ -199,7 +205,7 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     public function setUseMock(bool $useMock, string $fixturePath = ''): self
     {
         $this->useMock = $useMock;
-        if ($useMock & $fixturePath !== '') {
+        if ($useMock && $fixturePath !== '') {
             $this->fixture = (string)file_get_contents(
               $_SERVER['DOCUMENT_ROOT'] . $fixturePath
             );

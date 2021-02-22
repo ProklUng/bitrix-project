@@ -6,12 +6,12 @@ use Exception;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 
 /**
- * Class InstagramTransportExceptions
+ * Class InstagramTransportException
  * @package Local\Bundles\InstagramParserRapidApiBundle\Services\Exceptions
  *
  * @since 22.02.2021
  */
-class InstagramTransportExceptions extends Exception implements RequestExceptionInterface
+class InstagramTransportException extends Exception implements RequestExceptionInterface
 {
     /**
      * @inheritDoc
