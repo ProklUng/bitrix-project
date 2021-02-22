@@ -4,6 +4,7 @@ namespace Local\Bundles\ApiDtoConvertorBundle;
 
 use Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\ApiExtension;
 use Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\BaseDTOInterface;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -24,6 +25,7 @@ class ApiDtoConvertorBundle extends Bundle
 
     /**
      * @inheritDoc
+     * @throws RuntimeException
      */
     public function boot()
     {

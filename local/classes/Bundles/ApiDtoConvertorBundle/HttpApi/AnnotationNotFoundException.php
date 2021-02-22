@@ -9,6 +9,11 @@ use Throwable;
 
 class AnnotationNotFoundException extends RuntimeException implements Throwable
 {
+    /**
+     * AnnotationNotFoundException constructor.
+     *
+     * @param string $message
+     */
     private function __construct(string $message)
     {
         $this->message = $message;
