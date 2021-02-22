@@ -1,0 +1,21 @@
+instagram_parser_rapid_api:
+  defaults:
+    enabled: true
+
+  # Настройки кэширования. Опционально.
+  cache_path: 'cache/s1/instagram-parser'
+  cache_ttl: 86400
+
+  # Мок запроса
+  mock: true
+  fixture_path: '/local/classes/Bundles/InstagramParserRapidApiBundle/Fixture/response.txt'
+
+  # См. https://codeofaninja.com/tools/find-instagram-user-id/
+  # Или запрос вида https://www.instagram.com/web/search/topsearch/?query=dertaglu (поле PK)
+  instagram_user_id: 8440733461
+
+  # Ключ к https://rapidapi.com/restyler/api/instagram40
+  rapid_api_key: 9886bdf907msh430e9579da6a738p18854cjsnb789fb39922a0
+
+  # Параметр after rapidAPI. Опциональный.
+  rapid_api_after_param: ''

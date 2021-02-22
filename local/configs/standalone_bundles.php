@@ -17,5 +17,6 @@ return [
     Local\Bundles\BitrixIblockElementValidatorBundle\BitrixIblockElementValidatorBundle::class => ['all' => true],
     Local\Bundles\UrlSignedBundle\UrlSignedBundle::class => ['all' => true],
     Local\Bundles\BitrixOgGraphBundle\BitrixOgGraphBundle::class => ['all' => true],
+    Local\Bundles\InstagramParserRapidApiBundle\InstagramParserRapidApiBundle::class => ['all' => true]
 
 ];
