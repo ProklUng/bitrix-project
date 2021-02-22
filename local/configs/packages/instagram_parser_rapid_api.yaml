@@ -7,7 +7,7 @@ instagram_parser_rapid_api:
   cache_ttl: 86400
 
   # Мок запроса
-  mock: true
+  mock: false
   fixture_path: '/local/classes/Bundles/InstagramParserRapidApiBundle/Fixture/response.txt'
 
   # См. https://codeofaninja.com/tools/find-instagram-user-id/
