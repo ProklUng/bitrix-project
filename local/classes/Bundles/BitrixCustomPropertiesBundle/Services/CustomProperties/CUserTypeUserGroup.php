@@ -24,25 +24,25 @@ class CUserTypeUserGroup extends AbstractUserTypeProperty
     public function GetUserTypeDescription() : array
     {
         return [
-            "USER_TYPE_ID" => 'custom_usergroup', //Уникальный идентификатор типа свойств
-            "CLASS_NAME" => __CLASS__,
-            "DESCRIPTION" => 'Привязка к группе пользователей',
-            "BASE_TYPE" => CUserTypeManager::BASE_TYPE_INT,
+            'USER_TYPE_ID' => 'custom_usergroup', //Уникальный идентификатор типа свойств
+            'CLASS_NAME' => __CLASS__,
+            'DESCRIPTION' => 'Привязка к группе пользователей',
+            'BASE_TYPE' => CUserTypeManager::BASE_TYPE_INT,
         ];
     }
 
     /**
      * Получаем список значений.
      *
-     * @param $arUserField
+     * @param mixed $arUserField
      *
      * @return array|bool|CDBResult
      */
     public function GetList($arUserField)
     {
-        $by = "c_sort";
-        $order = "asc";
-        $groups = CGroup::GetList($by, $order, ["ACTIVE" => "Y"]);
+        $by = 'c_sort';
+        $order = 'asc';
+        $groups = CGroup::GetList($by, $order, ['ACTIVE' => 'Y']);
         $rsEnum = [];
 
         while ($arGroup = $groups->Fetch()) {
@@ -64,8 +64,8 @@ class CUserTypeUserGroup extends AbstractUserTypeProperty
      */
     protected static function getEmptyCaption(array $arUserField)
     {
-        return $arUserField["SETTINGS"]["CAPTION_NO_VALUE"] !== ''
-            ? $arUserField["SETTINGS"]["CAPTION_NO_VALUE"]
+        return $arUserField['SETTINGS']['CAPTION_NO_VALUE'] !== ''
+            ? $arUserField['SETTINGS']['CAPTION_NO_VALUE']
             : 'Группа пользователей не выбрана';
     }
 }

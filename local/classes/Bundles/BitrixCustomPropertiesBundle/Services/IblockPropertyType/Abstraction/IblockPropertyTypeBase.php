@@ -2,8 +2,8 @@
 
 namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction;
 
-use Local\Util\IblockPropertyType\Exception\NotImplementedMethodException;
-use Local\Util\IblockPropertyType\Exception\UnsupportedControlModeException;
+use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Exception\NotImplementedMethodException;
+use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Exception\UnsupportedControlModeException;
 
 /**
  * Class IblockPropertyTypeBase
@@ -43,6 +43,7 @@ abstract class IblockPropertyTypeBase implements IblockPropertyTypeInterface
      */
     public function init()
     {
+        /** @psalm-suppress UndefinedFunction */
         return AddEventHandler(
             'iblock',
             'OnIBlockPropertyBuildList',
@@ -376,5 +377,4 @@ abstract class IblockPropertyTypeBase implements IblockPropertyTypeInterface
     {
         throw new NotImplementedMethodException('getUIFilterProperty', static::class);
     }
-
 }

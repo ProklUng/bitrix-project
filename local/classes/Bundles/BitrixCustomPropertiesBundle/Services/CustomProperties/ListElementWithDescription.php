@@ -2,6 +2,7 @@
 
 namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties;
 
+use CIBlockElement;
 use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstraction\IblockPropertyTypeNativeInterface;
 
 /**
@@ -13,7 +14,9 @@ use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstr
  */
 class ListElementWithDescription implements IblockPropertyTypeNativeInterface
 {
-    /** @const string USER_TYPE */
+    /**
+     * @const string USER_TYPE
+     */
     public const USER_TYPE = 'multiBindProp';
 
     /**
@@ -21,10 +24,11 @@ class ListElementWithDescription implements IblockPropertyTypeNativeInterface
      */
     public function init(): void
     {
+        /** @psalm-suppress UndefinedFunction */
         AddEventHandler(
-            "iblock",
-            "OnIBlockPropertyBuildList",
-            [__CLASS__, "GetUserTypeDescription"]
+            'iblock',
+            'OnIBlockPropertyBuildList',
+            [__CLASS__, 'GetUserTypeDescription']
         );
     }
 
@@ -34,33 +38,36 @@ class ListElementWithDescription implements IblockPropertyTypeNativeInterface
     public static function GetUserTypeDescription() : array
     {
         return [
-            "PROPERTY_TYPE" => "E",
+            'PROPERTY_TYPE' => 'E',
             "USER_TYPE" => self::USER_TYPE,
-            'DESCRIPTION' => "Привязка к элементу с описанием",
-            "GetPropertyFieldHtml" => [__CLASS__, "GetPropertyFieldHtml"],
-            "ConvertToDB" => [__CLASS__, "ConvertToDB"],
-            "ConvertFromDB" => [__CLASS__, "ConvertFromDB"],
+            'DESCRIPTION' => 'Привязка к элементу с описанием',
+            'GetPropertyFieldHtml' => [__CLASS__, 'GetPropertyFieldHtml'],
+            'ConvertToDB' => [__CLASS__, 'ConvertToDB'],
+            'ConvertFromDB' => [__CLASS__, 'ConvertFromDB'],
         ];
     }
 
     /**
-     * @param $arProperty
-     * @param $arValue
-     * @param $strHTMLControlName
+     * @param array $arProperty
+     * @param array $arValue
+     * @param array $strHTMLControlName
      *
      * @return string
      */
-    public static function GetPropertyFieldHtml($arProperty, $arValue, $strHTMLControlName)
+    public static function GetPropertyFieldHtml(array $arProperty, array $arValue, array $strHTMLControlName) : string
     {
         // Описание превращаем обратно в массив ( в шаблоне также )
         $arValue['DESCRIPTION'] = unserialize($arValue['DESCRIPTION']);
+        $key = '';
+        $arItem = [];
+
         if ((int)$arValue['VALUE'] > 0) {
             $arFilter = [
-                "ID" => (int)$arValue['VALUE'],
-                "IBLOCK_ID" => $arProperty["LINK_IBLOCK_ID"],
+                'ID' => (int)$arValue['VALUE'],
+                'IBLOCK_ID' => $arProperty['LINK_IBLOCK_ID'],
             ];
-            //Получаем информацию о элементах по ID
-            $rsItem = \CIBlockElement::GetList([], $arFilter, false, false, ["ID", "IBLOCK_ID", "NAME"]);
+
+            $rsItem = CIBlockElement::GetList([], $arFilter, false, false, ['ID', 'IBLOCK_ID', 'NAME']);
             $arItem = $rsItem->GetNext();
         }
 
@@ -87,12 +94,12 @@ class ListElementWithDescription implements IblockPropertyTypeNativeInterface
     }
 
     /**
-     * @param $arProperty
-     * @param $arValue
+     * @param mixed $arProperty
+     * @param mixed $arValue
      *
-     * @return array|mixed
+     * @return mixed
      */
-    public static function ConvertToDB($arProperty, $arValue)
+    public static function ConvertToDB($arProperty, array $arValue)
     {
         //Если значение или описание массив, то сериализуем
         if (is_array($arValue) && array_key_exists('VALUE', $arValue) && !empty($arValue['VALUE'])) {
@@ -104,8 +111,8 @@ class ListElementWithDescription implements IblockPropertyTypeNativeInterface
     }
 
     /**
-     * @param $arProperty
-     * @param $arValue
+     * @param mixed $arProperty
+     * @param mixed $arValue
      *
      * @return array|mixed
      */

@@ -40,6 +40,7 @@ class CustomUfPropertiesProcessor
     public function register() : void
     {
         foreach ($this->processors as $processor) {
+            /** @psalm-suppress UndefinedFunction */
             AddEventHandler(
                 'main',
                 'OnUserTypeBuildList',

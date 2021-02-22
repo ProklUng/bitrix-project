@@ -25,7 +25,7 @@ class LaravelPhoneValidator implements Rule
      * @param  mixed $attribute Аттрибут.
      * @param  mixed $value     Значение.
      *
-     * @return boolean
+     * @return null|boolean
      */
     public function passes($attribute, $value): ?bool
     {

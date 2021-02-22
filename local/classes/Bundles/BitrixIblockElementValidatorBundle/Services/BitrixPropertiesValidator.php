@@ -54,6 +54,7 @@ class BitrixPropertiesValidator
         $this->customValidators = $serviceLocator;
         $this->sanitizer = $sanitizer;
 
+        /** @psalm-suppress UndefinedFunction */
         AddEventHandler(
             'iblock',
             'OnBeforeIBlockElementUpdate',
@@ -61,11 +62,12 @@ class BitrixPropertiesValidator
             1
         );
 
+        /** @psalm-suppress UndefinedFunction */
         AddEventHandler(
             'iblock',
             'OnBeforeIBlockElementAdd',
             [$this, 'onBeforeIBlockElementAddHandler'],
-        1
+            1
         );
     }
 
@@ -154,11 +156,11 @@ class BitrixPropertiesValidator
             // Неверное свойство в конфиге.
             if (!$propertyId) {
                 throw new RuntimeException(
-                  sprintf(
-                      'Не смог найти свойство %s в инфоблоке %s.',
-                      $item['code_property'],
-                      $item['id_iblock']
-                  )
+                    sprintf(
+                        'Не смог найти свойство %s в инфоблоке %s.',
+                        $item['code_property'],
+                        $item['id_iblock']
+                    )
                 );
             }
 

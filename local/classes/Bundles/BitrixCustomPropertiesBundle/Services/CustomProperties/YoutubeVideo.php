@@ -104,6 +104,7 @@ class YoutubeVideo extends IblockPropertyTypeBase
                 if (is_numeric($res)) {
                     $value['VALUE']['PREVIEW'] = (int)$res;
                 } else {
+                    /** @psalm-suppress InvalidGlobal */
                     global $APPLICATION;
                     $APPLICATION->ThrowException('Ошибка при сохранении превью видео');
                 }

@@ -342,6 +342,7 @@ class Base implements IblockPropertyTypeNativeInterface
         if ($showNoValue
             && ($arUserField['SETTINGS']['DISPLAY'] !== 'CHECKBOX' || $arUserField['MULTIPLE'] !== 'Y')
         ) {
+            /** @psalm-suppress UndefinedFunction */
             $enum = [null => htmlspecialcharsbx(static::getEmptyCaption($arUserField))];
         }
 
@@ -388,9 +389,11 @@ class Base implements IblockPropertyTypeNativeInterface
      * @param array $enum
      * @param mixed $propertyValue
      * @param array $propertyFormCfg
+     *
+     * @return string
      */
-    protected function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg)
+    protected function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg) : string
     {
-
+        return '';
     }
 }

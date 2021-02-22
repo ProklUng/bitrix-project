@@ -121,7 +121,7 @@ interface IblockPropertyTypeInterface
      * @param array $value ['VALUE' => 'mixed', 'DESCRIPTION' => 'string']
      * @param array $control
      *
-     * @return string
+     * @return mixed
      *
      * @link https://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/GetAdminListViewHTML.php
      */

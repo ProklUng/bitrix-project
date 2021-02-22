@@ -23,7 +23,7 @@ class AbstractUserTypeProperty
     /**
      * Обязательный метод для определения типа поля таблицы в БД при создании свойства.
      *
-     * @param $arUserField
+     * @param mixed $arUserField Пользовательское поле.
      *
      * @return string
      */
@@ -86,6 +86,7 @@ class AbstractUserTypeProperty
 
         $result = '<select name="'.$arHtmlControl['NAME'].'"'.$size.($arUserField['EDIT_IN_LIST'] != 'Y' ? ' disabled="disabled" ' : '').'>';
         if ($arUserField["MANDATORY"] != 'Y') {
+            /** @psalm-suppress UndefinedFunction */
             $result .= '<option value=""'.(!$bWasSelect ? ' selected' : '').'>'.htmlspecialcharsbx(
                     self::getEmptyCaption($arUserField)
                 ).'</option>';
@@ -116,6 +117,7 @@ class AbstractUserTypeProperty
         $result = '<select multiple name="'.$arHtmlControl['NAME'].'" size="'.$arUserField['SETTINGS']['LIST_HEIGHT'].'"'.($arUserField["EDIT_IN_LIST"] != 'Y' ? ' disabled="disabled" ' : '').'>';
 
         if ($arUserField['MANDATORY'] !== 'Y') {
+            /** @psalm-suppress UndefinedFunction */
             $result .= '<option value=""'.(!$arHtmlControl['VALUE'] ? ' selected' : '').'>'.htmlspecialcharsbx(
                     self::getEmptyCaption($arUserField)
                 ).'</option>';
@@ -189,7 +191,8 @@ class AbstractUserTypeProperty
         }
 
         $result = '<select name="'.$arHtmlControl['NAME'].'"'.$size.($arUserField["EDIT_IN_LIST"] != 'Y' ? ' disabled="disabled" ' : '').'>';
-        if ($arUserField["MANDATORY"] !== 'Y') {
+        if ($arUserField['MANDATORY'] !== 'Y') {
+            /** @psalm-suppress UndefinedFunction */
             $result .= '<option value=""'.(!$arHtmlControl['VALUE'] ? ' selected' : '').'>'.htmlspecialcharsbx(
                     self::getEmptyCaption($arUserField)
                 ).'</option>';
@@ -226,7 +229,8 @@ class AbstractUserTypeProperty
         }
 
         $result = '<select multiple name="' . $arHtmlControl['NAME'] . '" size="'.$arUserField['SETTINGS']['LIST_HEIGHT'].'"'.($arUserField["EDIT_IN_LIST"] != 'Y' ? ' disabled="disabled" ' : '').'>';
-        if ($arUserField["MANDATORY"] !== 'Y') {
+        if ($arUserField['MANDATORY'] !== 'Y') {
+            /** @psalm-suppress UndefinedFunction */
             $result .= '<option value=""'.(!$arHtmlControl['VALUE'] ? ' selected' : '').'>'.htmlspecialcharsbx(
                     self::getEmptyCaption($arUserField)
                 ).'</option>';
@@ -272,9 +276,7 @@ class AbstractUserTypeProperty
         }
 
         $result = '<select multiple name="'.$arHtmlControl['NAME'].'[]"'.$size.'>';
-        $result .= '<option value=""'.(!$arHtmlControl['VALUE'] ? ' selected' : '').'>'.GetMessage(
-                "MAIN_ALL"
-            ).'</option>';
+        $result .= '<option value=""'.(!$arHtmlControl['VALUE'] ? ' selected' : '').'>Не установлено</option>';
         foreach ($rsEnum as $key => $arEnum) {
             $result .= '<option value="'.$arEnum["ID"].'"'.(in_array(
                     $arEnum["ID"],

@@ -13,9 +13,9 @@ class Select extends Base
      * @param mixed $propertyValue
      * @param array $propertyFormCfg
      *
-     * @return string|void
+     * @return string
      */
-    public function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg)
+    public function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg) : string
     {
         $arProperty = $this->property;
         $bWasSelect = false;
@@ -25,6 +25,10 @@ class Select extends Base
             $bSelected = $propertyValue['VALUE'] == $idEnum;
             $bWasSelect = $bWasSelect || $bSelected;
             $result2 .= '<option value="' . $idEnum . '"' . ($bSelected ? ' selected' : '') . '>' . $valEnum . '</option>';
+        }
+
+        if (!array_key_exists('SETTINGS', $arProperty)) {
+            $arProperty['SETTINGS'] = [];
         }
 
         if ($arProperty['SETTINGS']['LIST_HEIGHT'] > 1) {

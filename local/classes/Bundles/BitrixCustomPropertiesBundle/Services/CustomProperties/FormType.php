@@ -78,7 +78,7 @@ class FormType extends IblockPropertyTypeBase
      */
     public function getUIFilterProperty(array $property, $controlName, array &$filter)
     {
-        $filter["type"] = "list";
+        $filter["type"] = 'list';
         $filter["items"] = array_column(self::getFormList(), 'NAME', 'SID');
     }
 
@@ -99,14 +99,14 @@ class FormType extends IblockPropertyTypeBase
     }
 
     /**
-     * @param $inputName
-     * @param string $selectedValue
-     * @param bool $addEmpty
+     * @param string   $inputName
+     * @param string   $selectedValue
+     * @param boolean  $addEmpty
      *
      * @throws LoaderException
      * @return string
      */
-    protected function getFormFieldHtml($inputName, $selectedValue = '', $addEmpty = true)
+    protected function getFormFieldHtml(string $inputName = '', string $selectedValue = '', bool $addEmpty = true) : string
     {
         $items = self::getFormList();
         $input = '<select style="max-width:250px;" name="' . $inputName . '">';
@@ -123,15 +123,15 @@ class FormType extends IblockPropertyTypeBase
     }
 
     /**
-     * @param string $sid
+     * @param string $sid Символьный код формы.
      *
      * @throws LoaderException
      * @return string
      */
-    protected function getFormName($sid)
+    protected function getFormName(string $sid) : string
     {
         $sid = trim($sid);
-        if ($sid == '') {
+        if ($sid === '') {
             return '';
         }
 

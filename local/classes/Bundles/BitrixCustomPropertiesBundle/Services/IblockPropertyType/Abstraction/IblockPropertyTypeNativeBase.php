@@ -15,6 +15,7 @@ class IblockPropertyTypeNativeBase implements IblockPropertyTypeNativeInterface
      */
     public function init() : void
     {
+        /** @psalm-suppress UndefinedFunction */
         AddEventHandler(
             'iblock',
             'OnIBlockPropertyBuildList',

@@ -13,9 +13,9 @@ class Checkbox extends Base
      * @param mixed $propertyValue
      * @param array $propertyFormCfg
      *
-     * @return string|void
+     * @return string
      */
-    public function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg)
+    public function getEditHTML(array $enum, $propertyValue, array $propertyFormCfg) : string
     {
         $bWasSelect = false;
         $result = '';
