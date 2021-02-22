@@ -3,6 +3,7 @@
 namespace Local\Bundles\InstagramParserRapidApiBundle\Services;
 
 use Exception;
+use Local\Bundles\InstagramParserRapidApiBundle\Services\Exceptions\InstagramTransportExceptions;
 use Local\Bundles\InstagramParserRapidApiBundle\Services\Interfaces\RetrieverInstagramDataInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -59,14 +60,13 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
      */
     private $fixture = '';
 
-
     /**
      * RetrieverInstagramDataRapidApi constructor.
      *
      * @param CacheInterface $cacher      Кэшер.
      * @param string         $userId      Instagram ID user.
      * @param string         $rapidApiKey Ключ к https://rapidapi.com/restyler/api/instagram40.
-     * @param string         $afterParam  Параметр after RapidAPI.
+     * @param string         $afterParam  Параметр after RapidAPI. Опционально (пока не реализовано).
      */
     public function __construct(
         CacheInterface $cacher,
@@ -82,22 +82,25 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
 
     /**
      * @inheritDoc
-     * @throws Exception
-     * @throws InvalidArgumentException
+     * @throws InstagramTransportExceptions Ошибки транспорта.
+     * @throws InvalidArgumentException     Ошибки кэшера.
      */
     public function query(): array
     {
-        return $this->cacher->get('instagram-parser-fok', function (ItemInterface $item) {
+        $result = $this->cacher->get('instagram_parser_rapid_api.parser_cache_key', function (ItemInterface $item) {
 
             $response = $this->getCurlData($this->userId, $this->count);
-            $json = json_decode($response, true);
-
-            if (!$json) {
-                throw new Exception('Get Request Error: answer not json!');
-            }
-
-            return $json;
+            return json_decode($response, true);
         });
+
+        if (!$result) {
+            throw new InstagramTransportExceptions(
+                'Get Request Error: answer not json!',
+                400
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -148,7 +151,7 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
         curl_close($curl);
 
         if ($err) {
-            throw new Exception('Get Request Error: '.$err);
+            throw new InstagramTransportExceptions('Get Request Error: ' . $err, 400);
         }
 
         return $response;

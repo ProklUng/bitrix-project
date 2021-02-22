@@ -54,7 +54,7 @@ class ComplexParser
      *
      * @return array
      *
-     * @throws Exception
+     * @throws Exception Ошибки парсинга.
      */
     public function parse() : array
     {
@@ -110,7 +110,7 @@ class ComplexParser
     }
 
     /**
-     * @param string $afterParam
+     * @param string $afterParam Параметр after RapidAPI.
      *
      * @return ComplexParser
      */
