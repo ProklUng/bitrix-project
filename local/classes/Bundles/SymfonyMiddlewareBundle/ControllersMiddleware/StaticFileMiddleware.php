@@ -50,6 +50,12 @@ class StaticFileMiddleware implements MiddlewareInterface
             throw new LogicException(sprintf('Invalid or not supported hash algorithm: "%s"', $this->hashAlgorithm));
         }
 
+        if ($this->publicDirectory === '') {
+            throw new LogicException(
+                sprintf('Public upload directory not configured. You forget initialize StaticFileMiddleware as service?')
+            );
+        }
+
         $target = $this->getRequestTarget($request);
         if ($target === '') {
             return null;
