@@ -56,6 +56,11 @@ class ExampleInstagramParserController extends AbstractController
         $this->parser->setCount($count);
 
         $result = $this->parser->parse();
+//        $nextPageMarker = $this->parser->getCurrentAfterParam();
+//        if ($nextPageMarker) {
+//            $this->parser->setAfterParam($nextPageMarker);
+//            $result = $this->parser->parse();
+//        }
 
         return new Response(
             $this->serializer->serialize($result, 'json'),
@@ -84,6 +89,34 @@ class ExampleInstagramParserController extends AbstractController
         $result = [
             'id' => $userIdRetriever->getUserId()
         ];
+
+        return new Response(
+            $this->serializer->serialize($result, 'json'),
+            Response::HTTP_OK,
+            ['Content-Type', 'application/json; charset=utf-8']
+        );
+    }
+
+    /**
+     * @param Request           $request         Request.
+     * @param string            $username        Пользователь.
+     * @param UserInfoRetriever $userIdRetriever Извлекатель ID.
+     *
+     * @return Response
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function byUserName(
+        Request $request,
+        string $username,
+        UserInfoRetriever $userIdRetriever
+    ): Response {
+
+        $userIdRetriever->setUserName($username);
+        $idUser = $userIdRetriever->getUserId();
+        $this->parser->setIdUser($idUser);
+
+        $result = $this->parser->parse();
 
         return new Response(
             $this->serializer->serialize($result, 'json'),

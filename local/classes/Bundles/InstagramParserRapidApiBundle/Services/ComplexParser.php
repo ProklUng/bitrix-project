@@ -36,6 +36,11 @@ class ComplexParser
     private $afterParam;
 
     /**
+     * @var array $data Спарсенные сырые данные.
+     */
+    private $data = [];
+
+    /**
      * ComplexParser constructor.
      *
      * @param RetrieverInstagramDataInterface   $parserInstagram Сервис парсинга Инстаграма.
@@ -62,13 +67,13 @@ class ComplexParser
             $this->parserInstagram->setAfterMark($this->afterParam);
         }
 
-        $data = $this->parserInstagram->query();
+        $this->data = $this->parserInstagram->query();
 
         if ($this->startOffset !== 0) {
-            $data = array_slice($data, $this->startOffset, $this->count, true);
+            $this->data = array_slice($this->data, $this->startOffset, $this->count, true);
         }
 
-        return $this->dataTransformer->processMedias($data, $this->count);
+        return $this->dataTransformer->processMedias($this->data, $this->count);
     }
 
     /**
@@ -117,6 +122,31 @@ class ComplexParser
     public function setAfterParam(string $afterParam): ComplexParser
     {
         $this->afterParam = $afterParam;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getCurrentAfterParam(): string
+    {
+        if (count($this->data) === 0) {
+            $this->parserInstagram->query();
+        }
+
+        return $this->dataTransformer->getNextPageCursor($this->data);
+    }
+
+    /**
+     * @param string $userId ID юзера.
+     *
+     * @return $this
+     */
+    public function setIdUser(string $userId) : self
+    {
+        $this->parserInstagram->setUserId($userId);
 
         return $this;
     }

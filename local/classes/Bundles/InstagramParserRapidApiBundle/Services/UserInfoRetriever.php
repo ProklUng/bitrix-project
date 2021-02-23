@@ -35,7 +35,7 @@ class UserInfoRetriever
     /**
      * @var string $userName Instagram user name.
      */
-    private $userName;
+    private $userName = '';
 
     /**
      * @var boolean $useMock Использовать мок? (для отладки)
@@ -52,16 +52,25 @@ class UserInfoRetriever
      *
      * @param CacheInterface              $cacher             Кэшер.
      * @param InstagramTransportInterface $instagramTransport Транспорт.
-     * @param string                      $userName           Instagram userName.
      */
     public function __construct(
         CacheInterface $cacher,
-        InstagramTransportInterface $instagramTransport,
-        string $userName
+        InstagramTransportInterface $instagramTransport
     ) {
         $this->cacher = $cacher;
-        $this->userName = $userName;
         $this->instagramTransport = $instagramTransport;
+    }
+
+    /**
+     * @param string $userName Имя пользователя.
+     *
+     * @return UserInfoRetriever
+     */
+    public function setUserName(string $userName): UserInfoRetriever
+    {
+        $this->userName = $userName;
+
+        return $this;
     }
 
     /**
@@ -92,7 +101,7 @@ class UserInfoRetriever
      */
     public function getAllData() : array
     {
-       return $this->query();
+        return $this->query();
     }
 
     /**
@@ -109,18 +118,6 @@ class UserInfoRetriever
                 $_SERVER['DOCUMENT_ROOT'] . $fixturePath
             );
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $userName Имя пользователя.
-     *
-     * @return UserInfoRetriever
-     */
-    public function setUserName(string $userName): UserInfoRetriever
-    {
-        $this->userName = $userName;
 
         return $this;
     }

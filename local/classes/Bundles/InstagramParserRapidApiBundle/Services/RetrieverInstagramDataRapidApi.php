@@ -91,6 +91,10 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
 
         $keyCache = self::CACHE_KEY. $this->userId;
         if ($this->after) {
+            $keyCache .= md5($this->after);
+        }
+
+        if ($this->after) {
             $keyCache .= $this->after;
         }
 

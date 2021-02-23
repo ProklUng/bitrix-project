@@ -50,7 +50,7 @@ class ComplexParserTest extends TestCase
     {
         $mockRetriever = Mockery::mock(RetrieverInstagramDataInterface::class);
         $mockRetriever->shouldReceive('query')->once()->andReturn([]);
-        $mockRetriever = $mockRetriever->shouldReceive('setQueryId')->never();
+        $mockRetriever = $mockRetriever->shouldReceive('setAfterMark')->never();
 
         $mockTransformer = Mockery::mock(InstagramDataTransformerInterface::class);
         $mockTransformer = $mockTransformer->shouldReceive('processMedias')->once()->andReturn([]);
@@ -75,7 +75,7 @@ class ComplexParserTest extends TestCase
     {
         $mockRetriever = Mockery::mock(RetrieverInstagramDataInterface::class);
         $mockRetriever->shouldReceive('query')->once()->andReturn([]);
-        $mockRetriever = $mockRetriever->shouldReceive('setQueryId')->once();
+        $mockRetriever = $mockRetriever->shouldReceive('setAfterMark')->once();
 
         $mockTransformer = Mockery::mock(InstagramDataTransformerInterface::class);
         $mockTransformer = $mockTransformer->shouldReceive('processMedias')->once()->andReturn([]);
