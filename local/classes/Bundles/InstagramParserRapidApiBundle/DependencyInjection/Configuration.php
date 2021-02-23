@@ -40,7 +40,6 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('instagram_user_id')->end()
                 ->scalarNode('instagram_user_name')->defaultValue('')->end()
                 ->scalarNode('rapid_api_key')->end()
-                ->scalarNode('rapid_api_after_param')->defaultValue('')->end()
                 ->scalarNode('fixture_response_path')->defaultValue(
                     '/local/classes/Bundles/InstagramParserRapidApiBundle/Fixture/response.txt'
                 )->end()

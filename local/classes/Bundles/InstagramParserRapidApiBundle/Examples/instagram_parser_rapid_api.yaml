@@ -36,6 +36,3 @@ instagram_parser_rapid_api:
 
   # Ключ к https://rapidapi.com/restyler/api/instagram40
   rapid_api_key: 5466bdf907msh430e9579da6a738p18854cjsnb789fb399aa0
-
-  # Параметр after rapidAPI. Опциональный.
-  rapid_api_after_param: ''

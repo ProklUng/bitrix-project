@@ -29,13 +29,13 @@ interface RetrieverInstagramDataInterface
     public function setUserId(string $userId): self;
 
     /**
-     * Сеттер query_id.
+     * Сеттер after. Постраничное получение.
      *
-     * @param string $queryId Параметр after из https://rapidapi.com/restyler/api/instagram40.
+     * @param string $after Параметр after из https://rapidapi.com/restyler/api/instagram40.
      *
      * @return RetrieverInstagramDataInterface
      */
-    public function setQueryId(string $queryId): self;
+    public function setAfterMark(string $after): self;
 
     /**
      * Сеттер количества картинок.

@@ -42,9 +42,9 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     private $userId;
 
     /**
-     * @var string $queryId Параметр afterParams RapidAPI.
+     * @var string $after Параметр after RapidAPI. Для постраничного получения.
      */
-    private $queryId;
+    private $after;
 
     /**
      * @var integer $count Сколько картинок запрашивать.
@@ -67,18 +67,15 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
      * @param CacheInterface              $cacher             Кэшер.
      * @param InstagramTransportInterface $instagramTransport Транспорт.
      * @param string                      $userId             Instagram ID user.
-     * @param string                      $afterParam         Параметр after RapidAPI. Опционально (пока не реализовано).
      */
     public function __construct(
         CacheInterface $cacher,
         InstagramTransportInterface $instagramTransport,
-        string $userId,
-        string $afterParam = ''
+        string $userId
     ) {
         $this->cacher = $cacher;
         $this->instagramTransport = $instagramTransport;
         $this->userId = $userId;
-        $this->queryId = $afterParam;
     }
 
     /**
@@ -93,8 +90,8 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
         }
 
         $keyCache = self::CACHE_KEY. $this->userId;
-        if ($this->queryId) {
-            $keyCache .= $this->queryId;
+        if ($this->after) {
+            $keyCache .= $this->after;
         }
 
         $result = $this->cacher->get(
@@ -106,8 +103,8 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
             function (CacheItemInterface $item) {
                 $query = '/account-medias?userid=' . $this->userId . '&first=' . $this->count;
                 // Постраничные запросы.
-                if ($this->queryId) {
-                    $query .= '&after='.$this->queryId;
+                if ($this->after) {
+                    $query .= '&after='.$this->after;
                 }
 
                 try {
@@ -156,9 +153,9 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     /**
      * @inheritDoc
      */
-    public function setQueryId(string $queryId): RetrieverInstagramDataInterface
+    public function setAfterMark(string $after): RetrieverInstagramDataInterface
     {
-        $this->queryId = $queryId;
+        $this->after = $after;
 
         return $this;
     }

@@ -34,7 +34,6 @@ services:
       - '@instagram_parser_rapid_api.cacher'
       - '@instagram_parser_rapid_api.transport'
       - '%instagram_parser_rapid_api.instagram_user_id%'
-      - '%instagram_parser_rapid_api.after_param%'
     calls:
       - setUseMock: ['%instagram_parser_rapid_api.mock%', '%instagram_parser_rapid_api.fixture_response_path%']
 
