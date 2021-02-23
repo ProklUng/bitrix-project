@@ -84,6 +84,46 @@ class InstagramDataTransformerRapidApiTest extends TestCase
     }
 
     /**
+     * getNextPageCursor(). Валидная фикстура.
+     *
+     * @return void
+     */
+    public function testProcessCursor() : void
+    {
+        $validFixture = json_decode(file_get_contents(
+            $_SERVER['DOCUMENT_ROOT'] . '/local/classes/Bundles/InstagramParserRapidApiBundle/Fixture/response.txt'
+        ), true);
+
+        $result = $this->testObject->getNextPageCursor($validFixture);
+
+        $this->assertNotEmpty(
+            $result,
+            'Курсор следующей страницы не определился.'
+        );
+    }
+
+    /**
+     * getNextPageCursor(). Нет следующей страницы.
+     *
+     * @return void
+     */
+    public function testProcessCursorNoNextPage() : void
+    {
+        $validFixture = json_decode(file_get_contents(
+            $_SERVER['DOCUMENT_ROOT'] . '/local/classes/Bundles/InstagramParserRapidApiBundle/Fixture/response.txt'
+        ), true);
+
+        $validFixture['page_info']['has_next_page'] = false;
+
+        $result = $this->testObject->getNextPageCursor($validFixture);
+
+        $this->assertEmpty(
+            $result,
+            'Курсор следующей страницы определился, а не должен.'
+        );
+    }
+
+    /**
      * processMedias(). Игнор видео.
      *
      * @return void

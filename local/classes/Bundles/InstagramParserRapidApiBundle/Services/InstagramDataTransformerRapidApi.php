@@ -13,7 +13,9 @@ use RuntimeException;
  */
 class InstagramDataTransformerRapidApi implements InstagramDataTransformerInterface
 {
-    /** @var array $arMedias Результат. */
+    /**
+     * @var array $arMedias Результат.
+     */
     private $arMedias = [];
 
     /**
@@ -21,6 +23,10 @@ class InstagramDataTransformerRapidApi implements InstagramDataTransformerInterf
      */
     public function processMedias(array $arDataFeed, int $count = 3): array
     {
+        /**
+         * @internal $arDataFeed['page_info'] =>
+         * ['has_next_page' => true, 'end_cursor' => 'XXXXX']
+         */
         $countPicture = 1;
         $data = $arDataFeed['edges'] ?? [];
 
@@ -50,4 +56,19 @@ class InstagramDataTransformerRapidApi implements InstagramDataTransformerInterf
 
         return $this->arMedias;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getNextPageCursor(array $arDataFeed) : string
+    {
+        if (!array_key_exists('page_info', $arDataFeed)) {
+            return '';
+        }
+
+        return $arDataFeed['page_info']['has_next_page']
+            ?
+            $arDataFeed['page_info']['end_cursor'] : '';
+    }
+
 }
