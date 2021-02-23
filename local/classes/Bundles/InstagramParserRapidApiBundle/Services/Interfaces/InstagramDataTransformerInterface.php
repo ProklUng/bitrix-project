@@ -19,4 +19,13 @@ interface InstagramDataTransformerInterface
      * @return array
      */
     public function processMedias(array $arDataFeed, int $count = 3): array;
+
+    /**
+     * Получить "курсор" следующей страницы. Пусто, если следующей страницы нет.
+     *
+     * @param array $arDataFeed Данные фида.
+     *
+     * @return string
+     */
+    public function getNextPageCursor(array $arDataFeed) : string;
 }

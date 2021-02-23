@@ -59,7 +59,7 @@ class ComplexParser
     public function parse() : array
     {
         if ($this->afterParam) {
-            $this->parserInstagram->setQueryId($this->afterParam);
+            $this->parserInstagram->setAfterMark($this->afterParam);
         }
 
         $data = $this->parserInstagram->query();
