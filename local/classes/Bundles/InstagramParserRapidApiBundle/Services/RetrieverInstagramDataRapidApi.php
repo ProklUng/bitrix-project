@@ -5,10 +5,10 @@ namespace Local\Bundles\InstagramParserRapidApiBundle\Services;
 use Exception;
 use Local\Bundles\InstagramParserRapidApiBundle\Services\Exceptions\InstagramTransportException;
 use Local\Bundles\InstagramParserRapidApiBundle\Services\Interfaces\RetrieverInstagramDataInterface;
+use Local\Bundles\InstagramParserRapidApiBundle\Services\Transport\InstagramTransportInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Class RetrieverInstagramDataRapidApi
@@ -22,11 +22,6 @@ use Symfony\Contracts\Cache\ItemInterface;
 class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
 {
     /**
-     * @const string RAPID_API_URL URL RAPID API.
-     */
-    private const RAPID_API_URL = 'instagram40.p.rapidapi.com';
-
-    /**
      * @const string CACHE_KEY Ключ кэша.
      */
     private const CACHE_KEY = 'instagram_parser_rapid_api.parser_cache_key';
@@ -35,6 +30,11 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
      * @var CacheInterface $cacher Кэшер.
      */
     private $cacher;
+
+    /**
+     * @var InstagramTransportInterface Транспорт.
+     */
+    private $instagramTransport;
 
     /**
      * @var string $userId Instagram ID user. @see См. https://codeofaninja.com/tools/find-instagram-user-id/
@@ -52,11 +52,6 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     private $count = 12;
 
     /**
-     * @var string $rapidApiKey
-     */
-    private $rapidApiKey;
-
-    /**
      * @var boolean $useMock Использовать мок? (для отладки)
      */
     private $useMock = false;
@@ -69,21 +64,21 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     /**
      * RetrieverInstagramDataRapidApi constructor.
      *
-     * @param CacheInterface $cacher      Кэшер.
-     * @param string         $userId      Instagram ID user.
-     * @param string         $rapidApiKey Ключ к https://rapidapi.com/restyler/api/instagram40.
-     * @param string         $afterParam  Параметр after RapidAPI. Опционально (пока не реализовано).
+     * @param CacheInterface              $cacher             Кэшер.
+     * @param InstagramTransportInterface $instagramTransport Транспорт.
+     * @param string                      $userId             Instagram ID user.
+     * @param string                      $afterParam         Параметр after RapidAPI. Опционально (пока не реализовано).
      */
     public function __construct(
         CacheInterface $cacher,
+        InstagramTransportInterface $instagramTransport,
         string $userId,
-        string $rapidApiKey,
         string $afterParam = ''
     ) {
         $this->cacher = $cacher;
+        $this->instagramTransport = $instagramTransport;
         $this->userId = $userId;
         $this->queryId = $afterParam;
-        $this->rapidApiKey = $rapidApiKey;
     }
 
     /**
@@ -93,24 +88,52 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
      */
     public function query(): array
     {
-        if ($this->useMock && $this->fixture) {
-            return json_decode($this->fixture, true);;
+        if ($this->useMock && trim($this->fixture)) {
+            return json_decode($this->fixture, true);
         }
 
-        $result = $this->cacher->get(self::CACHE_KEY,
+        $keyCache = self::CACHE_KEY. $this->userId;
+        if ($this->queryId) {
+            $keyCache .= $this->queryId;
+        }
+
+        $result = $this->cacher->get(
+            $keyCache,
             /**
              * @param CacheItemInterface $item
              * @return mixed
              */
             function (CacheItemInterface $item) {
-                $response = $this->getCurlData($this->userId, $this->count);
+                $query = '/account-medias?userid=' . $this->userId . '&first=' . $this->count;
+                // Постраничные запросы.
+                if ($this->queryId) {
+                    $query .= '&after='.$this->queryId;
+                }
+
+                try {
+                    $response = $this->instagramTransport->get($query);
+                } catch (Exception $e) {
+                    return null;
+                }
 
                 return json_decode($response, true);
             }
         );
 
+        // Ошибки API. Неверный ключ и т.д.
+        if (array_key_exists('message', $result)
+            && $result['message'] !== ''
+        ) {
+            $this->cacher->delete($keyCache);
+            throw new InstagramTransportException(
+                $result['message'],
+                400
+            );
+        }
+
+        // В ответ не пришел json.
         if (!$result) {
-            $this->cacher->delete(self::CACHE_KEY);
+            $this->cacher->delete($keyCache);
             throw new InstagramTransportException(
                 'Get Request Error: answer not json!',
                 400
@@ -118,55 +141,6 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Обращение к RapidAPI через CURL.
-     *
-     * @param string  $userId ID пользователя.
-     * @param integer $count  Сколько картинок получить (максимум - 12).
-     *
-     * @return string
-     * @throws Exception Ошибки транспорта.
-     */
-    private function getCurlData(
-        string $userId,
-        int $count = 12
-    ): string {
-         // Опциональный параметр after.
-        $queryString = 'https://' . self::RAPID_API_URL . '/account-medias?userid=' . $userId . '&first=' . $count;
-        if ($this->queryId) {
-            $queryString = $queryString . '&after=' . $this->queryId;
-        }
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl,
-            [
-                CURLOPT_URL => $queryString,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-                CURLOPT_HTTPHEADER => [
-                    'x-rapidapi-host: '.self::RAPID_API_URL,
-                    'x-rapidapi-key: '.$this->rapidApiKey,
-                ],
-        ]);
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            throw new InstagramTransportException('Get Request Error: ' . $err, 400);
-        }
-
-        return (string)$response;
     }
 
     /**

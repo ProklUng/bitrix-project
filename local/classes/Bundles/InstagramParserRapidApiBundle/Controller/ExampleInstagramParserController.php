@@ -4,6 +4,8 @@ namespace Local\Bundles\InstagramParserRapidApiBundle\Controller;
 
 use Exception;
 use Local\Bundles\InstagramParserRapidApiBundle\Services\ComplexParser;
+use Local\Bundles\InstagramParserRapidApiBundle\Services\UserInfoRetriever;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,7 +51,7 @@ class ExampleInstagramParserController extends AbstractController
     public function action(
         Request $request,
         int $count = 3
-    ) : Response {
+    ): Response {
         $this->parser->setQueryCount(12);
         $this->parser->setCount($count);
 
@@ -58,7 +60,35 @@ class ExampleInstagramParserController extends AbstractController
         return new Response(
             $this->serializer->serialize($result, 'json'),
             Response::HTTP_OK,
-            ['Content-Type',  'application/json; charset=utf-8']
+            ['Content-Type', 'application/json; charset=utf-8']
+        );
+    }
+
+    /**
+     * @param Request           $request         Request.
+     * @param string            $username        Пользователь.
+     * @param UserInfoRetriever $userIdRetriever Извлекатель ID.
+     *
+     * @return Response
+     * @throws Exception
+     * @throws InvalidArgumentException
+     */
+    public function userId(
+        Request $request,
+        string $username,
+        UserInfoRetriever $userIdRetriever
+    ): Response {
+
+        $userIdRetriever->setUserName($username);
+
+        $result = [
+            'id' => $userIdRetriever->getUserId()
+        ];
+
+        return new Response(
+            $this->serializer->serialize($result, 'json'),
+            Response::HTTP_OK,
+            ['Content-Type', 'application/json; charset=utf-8']
         );
     }
 }

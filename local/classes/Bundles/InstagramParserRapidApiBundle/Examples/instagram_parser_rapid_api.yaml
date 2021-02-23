@@ -12,7 +12,7 @@ instagram_parser_rapid_api:
   ##############
   # Мок запроса
   ##############
-  mock: true
+  mock: false
   # Путь к фикстуре запроса картинок.
   fixture_response_path: '/local/classes/Bundles/InstagramParserRapidApiBundle/Fixture/response.txt'
   # Путь к фикстуре запроса данных пользователя.
@@ -35,4 +35,7 @@ instagram_parser_rapid_api:
   ################
 
   # Ключ к https://rapidapi.com/restyler/api/instagram40
-  rapid_api_key: 57777dfgdfg579da6a738p18854cjsnb789fb399aa0
+  rapid_api_key: 54996bdf907msh430e9579da6a738p18855cjsnb789fb399bb0
+
+  # Параметр after rapidAPI. Опциональный.
+  rapid_api_after_param: ''

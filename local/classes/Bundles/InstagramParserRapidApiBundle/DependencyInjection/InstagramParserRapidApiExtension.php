@@ -32,11 +32,14 @@ class InstagramParserRapidApiExtension extends Extension
         }
 
         $container->setParameter('instagram_parser_rapid_api.instagram_user_id', $config['instagram_user_id']);
+        $container->setParameter('instagram_parser_rapid_api.instagram_user_name', $config['instagram_user_name']);
         $container->setParameter('instagram_parser_rapid_api.rapid_api_key', $config['rapid_api_key']);
         $container->setParameter('instagram_parser_rapid_api.cache_ttl', $config['cache_ttl']);
+        $container->setParameter('instagram_parser_rapid_api.cache_user_data_ttl', $config['cache_user_data_ttl']);
         $container->setParameter('instagram_parser_rapid_api.cache_path', $config['cache_path']);
         $container->setParameter('instagram_parser_rapid_api.mock', $config['mock']);
-        $container->setParameter('instagram_parser_rapid_api.fixture_path', $config['fixture_path']);
+        $container->setParameter('instagram_parser_rapid_api.fixture_response_path', $config['fixture_response_path']);
+        $container->setParameter('instagram_parser_rapid_api.fixture_user_path', $config['fixture_user_path']);
         $container->setParameter('instagram_parser_rapid_api.after_param', $config['rapid_api_after_param']);
 
         $loader = new YamlFileLoader(

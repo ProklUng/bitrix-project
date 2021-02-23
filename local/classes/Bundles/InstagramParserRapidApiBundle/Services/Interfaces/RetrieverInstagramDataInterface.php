@@ -47,7 +47,7 @@ interface RetrieverInstagramDataInterface
     public function setCount(int $count): self;
 
     /**
-     * @param boolean $useMock     Использовать мок?
+     * @param boolean $useMock     Использовать мок.
      * @param string  $fixturePath Путь к фикстуре.
      *
      * @return RetrieverInstagramDataInterface
