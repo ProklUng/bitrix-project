@@ -177,12 +177,12 @@ class RetrieverInstagramDataRapidApi implements RetrieverInstagramDataInterface
     /**
      * @inheritDoc
      */
-    public function setUseMock(bool $useMock, string $fixturePath = ''): self
+    public function setUseMock(bool $useMock, string $fixturePath = ''): RetrieverInstagramDataInterface
     {
         $this->useMock = $useMock;
         if ($useMock && $fixturePath !== '') {
             $this->fixture = (string)file_get_contents(
-              $_SERVER['DOCUMENT_ROOT'] . $fixturePath
+                $_SERVER['DOCUMENT_ROOT'] . $fixturePath
             );
         }
 
