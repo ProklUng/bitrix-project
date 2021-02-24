@@ -132,15 +132,7 @@ class UserInfoRetriever
     {
         if ($this->useMock && trim($this->fixture)) {
             $result =  json_decode($this->fixture, true);
-            unset(
-                $result['edge_felix_video_timeline'],
-                $result['edge_owner_to_timeline_media'],
-                $result['edge_related_profiles'],
-                $result['edge_media_collections'],
-                $result['edge_saved_media']
-            );
-
-            return $result;
+            return $result ? $this->clearResult($result) : $result;
         }
 
         $keyCache = self::CACHE_KEY. $this->userName;
@@ -160,15 +152,8 @@ class UserInfoRetriever
                 }
 
                 $result =  json_decode($response, true);
-                unset(
-                    $result['edge_felix_video_timeline'],
-                    $result['edge_owner_to_timeline_media'],
-                    $result['edge_related_profiles'],
-                    $result['edge_media_collections'],
-                    $result['edge_saved_media']
-                );
 
-                return $result;
+                return $result ? $this->clearResult($result) : $result;
             }
         );
 
@@ -191,6 +176,26 @@ class UserInfoRetriever
                 400
             );
         }
+
+        return $result;
+    }
+
+    /**
+     * Очистить результат от лишнего.
+     *
+     * @param array $result Результат.
+     *
+     * @return array
+     */
+    private function clearResult(array $result) : array
+    {
+        unset(
+            $result['edge_felix_video_timeline'],
+            $result['edge_owner_to_timeline_media'],
+            $result['edge_related_profiles'],
+            $result['edge_media_collections'],
+            $result['edge_saved_media']
+        );
 
         return $result;
     }
