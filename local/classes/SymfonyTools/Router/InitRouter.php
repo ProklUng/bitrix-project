@@ -34,6 +34,16 @@ use Symfony\Component\Routing\RouteCollection;
 class InitRouter
 {
     /**
+     * @var RouteCollection[] $bundlesRoutes Роуты бандлов.
+     */
+    private static $bundlesRoutes = [];
+
+    /**
+     * @var RouteCollection $routeCollection Коллекция роутов.
+     */
+    private $routeCollection;
+
+    /**
      * @var Request $request Request.
      */
     private $request;
@@ -94,7 +104,7 @@ class InitRouter
         $this->dispatcher = $dispatcher;
         $this->controllerResolver = $controllerResolver;
         $this->argumentResolver = $argumentResolver;
-
+        $this->routeCollection = $routeCollection;
         $this->requestStack = $requestStack;
         $this->requestStack->push($this->request);
 
@@ -102,7 +112,10 @@ class InitRouter
         $requestContext = new RequestContext();
         $requestContext->fromRequest($this->request);
 
-        $matcher = new UrlMatcher($routeCollection, $requestContext);
+        // Роуты бандлов.
+        $this->mixRoutesBundles();
+
+        $matcher = new UrlMatcher($this->routeCollection, $requestContext);
         // Подписчики на события по умолчанию.
         $this->defaultSubscribers = [
             new RouterListener($matcher, $this->requestStack),
@@ -151,6 +164,36 @@ class InitRouter
         $response->send();
 
         exit;
+    }
+
+    /**
+     * Подмес роутов бандлов к общим роутам.
+     *
+     * @return void
+     */
+    public function mixRoutesBundles() : void
+    {
+        if (!self::$bundlesRoutes) {
+            return;
+        }
+
+        foreach (self::$bundlesRoutes as $collection) {
+            if ($collection instanceof RouteCollection) {
+                $this->routeCollection->addCollection($collection);
+            }
+        }
+    }
+
+    /**
+     * Добавить роуты бандлов.
+     *
+     * @param RouteCollection $routeCollection Коллкция роутов.
+     *
+     * @return void
+     */
+    public static function addRoutesBundle(RouteCollection $routeCollection) : void
+    {
+        self::$bundlesRoutes[] = $routeCollection;
     }
 
     /**
