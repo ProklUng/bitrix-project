@@ -67,3 +67,19 @@ services:
       - setCount: [3]
 
   Local\Bundles\InstagramParserRapidApiBundle\Services\ComplexParser: '@instagram_parser_rapid_api.parser'
+
+  #####################
+  # Консольные команды
+  ####################
+
+  # Создать фикстуры.
+  Local\Bundles\InstagramParserRapidApiBundle\Command\MakeFixtures:
+    public: true
+    arguments:
+      - '@instagram_parser_rapid_api.rapid_api'
+      - '@instagram_parser_rapid_api.rapid_api_get_user_id'
+      - '%instagram_parser_rapid_api.instagram_user_name%'
+      - '%instagram_parser_rapid_api.fixture_response_path%'
+      - '%instagram_parser_rapid_api.fixture_user_path%'
+    tags:
+      - { name: console.command, command: make:instagram-fixtures }

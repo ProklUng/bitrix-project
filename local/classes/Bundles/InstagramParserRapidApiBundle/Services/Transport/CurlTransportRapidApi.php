@@ -50,6 +50,8 @@ class CurlTransportRapidApi implements InstagramTransportInterface
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_HTTPHEADER => [
                     'x-rapidapi-host: '.self::RAPID_API_URL,
                     'x-rapidapi-key: '.$this->rapidApiKey,
