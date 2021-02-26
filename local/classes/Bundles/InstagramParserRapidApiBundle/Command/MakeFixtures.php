@@ -7,6 +7,7 @@ use Local\Bundles\InstagramParserRapidApiBundle\Services\Exceptions\InstagramTra
 use Local\Bundles\InstagramParserRapidApiBundle\Services\Interfaces\RetrieverInstagramDataInterface;
 use Local\Bundles\InstagramParserRapidApiBundle\Services\UserInfoRetriever;
 use Psr\Cache\InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -84,19 +85,20 @@ class MakeFixtures extends Command
     protected function configure() : void
     {
         $this->setName('make:instagram-fixtures')
-             ->setDescription('Make Instagram fixtures')
-             ->addArgument('username', InputArgument::OPTIONAL, 'Instagram user name')
+            ->setDescription('Make Instagram fixtures')
+            ->addArgument('username', InputArgument::OPTIONAL, 'Instagram user name')
         ;
-       }
+    }
 
     /**
      * Исполнение команды.
      *
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return void
      * @throws Exception
+     * @throws InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output) : void
     {
@@ -124,8 +126,7 @@ class MakeFixtures extends Command
      *
      * @return string
      *
-     * @throws InstagramTransportException
-     * @throws InvalidArgumentException
+     * @throws InstagramTransportException | RuntimeException | InvalidArgumentException
      */
     private function makeUserFixture(string $username) : string
     {
@@ -141,7 +142,13 @@ class MakeFixtures extends Command
 
         $this->output->writeln('Фикстура данных пользователя создана.');
 
-        return $allData['id'];
+        if (!array_key_exists('id', $allData)) {
+            throw new RuntimeException(
+                'В ответе на данные пользователя отсутствует ключ ID.'
+            );
+        }
+
+        return (string)$allData['id'];
     }
 
     /**
@@ -179,8 +186,8 @@ class MakeFixtures extends Command
     private function write(string $filename, array $content) : bool
     {
         return (bool)file_put_contents(
-          $_SERVER['DOCUMENT_ROOT'] . $filename,
-          json_encode($content)
+            $_SERVER['DOCUMENT_ROOT'] . $filename,
+            json_encode($content)
         );
     }
 }
