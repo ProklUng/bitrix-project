@@ -2,6 +2,7 @@
 
 namespace Local\Bundles\CustomRequestResponserBundle\Services\BitrixEventBridge;
 
+use Bitrix\Main\Context;
 use Local\Bundles\CustomRequestResponserBundle\Event\Listeners\PageSpeedMiddlewares;
 
 /**
@@ -10,6 +11,7 @@ use Local\Bundles\CustomRequestResponserBundle\Event\Listeners\PageSpeedMiddlewa
  * @package Local\Bundles\CustomRequestResponserBundle\Services\BitrixEventBridge
  *
  * @since 21.02.2021
+ * @since 28.02.2021 В админке middleware не действуют во избежании побочных эффектов.
  */
 class Bridge extends PageSpeedMiddlewares
 {
@@ -22,6 +24,11 @@ class Bridge extends PageSpeedMiddlewares
      */
     public function handleEvent(string &$content) : void
     {
+        $request = Context::getCurrent()->getRequest();
+        if ($request->isAdminSection()) {
+            return;
+        }
+
         foreach ($this->middlewaresBag as $middleware) {
             $content = $middleware->apply($content);
         }
