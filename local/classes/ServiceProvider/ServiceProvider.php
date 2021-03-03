@@ -60,6 +60,7 @@ use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
  * @since 14.11.2020 Загрузка конфигураций бандлов.
  * @since 12.12.2020 Полноценный контейнер в kernel.
  * @since 12.12.2020 DoctrineDbalExtension.
+ * @since 03.03.2021 Разные компилированные контейнеры в зависмости от файла конфигурации.
  */
 class ServiceProvider
 {
@@ -155,7 +156,9 @@ class ServiceProvider
             $filename = self::SERVICE_CONFIG_FILE;
         }
 
-        if (self::$containerBuilder !== null) {
+        $this->filename = $filename;
+
+        if (static::$containerBuilder !== null) {
             return;
         }
 
@@ -184,7 +187,7 @@ class ServiceProvider
      */
     public function get(string $id)
     {
-        return self::$containerBuilder->get($id);
+        return static::$containerBuilder->get($id);
     }
 
     /**
@@ -194,7 +197,7 @@ class ServiceProvider
      */
     public function container(): ContainerBuilder
     {
-        return self::$containerBuilder ?: $this->initContainer($this->filename);
+        return static::$containerBuilder ?: $this->initContainer($this->filename);
     }
 
     /**
@@ -206,7 +209,7 @@ class ServiceProvider
      */
     public function setContainer(PsrContainerInterface $container): void
     {
-        self::$containerBuilder  = $container;
+        static::$containerBuilder  = $container;
     }
 
     /**
@@ -222,17 +225,17 @@ class ServiceProvider
     {
         // Если в dev режиме, то не компилировать контейнер.
         if (env('DEBUG', false) === true) {
-            if (self::$containerBuilder !== null) {
-                return self::$containerBuilder;
+            if (static::$containerBuilder !== null) {
+                return static::$containerBuilder;
             }
 
             // Загрузить, инициализировать и скомпилировать контейнер.
-            self::$containerBuilder = $this->initialize($fileName);
+            static::$containerBuilder = $this->initialize($fileName);
 
             // Исполнить PostLoadingPasses.
             $this->runPostLoadingPasses();
 
-            return self::$containerBuilder;
+            return static::$containerBuilder;
         }
 
         // Создать директорию
@@ -240,27 +243,27 @@ class ServiceProvider
         $this->createCacheDirectory();
 
         /** Путь к скомпилированному контейнеру. */
-        $compiledContainerFile = $this->projectRoot . self::COMPILED_CONTAINER_DIR
+        $compiledContainerFile = $this->getPathCacheDirectory($this->filename)
             . self::COMPILED_CONTAINER_FILE;
 
         $containerConfigCache = new ConfigCache($compiledContainerFile, true);
         // Класс скомпилированного контейнера.
-        $classCompiledContainerName = 'MyCachedContainer';
+        $classCompiledContainerName = 'MyCachedContainer' . md5($this->filename);
 
         if (!$containerConfigCache->isFresh()) {
             // Загрузить, инициализировать и скомпилировать контейнер.
-            self::$containerBuilder = $this->initialize($fileName);
+            static::$containerBuilder = $this->initialize($fileName);
 
             // Опция в конфиге - компилировать ли контейнер.
-            if (!self::$containerBuilder->getParameter('compile.container')) {
-                return self::$containerBuilder;
+            if (!static::$containerBuilder->getParameter('compile.container')) {
+                return static::$containerBuilder;
             }
 
-            $dumper = new PhpDumper(self::$containerBuilder);
+            $dumper = new PhpDumper(static::$containerBuilder);
 
             $containerConfigCache->write(
                 $dumper->dump(['class' => $classCompiledContainerName]),
-                self::$containerBuilder->getResources()
+                static::$containerBuilder->getResources()
             );
         }
 
@@ -269,12 +272,12 @@ class ServiceProvider
 
         $classCompiledContainerName = '\\'.$classCompiledContainerName;
 
-        self::$containerBuilder = new $classCompiledContainerName();
+        static::$containerBuilder = new $classCompiledContainerName();
 
         // Исполнить PostLoadingPasses.
         $this->runPostLoadingPasses();
 
-        return self::$containerBuilder;
+        return static::$containerBuilder;
     }
 
     /**
@@ -291,7 +294,7 @@ class ServiceProvider
      */
     protected function loadContainer(string $fileName)
     {
-        self::$containerBuilder = new ContainerBuilder();
+        static::$containerBuilder = new ContainerBuilder();
 
         $this->setDefaultParamsContainer();
 
@@ -308,7 +311,7 @@ class ServiceProvider
             if (get_class($pass) === MergeExtensionConfigurationPass::class) {
                 continue;
             }
-            self::$containerBuilder->addCompilerPass($pass);
+            static::$containerBuilder->addCompilerPass($pass);
         }
 
         $this->standartSymfonyPasses();
@@ -322,13 +325,13 @@ class ServiceProvider
             // Фаза. По умолчанию PassConfig::TYPE_BEFORE_OPTIMIZATION
             $phase = !empty($compilerPass['phase']) ? $compilerPass['phase'] : PassConfig::TYPE_BEFORE_OPTIMIZATION;
 
-            self::$containerBuilder->addCompilerPass($passInitiated, $phase);
+            static::$containerBuilder->addCompilerPass($passInitiated, $phase);
         }
 
         // Подключение возможности обработки событий HtppKernel через Yaml конфиг.
         // tags:
         //      - { name: kernel.event_listener, event: kernel.request, method: handle }
-        self::$containerBuilder->register('event_dispatcher', EventDispatcher::class);
+        static::$containerBuilder->register('event_dispatcher', EventDispatcher::class);
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->setHotPathEvents([
@@ -339,9 +342,9 @@ class ServiceProvider
             KernelEvents::FINISH_REQUEST,
         ]);
 
-        self::$containerBuilder->addCompilerPass($registerListenersPass);
+        static::$containerBuilder->addCompilerPass($registerListenersPass);
 
-        $loader = new YamlFileLoader(self::$containerBuilder, new FileLocator(
+        $loader = new YamlFileLoader(static::$containerBuilder, new FileLocator(
             $this->projectRoot
         ));
 
@@ -350,8 +353,8 @@ class ServiceProvider
 
             // Подгрузить конфигурации из папки config.
             $this->configureContainer(
-                self::$containerBuilder,
-                $this->getContainerLoader(self::$containerBuilder)
+                static::$containerBuilder,
+                $this->getContainerLoader(static::$containerBuilder)
             );
 
             // FrameworkExtension.
@@ -361,14 +364,14 @@ class ServiceProvider
             $this->registerDoctrineDbalExtension();
 
             // Контейнер в AppKernel, чтобы соответствовать Symfony.
-            if (self::$containerBuilder->has('kernel')) {
-                $kernelService = self::$containerBuilder->get('kernel');
+            if (static::$containerBuilder->has('kernel')) {
+                $kernelService = static::$containerBuilder->get('kernel');
                 if ($kernelService) {
-                    $kernelService->setContainer(self::$containerBuilder);
+                    $kernelService->setContainer(static::$containerBuilder);
                 }
             }
 
-            return self::$containerBuilder;
+            return static::$containerBuilder;
         } catch (Exception $e) {
             $this->errorHandler->die('Ошибка загрузки Symfony Container: ' . $e->getMessage());
             return false;
@@ -390,17 +393,17 @@ class ServiceProvider
             $this->loadContainer($fileName);
 
             // Дополнить переменные приложения сведениями о зарегистрированных бандлах.
-            self::$containerBuilder->get('kernel')->registerStandaloneBundles();
+            static::$containerBuilder->get('kernel')->registerStandaloneBundles();
 
-            self::$containerBuilder->getParameterBag()->add(
-                self::$containerBuilder->get('kernel')->getKernelParameters()
+            static::$containerBuilder->getParameterBag()->add(
+                static::$containerBuilder->get('kernel')->getKernelParameters()
             );
 
             // Boot bundles.
-            $this->bundlesLoader->boot(self::$containerBuilder);
-            $this->bundlesLoader->registerExtensions(self::$containerBuilder);
+            $this->bundlesLoader->boot(static::$containerBuilder);
+            $this->bundlesLoader->registerExtensions(static::$containerBuilder);
 
-            self::$containerBuilder->compile(true);
+            static::$containerBuilder->compile(true);
         } catch (Exception $e) {
             $this->errorHandler->die(
                 $e->getMessage().'<br><br><pre>'.$e->getTraceAsString().'</pre>'
@@ -409,7 +412,7 @@ class ServiceProvider
             return null;
         }
 
-        return self::$containerBuilder;
+        return static::$containerBuilder;
     }
 
     /**
@@ -423,8 +426,8 @@ class ServiceProvider
      */
     private function setDefaultParamsContainer() : void
     {
-        if (!self::$containerBuilder->hasDefinition('kernel')) {
-            self::$containerBuilder->register('kernel', AppKernel::class)
+        if (!static::$containerBuilder->hasDefinition('kernel')) {
+            static::$containerBuilder->register('kernel', AppKernel::class)
                 ->addTag('service.bootstrap')
                 ->setAutoconfigured(true)
                 ->setPublic(true)
@@ -432,9 +435,23 @@ class ServiceProvider
             ;
         }
 
-        self::$containerBuilder->getParameterBag()->add(
-            self::$containerBuilder->get('kernel')->getKernelParameters()
+        static::$containerBuilder->getParameterBag()->add(
+            static::$containerBuilder->get('kernel')->getKernelParameters()
         );
+    }
+
+    /**
+     * Путь к директории с компилированным контейнером.
+     *
+     * @param string $filename Конфигурация.
+     *
+     * @return string
+     *
+     * @since 03.03.2021
+     */
+    protected function getPathCacheDirectory(string $filename) : string
+    {
+        return $this->projectRoot . self::COMPILED_CONTAINER_DIR .'/containers/'. md5($filename);
     }
 
     /**
@@ -444,9 +461,11 @@ class ServiceProvider
      */
     protected function createCacheDirectory() : void
     {
-        if (!$this->filesystem->exists($this->projectRoot . self::COMPILED_CONTAINER_DIR)) {
+        $dir = $this->getPathCacheDirectory($this->filename);
+
+        if (!$this->filesystem->exists($dir)) {
             try {
-                $this->filesystem->mkdir($this->projectRoot . self::COMPILED_CONTAINER_DIR);
+                $this->filesystem->mkdir($dir);
             } catch (IOExceptionInterface $exception) {
                 $this->errorHandler->die('An error occurred while creating your directory at '.$exception->getPath());
             }
@@ -487,21 +506,21 @@ class ServiceProvider
             ],
         ];
 
-        self::$containerBuilder->registerForAutoconfiguration(AbstractController::class)
+        static::$containerBuilder->registerForAutoconfiguration(AbstractController::class)
             ->addTag('controller.service_arguments');
 
-        self::$containerBuilder->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
+        static::$containerBuilder->registerForAutoconfiguration(ArgumentValueResolverInterface::class)
             ->addTag('controller.argument_value_resolver');
 
-        self::$containerBuilder->registerForAutoconfiguration(ServiceLocator::class)
+        static::$containerBuilder->registerForAutoconfiguration(ServiceLocator::class)
             ->addTag('container.service_locator');
 
-        self::$containerBuilder->registerForAutoconfiguration(EventSubscriberInterface::class)
+        static::$containerBuilder->registerForAutoconfiguration(EventSubscriberInterface::class)
             ->addTag('kernel.event_subscriber');
 
         // Применяем compiler passes.
         foreach ($standartCompilerPasses as $pass) {
-            self::$containerBuilder->addCompilerPass(
+            static::$containerBuilder->addCompilerPass(
                 new $pass['pass'],
                 $pass['phase'] ?? PassConfig::TYPE_BEFORE_OPTIMIZATION
             );
@@ -520,7 +539,7 @@ class ServiceProvider
     private function loadSymfonyBundles() : void
     {
         $this->bundlesLoader = new BundlesLoader(
-            self::$containerBuilder
+            static::$containerBuilder
         );
 
         $this->bundlesLoader->load(); // Загрузить бандлы.
@@ -546,7 +565,7 @@ class ServiceProvider
         foreach ($this->postLoadingPassesBag as $postLoadingPass) {
             if (class_exists($postLoadingPass['pass'])) {
                 $class = new $postLoadingPass['pass'];
-                $class->action(self::$containerBuilder);
+                $class->action(static::$containerBuilder);
             }
         }
     }
@@ -588,7 +607,7 @@ class ServiceProvider
     protected function getContainerLoader(ContainerBuilder $container): DelegatingLoader
     {
         $locator = new \Symfony\Component\HttpKernel\Config\FileLocator(
-            self::$containerBuilder->get('kernel')
+            static::$containerBuilder->get('kernel')
         );
 
         $resolver = new LoaderResolver([
@@ -617,14 +636,14 @@ class ServiceProvider
     private function registerFrameworkExtensions() : void
     {
         $this->frameworkExtension->registerCacheConfiguration(
-            self::$containerBuilder->getParameter('cache'),
-            self::$containerBuilder
+            static::$containerBuilder->getParameter('cache'),
+            static::$containerBuilder
         );
 
-        if (self::$containerBuilder->hasParameter('routing')) {
+        if (static::$containerBuilder->hasParameter('routing')) {
             $this->frameworkExtension->loadAnnotationRoute(
-                self::$containerBuilder->getParameter('routing'),
-                self::$containerBuilder
+                static::$containerBuilder->getParameter('routing'),
+                static::$containerBuilder
             );
         }
     }
@@ -639,12 +658,12 @@ class ServiceProvider
      */
     private function registerDoctrineDbalExtension() : void
     {
-        if (self::$containerBuilder->hasParameter('dbal')) {
-            $dbalConfig = self::$containerBuilder->getParameter('dbal');
+        if (static::$containerBuilder->hasParameter('dbal')) {
+            $dbalConfig = static::$containerBuilder->getParameter('dbal');
 
             $this->doctrineDbalExtension->dbalLoad(
                 $dbalConfig,
-                self::$containerBuilder
+                static::$containerBuilder
             );
         }
     }
@@ -661,8 +680,8 @@ class ServiceProvider
     public static function __callStatic(string $method, $args = null)
     {
         if ($method === 'instance') {
-            if (!empty(self::$containerBuilder)) {
-                return self::$containerBuilder;
+            if (!empty(static::$containerBuilder)) {
+                return static::$containerBuilder;
             }
 
             $self = new self(...$args);
