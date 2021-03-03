@@ -633,7 +633,7 @@ class ServiceProvider
      *
      * @throws LogicException
      */
-    private function registerFrameworkExtensions() : void
+    protected function registerFrameworkExtensions() : void
     {
         $this->frameworkExtension->registerCacheConfiguration(
             static::$containerBuilder->getParameter('cache'),
