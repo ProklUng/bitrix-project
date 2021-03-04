@@ -122,6 +122,11 @@ class ServiceProvider
     protected $pathBundlesConfig = '/local/configs/standalone_bundles.php';
 
     /**
+     * @var string $configDir Папка, где лежат конфиги.
+     */
+    protected $configDir = '/local/configs';
+
+    /**
      * @var array $compilerPassesBag Набор Compiler Pass.
      */
     protected $compilerPassesBag = [];
@@ -589,7 +594,7 @@ class ServiceProvider
      */
     private function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
-        $confDir = $_SERVER['DOCUMENT_ROOT'] .'/local/configs';
+        $confDir = $_SERVER['DOCUMENT_ROOT'] . $this->configDir;
         $container->setParameter('container.dumper.inline_class_loader', true);
 
         $loader->load($confDir . '/packages/*' . self::CONFIG_EXTS, 'glob');
