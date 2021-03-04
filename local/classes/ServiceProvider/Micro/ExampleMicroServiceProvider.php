@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @since 04.03.2021
  */
-class ExampleMicroServiceProvider
+class ExampleMicroServiceProvider extends AbstractStandaloneServiceProvider
 {
     /**
      * @var ContainerBuilder $containerBuilder Контейнер.
