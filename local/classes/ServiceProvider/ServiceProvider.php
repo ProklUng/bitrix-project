@@ -117,6 +117,11 @@ class ServiceProvider
     private $bundles = [];
 
     /**
+     * @var string $pathBundlesConfig Путь к конфигурации бандлов.
+     */
+    protected $pathBundlesConfig = '/local/configs/standalone_bundles.php';
+
+    /**
      * @var array $compilerPassesBag Набор Compiler Pass.
      */
     protected $compilerPassesBag = [];
@@ -539,7 +544,8 @@ class ServiceProvider
     private function loadSymfonyBundles() : void
     {
         $this->bundlesLoader = new BundlesLoader(
-            static::$containerBuilder
+            static::$containerBuilder,
+            $this->pathBundlesConfig
         );
 
         $this->bundlesLoader->load(); // Загрузить бандлы.

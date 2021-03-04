@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfiguration
  * @since 08.11.2020 Устранение ошибки, связанной с многократной загрузкой конфигурации бандлов.
  * @since 19.11.2020 Сделать все приватные подписчики событий публичными.
  * @since 20.12.2020 Сделать все приватные консольные команды публичными.
+ * @since 04.03.2021 Возможность загрузки бандлов несколькими провайдерами.
  */
 class BundlesLoader
 {
@@ -44,19 +45,20 @@ class BundlesLoader
      * BundlesLoader constructor.
      *
      * @param ContainerBuilder $container  Контейнер в стадии формирования.
-     * @param string|null      $configPath Путь к bundles.php (конфигурация бандлов).
+     * @param string           $configPath Путь к bundles.php (конфигурация бандлов).
      */
     public function __construct(
         ContainerBuilder $container,
-        string $configPath = null
+        string $configPath = ''
     ) {
-        $configPath = $configPath ?? self::PATH_BUNDLES_CONFIG;
+        $configPath = $configPath ?: self::PATH_BUNDLES_CONFIG;
 
         if (@file_exists($_SERVER['DOCUMENT_ROOT'] . $configPath)) {
             $this->bundles = require $_SERVER['DOCUMENT_ROOT'] . $configPath;
         }
 
         $this->container = $container;
+        static::$bundlesMap[static::class] = [];
     }
 
     /**
@@ -102,7 +104,7 @@ class BundlesLoader
                 );
 
                 // Сохраняю инстанцированный бандл в статику.
-                self::$bundlesMap[$bundle->getName()] = $bundle;
+                static::$bundlesMap[static::class][$bundle->getName()] = $bundle;
             } else {
                 throw new InvalidArgumentException(
                     sprintf(
@@ -150,7 +152,7 @@ class BundlesLoader
         /**
          * @var Bundle $bundle
          */
-        foreach (self::$bundlesMap as $bundle) {
+        foreach (static::$bundlesMap[static::class] as $bundle) {
             $bundle->setContainer($container);
             $bundle->boot();
         }
@@ -163,7 +165,7 @@ class BundlesLoader
      */
     public function bundles() : array
     {
-        return self::$bundlesMap;
+        return static::$bundlesMap[static::class] ?? [];
     }
 
     /**
@@ -173,6 +175,6 @@ class BundlesLoader
      */
     public static function getBundlesMap() : array
     {
-        return self::$bundlesMap;
+        return static::$bundlesMap[static::class] ?? [];
     }
 }
