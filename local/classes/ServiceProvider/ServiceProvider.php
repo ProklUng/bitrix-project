@@ -491,7 +491,7 @@ class ServiceProvider
      *
      * @see FrameworkBundle
      */
-    private function standartSymfonyPasses(): void
+    protected function standartSymfonyPasses(): void
     {
         // Пассы Symfony.
         $standartCompilerPasses = [
