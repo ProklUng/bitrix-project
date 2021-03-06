@@ -22,4 +22,5 @@ return [
     Local\Bundles\DtoMapperBundle\DtoMapperBundle::class => ['all' => true],
     Local\Bundles\BitrixComponentParamsBundle\BitrixComponentParamsBundle::class => ['all' => true],
     Local\Bundles\SymfonyMailerBundle\SymfonyMailerBundle::class => ['all' => true],
+    Local\Bundles\RequestLogBundle\RequestLogBundle::class => ['all' => true],
 ];
