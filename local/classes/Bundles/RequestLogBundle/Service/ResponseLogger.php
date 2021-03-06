@@ -13,7 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ResponseLogger
 {
+    /**
+     * @const string FILENAME_SEPARATOR Разделитель в имени файлов.
+     */
     private const FILENAME_SEPARATOR = '__';
+
+    /**
+     * @const string FILENAME_QS_SEPARATOR Разделитель GET параметров в имени файлов.
+     */
     private const FILENAME_QS_SEPARATOR = '--';
 
     /**
@@ -96,6 +103,10 @@ class ResponseLogger
     {
         $filename = $this->getFilePathByRequest($request);
         $requestJsonContent = json_decode($request->getContent(), true);
+
+        // Gzip-ованный контент.
+        $this->gzippedContent($response);
+
         $responseJsonContent = json_decode($response->getContent(), true);
 
         $dumpFileContent = [
@@ -194,6 +205,8 @@ class ResponseLogger
     }
 
     /**
+     * Задать директорию с моками.
+     *
      * @param string $mocksDir Относительный путь к директории с моками.
      *
      * @return void
@@ -204,11 +217,35 @@ class ResponseLogger
     }
 
     /**
+     * Директория с моками.
+     *
      * @return string
      */
     public function getMocksDir(): string
     {
         return $this->mocksDir;
+    }
+
+    /**
+     * Обработка зазипованного контента.
+     *
+     * @param Response $response Response.
+     *
+     * @return void
+     */
+    private function gzippedContent(Response $response) : void
+    {
+        // Gzip-ованный контент.
+        if (function_exists('ob_gzhandler')
+            &&
+            $response->headers->get('content-encoding', '') === 'gzip'
+        ) {
+            $responseContent = gzdecode($response->getContent());
+            if ($responseContent) {
+                $response->setContent($responseContent);
+                $response->headers->set('content-encoding', null);
+            }
+        }
     }
 
     /**
