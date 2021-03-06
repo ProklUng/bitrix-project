@@ -136,6 +136,11 @@ class ResponseLogger
     public function getFilePathByRequest(Request $request)
     {
         $requestPathInfo = trim($request->getPathInfo(), '/');
+
+        if (!$requestPathInfo) {
+            $requestPathInfo = $request->getRequestUri();
+        }
+
         $requestMethod = $request->getMethod();
         $requestContent = $request->getContent();
         $requestQueryParameters = $request->query->all();
@@ -196,6 +201,14 @@ class ResponseLogger
     public function setMocksDir(string $mocksDir): void
     {
         $this->mocksDir = $mocksDir;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMocksDir(): string
+    {
+        return $this->mocksDir;
     }
 
     /**

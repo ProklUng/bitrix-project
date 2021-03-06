@@ -29,7 +29,6 @@ services:
     arguments:
       - '@mroca_request_log.reponse_logger'
       - '@mroca_filesystem'
-      - '%mroca_request_log.mocks_dir%'
     tags:
       - { name: kernel.event_listener, event: kernel.request, method: handle }
 

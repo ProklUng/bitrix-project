@@ -16,34 +16,26 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class RequestMockListener
 {
     /**
-     * @var ResponseLogger $responseLogger
+     * @var ResponseLogger $responseLogger Логгер.
      */
     private $responseLogger;
 
     /**
-     * @var Filesystem $filesystem
+     * @var Filesystem $filesystem Файловая система.
      */
     private $filesystem;
-
-    /**
-     * @var string $mockDir
-     */
-    private $mockDir;
 
     /**
      * RequestMockListener constructor.
      *
      * @param ResponseLogger $responseLogger Логгер.
      * @param Filesystem     $filesystem     Файловая система.
-     * @param string         $mockDir        Директория с моками.
      */
     public function __construct(
         ResponseLogger $responseLogger,
-        Filesystem $filesystem,
-        string $mockDir
+        Filesystem $filesystem
     ) {
         $this->responseLogger = $responseLogger;
-        $this->mockDir = $mockDir;
         $this->filesystem = $filesystem;
     }
 
@@ -62,7 +54,7 @@ class RequestMockListener
             return;
         }
 
-        $pathMock = $this->mockDir . $this->responseLogger->getFilePathByRequest($request);
+        $pathMock = $this->responseLogger->getMocksDir() . $this->responseLogger->getFilePathByRequest($request);
 
         if (!$this->filesystem->exists($pathMock)) {
             return;
