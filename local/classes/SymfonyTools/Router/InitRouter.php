@@ -30,6 +30,7 @@ use Symfony\Component\Routing\RouteCollection;
  * @since 16.09.2020 Доработка. RequestContext.
  * @since 30.10.2020 ArgumentResolver пробрасывается снаружи.
  * @since 19.11.2020 RequestStack пробрасывается снаружи.
+ * @since 06.03.2021 Инициация события kernel.terminate.
  */
 class InitRouter
 {
@@ -147,6 +148,8 @@ class InitRouter
 
         try {
             $response = $framework->handle($this->request);
+            // Инициирует событие kernel.terminate.
+            $framework->terminate($this->request, $response);
         } catch (Exception $e) {
             return;
         }
