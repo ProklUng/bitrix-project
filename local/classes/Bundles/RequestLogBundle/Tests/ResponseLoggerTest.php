@@ -93,12 +93,13 @@ class ResponseLoggerTest extends TestCase
     {
         $request = Request::create('/categories?order[parent.name]=asc+desc&limit=5', 'GET');
         $response = Response::create(json_encode(['foo' => 'bar']), Response::HTTP_OK, ['Content-Type' => 'application/json']);
+        $serializedResponse = json_encode(serialize($response));
 
         $file = $this->responseLogger->logResponse($request, $response);
 
         self::assertTrue(is_file($file));
 
-        self::assertJsonStringEqualsJsonFile($file, '{
+        self::assertJsonStringEqualsJsonFile($file,'{
             "request": {
                 "uri": "/categories?order[parent.name]=asc+desc&limit=5",
                 "method": "GET",
@@ -110,9 +111,11 @@ class ResponseLoggerTest extends TestCase
                 "contentType": "application/json",
                 "content": {
                     "foo": "bar"
-                }
+                },
+                "serialized_response": ' . $serializedResponse . '
             }
-        }');
+        }'
+        );
     }
 
     /**
@@ -122,6 +125,7 @@ class ResponseLoggerTest extends TestCase
     {
         $request = Request::create('/categories', 'POST', ['key' => 'value']);
         $response = Response::create('', Response::HTTP_CREATED);
+        $serializedResponse = json_encode(serialize($response));
 
         $file = $this->responseLogger->logResponse($request, $response);
 
@@ -139,7 +143,8 @@ class ResponseLoggerTest extends TestCase
             "response": {
                 "statusCode": 201,
                 "contentType": null,
-                "content": ""
+                "content": "",
+                "serialized_response": ' . $serializedResponse . '
             }
         }');
     }

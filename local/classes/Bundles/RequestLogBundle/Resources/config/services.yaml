@@ -4,6 +4,10 @@ services:
     autoconfigure: true
     public: true
 
+  mroca_filesystem:
+    public: false
+    class: Symfony\Component\Filesystem\Filesystem
+
   mroca_request_log.reponse_logger:
     class: Local\Bundles\RequestLogBundle\Service\ResponseLogger
     arguments:
@@ -18,6 +22,16 @@ services:
       - '@mroca_request_log.reponse_logger'
     tags:
       - { name: kernel.event_listener, event: kernel.terminate, method: handle }
+
+  mroca_request_log.request_mock_listener:
+    public: true
+    class: Local\Bundles\RequestLogBundle\EventListener\RequestMockListener
+    arguments:
+      - '@mroca_request_log.reponse_logger'
+      - '@mroca_filesystem'
+      - '%mroca_request_log.mocks_dir%'
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: handle }
 
   mroca_request_log.command.clear_request_logs:
     class: Local\Bundles\RequestLogBundle\Command\ClearRequestLogsCommand

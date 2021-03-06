@@ -109,12 +109,13 @@ class ResponseLogger
                 'statusCode' => $response->getStatusCode(),
                 'contentType' => $response->headers->get('Content-Type'),
                 'content' => $responseJsonContent ?: $response->getContent(),
+                'serialized_response' => serialize($response) // Для мокинга.
             ],
         ];
 
         $this->filesystem->dumpFile($this->mocksDir.$filename, self::jsonEncode($dumpFileContent, true));
 
-        return $this->mocksDir.$filename;
+        return $this->mocksDir . $filename;
     }
 
     /**
@@ -205,7 +206,7 @@ class ResponseLogger
      *
      * @return string
      */
-    private function jsonEncode(array $data, $pretty = false) : string
+    private function jsonEncode(array $data, bool $pretty = false) : string
     {
         $options = JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES;
 
@@ -226,7 +227,7 @@ class ResponseLogger
      *
      * @return string
      */
-    private function httpBuildQuery($data, string $keyPrefix = '', $isChildren = false)
+    private function httpBuildQuery($data, string $keyPrefix = '', bool $isChildren = false)
     {
         if (!is_array($data)) {
             return '';
@@ -298,7 +299,7 @@ class ResponseLogger
      *
      * @return boolean
      */
-    private static function isNonAssociativeArray($data)
+    private static function isNonAssociativeArray($data) : bool
     {
         return is_array($data) && array_keys($data) === range(0, count($data) - 1);
     }

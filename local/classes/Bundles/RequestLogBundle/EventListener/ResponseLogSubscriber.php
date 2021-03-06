@@ -42,6 +42,11 @@ class ResponseLogSubscriber
             return;
         }
 
+        // Восстановленный из мока Response.
+        if ($event->getResponse()->headers->get('x-generated-response-mock', '')) {
+            return;
+        }
+
         $this->responseLogger->logResponse($event->getRequest(), $event->getResponse());
     }
 }

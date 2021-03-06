@@ -31,6 +31,7 @@ final class RequestLogExtension extends Extension
         $container->setParameter('mroca_request_log.mocks_dir_commands', $config['mocks_dir_commands']);
         $container->setParameter('mroca_request_log.hash_query_params', $config['hash_query_params']);
         $container->setParameter('mroca_request_log.use_indexed_associative_array', $config['use_indexed_associative_array']);
+        $container->setParameter('mroca_request_log.mock_request', $config['mock_request']);
 
         $loader = new YamlFileLoader(
             $container,
@@ -38,6 +39,11 @@ final class RequestLogExtension extends Extension
         );
 
         $loader->load('services.yaml');
+
+        // По опции не использовать мок запроса.
+        if (!$config['mock_request']) {
+            $container->removeDefinition('mroca_request_log.request_mock_listener');
+        }
     }
 
     /**
