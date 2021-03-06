@@ -59,7 +59,7 @@ final class LogResponse implements OnKernelResponseHandlerInterface
 
         // Нужно ли логгировать контент.
         $needLogContent = array_key_exists('log_content', $param) ?
-                           $param['log_content'] : false;
+            $param['log_content'] : false;
 
         $path = $request->getBasePath();
         $contentType = $request->getContentType();
@@ -68,6 +68,9 @@ final class LogResponse implements OnKernelResponseHandlerInterface
 
         $response = $event->getResponse();
         $statusCode = $response->getStatusCode();
+
+        $requestJsonContent = json_decode($request->getContent(), true);
+
         $message = \sprintf(
             'Response %s for "%s %s"',
             $statusCode,
@@ -81,6 +84,7 @@ final class LogResponse implements OnKernelResponseHandlerInterface
                 'method' => $request->getMethod(),
                 'path' => $path,
                 'uri' => $request->getRequestUri(),
+                'content_request' => $requestJsonContent ?: $request->getContent(),
                 'param_request' => $this->getParamsRequest($request),
                 'content-type-request' => $contentType,
                 'content-type-response' => $response->headers->get('Content-Type'),
@@ -88,7 +92,7 @@ final class LogResponse implements OnKernelResponseHandlerInterface
                 'client-ip' => $clientIp,
                 'status_code' => $statusCode,
                 'user-agent' => $userAgent,
-                'content' => $needLogContent ? $event->getResponse()->getContent() : ''
+                'content_response' => $needLogContent ? $event->getResponse()->getContent() : ''
             ]
         );
     }
