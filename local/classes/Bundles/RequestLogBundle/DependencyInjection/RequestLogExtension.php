@@ -3,6 +3,7 @@
 namespace Local\Bundles\RequestLogBundle\DependencyInjection;
 
 use Exception;
+use Local\Bundles\RequestLogBundle\Service\BitrixBridge\ResponseTransformer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -43,6 +44,14 @@ final class RequestLogExtension extends Extension
         // По опции не использовать мок запроса.
         if (!$config['mock_request']) {
             $container->removeDefinition('mroca_request_log.request_mock_listener');
+        }
+
+        // Битриксовый бридж.
+        $loader->load('bitrix.yaml');
+
+        if (count($config['bitrix_uri_list']) > 0) {
+            $transformer = $container->findDefinition(ResponseTransformer::class);
+            $transformer->replaceArgument(1, $config['bitrix_uri_list']);
         }
     }
 
