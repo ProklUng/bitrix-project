@@ -32,6 +32,14 @@ services:
       - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 10 }
       - { name: custom_request_responser.handler, priority: 10 }
 
+  # Логгирование Request & Response.
+  custom_request_responser.logger_response:
+    class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\LogResponse
+    arguments:
+      - '@logger'
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: handle, priority: 999 }
+
   # Запуск пачки middlewares PageSpeed.
   custom_request_responser.pagespeed_middlewares:
     class: Local\Bundles\CustomRequestResponserBundle\Event\Listeners\PageSpeedMiddlewares
