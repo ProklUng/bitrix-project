@@ -57,7 +57,7 @@ class DumpRequestLogsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $targetDirectory = $input->getArgument('target_directory');
+        $targetDirectory = (string)$input->getArgument('target_directory');
 
         $this->responseLogger->dumpMocksTo($targetDirectory);
 

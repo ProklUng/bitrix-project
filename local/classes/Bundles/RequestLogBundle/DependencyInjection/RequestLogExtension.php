@@ -51,7 +51,7 @@ final class RequestLogExtension extends Extension
 
         if (count($config['bitrix_uri_list']) > 0) {
             $transformer = $container->findDefinition(ResponseTransformer::class);
-            $transformer->replaceArgument(1, $config['bitrix_uri_list']);
+            $transformer->addArgument($config['bitrix_uri_list']);
         }
     }
 

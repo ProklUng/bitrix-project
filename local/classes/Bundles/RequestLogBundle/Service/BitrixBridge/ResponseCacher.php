@@ -67,7 +67,7 @@ class ResponseCacher
         }
 
         // Достать мок, вернуть десериализованный Response.
-        $content = file_get_contents($pathMock);
+        $content = (string)file_get_contents($pathMock);
         $data = json_decode($content, true);
 
         if ($data['response']['serialized_response']) {

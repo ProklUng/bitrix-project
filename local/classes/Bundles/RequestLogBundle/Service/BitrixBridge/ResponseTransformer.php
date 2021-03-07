@@ -74,7 +74,7 @@ class ResponseTransformer
         $symfonyResponse->headers->add($response->getHeaders()->toArray());
 
         // Восстановленный из мока Response.
-        if ($response->getHeaders()->get('x-generated-response-mock')) {
+        if (strlen($response->getHeaders()->get('x-generated-response-mock')) > 0) {
             return;
         }
 
@@ -92,7 +92,7 @@ class ResponseTransformer
     {
         $needProcess = false;
         foreach ($this->urls as $url) {
-            if (preg_match($url, $uri)) {
+            if (preg_match($url, $uri) !== false) {
                 $needProcess = true;
             }
         }

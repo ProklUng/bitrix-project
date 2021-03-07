@@ -151,7 +151,7 @@ class ResponseLogger
     {
         $requestPathInfo = trim($request->getPathInfo(), '/');
 
-        if (!$requestPathInfo) {
+        if (strlen($requestPathInfo) === 0) {
             $requestPathInfo = $request->getRequestUri();
         }
 
@@ -168,7 +168,7 @@ class ResponseLogger
         }
 
         // Add query parameters
-        if (count($requestQueryParameters)) {
+        if (count($requestQueryParameters) > 0) {
             $requestQueryParametersString = self::httpBuildQuery(self::sortArray($requestQueryParameters));
 
             // Url encode filename if needed
@@ -180,7 +180,7 @@ class ResponseLogger
         }
 
         // Add request content hash
-        if ($requestContent) {
+        if (strlen($requestContent) > 0) {
             // If JSON, sort data
             $jsonContent = json_decode($requestContent, true);
             if (null !== $jsonContent) {
@@ -191,7 +191,7 @@ class ResponseLogger
         }
 
         // Add request parameters hash
-        if ($requestParameters) {
+        if (count($requestParameters) > 0) {
             $filename .= self::FILENAME_SEPARATOR.$this->generateFilenameHash(self::jsonEncode(self::sortArray($requestParameters)));
         }
 
@@ -244,7 +244,7 @@ class ResponseLogger
             $response->headers->get('content-encoding', '') === 'gzip'
         ) {
             $responseContent = gzdecode((string)$response->getContent());
-            if ($responseContent) {
+            if ($responseContent !== false) {
                 $response->setContent($responseContent);
                 $response->headers->set('content-encoding', '');
             }
