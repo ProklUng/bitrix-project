@@ -59,8 +59,8 @@ class ResponseCacher
         );
 
         $pathMock = $this->responseLogger->getMocksDir()
-                    .
-                    $this->responseLogger->getFilePathByRequest($symfonyRequest);
+            .
+            $this->responseLogger->getFilePathByRequest($symfonyRequest);
 
         if (!$this->filesystem->exists($pathMock)) {
             return;
@@ -74,11 +74,11 @@ class ResponseCacher
             /** @var Response $response */
             $response = unserialize($data['response']['serialized_response']);
             // Пометить Response восстановленным из мока.
-            $response->headers->set('x-generated-response-mock', true);
+            $response->headers->set('x-generated-response-mock', 'true');
             $response->sendHeaders();
 
             // Send the response to the browser and exit app.
-            CMain::FinalActions($response->getContent());
+            CMain::FinalActions((string)$response->getContent());
             exit;
         }
     }

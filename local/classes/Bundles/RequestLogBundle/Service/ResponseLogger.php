@@ -50,12 +50,15 @@ class ResponseLogger
      * @param boolean $hashQueryParams
      * @param boolean $useIndexedAssociativeArray
      */
-    public function __construct(string $mocksDir, $hashQueryParams = false, $useIndexedAssociativeArray = false)
-    {
+    public function __construct(
+        string $mocksDir,
+        bool $hashQueryParams = false,
+        bool $useIndexedAssociativeArray = false
+    ) {
         $this->mocksDir = rtrim($mocksDir, '/').'/';
 
-        $this->hashQueryParams = (bool) $hashQueryParams;
-        $this->useIndexedAssociativeArray = (bool) $useIndexedAssociativeArray;
+        $this->hashQueryParams = $hashQueryParams;
+        $this->useIndexedAssociativeArray = $useIndexedAssociativeArray;
         $this->filesystem = new Filesystem();
     }
 
@@ -107,7 +110,7 @@ class ResponseLogger
         // Gzip-ованный контент.
         $this->gzippedContent($response);
 
-        $responseJsonContent = json_decode($response->getContent(), true);
+        $responseJsonContent = json_decode((string)$response->getContent(), true);
 
         $dumpFileContent = [
             'request' => [
@@ -196,7 +199,7 @@ class ResponseLogger
         $filenameArray = explode('/', $filename);
 
         $filenameArray[count($filenameArray) - 1] = $requestMethod.self::FILENAME_SEPARATOR.end($filenameArray);
-        $filename = implode($filenameArray, '/');
+        $filename = implode('/', $filenameArray);
 
         // Add extension
         $filename .= '.json';
@@ -240,10 +243,10 @@ class ResponseLogger
             &&
             $response->headers->get('content-encoding', '') === 'gzip'
         ) {
-            $responseContent = gzdecode($response->getContent());
+            $responseContent = gzdecode((string)$response->getContent());
             if ($responseContent) {
                 $response->setContent($responseContent);
-                $response->headers->set('content-encoding', null);
+                $response->headers->set('content-encoding', '');
             }
         }
     }

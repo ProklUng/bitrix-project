@@ -68,7 +68,7 @@ class RequestMockListener
             /** @var Response $response */
             $response = unserialize($data['response']['serialized_response']);
             // Пометить Response восстановленным из мока.
-            $response->headers->set('x-generated-response-mock', true);
+            $response->headers->set('x-generated-response-mock', 'true');
             $event->setResponse($response);
         }
     }
