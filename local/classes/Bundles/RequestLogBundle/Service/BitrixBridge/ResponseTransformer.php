@@ -90,6 +90,10 @@ class ResponseTransformer
      */
     private function needProcess(string $uri) : bool
     {
+        if (stripos($uri, '/bitrix/') !== false) {
+            return false;
+        }
+
         $needProcess = false;
         foreach ($this->urls as $url) {
             if (preg_match($url, $uri) !== false) {
