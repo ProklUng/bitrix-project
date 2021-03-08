@@ -96,7 +96,7 @@ class ResponseTransformer
 
         $needProcess = false;
         foreach ($this->urls as $url) {
-            if (preg_match($url, $uri) !== false) {
+            if (preg_match($url, $uri)) {
                 $needProcess = true;
             }
         }
