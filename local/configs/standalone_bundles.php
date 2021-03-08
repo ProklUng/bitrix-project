@@ -23,4 +23,5 @@ return [
     Local\Bundles\BitrixComponentParamsBundle\BitrixComponentParamsBundle::class => ['all' => true],
     Local\Bundles\SymfonyMailerBundle\SymfonyMailerBundle::class => ['all' => true],
     Local\Bundles\RequestLogBundle\RequestLogBundle::class => ['all' => true],
+    Local\Bundles\SymfonyBladeBundle\SymfonyBladeBundle::class => ['all' => true],
 ];
