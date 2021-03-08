@@ -1,4 +1,16 @@
 {
+  "name": "proklung/bitrix-project",
+  "description": "Bitrix build with integration of Symfony",
+  "authors": [
+    {
+      "name": "Gavrilov Fedor",
+      "email": "funtik21975@gmail.com"
+    }
+  ],
+  "keywords": [
+    "bitrix",
+    "symfony"
+  ],
   "repositories": [
     {
       "type": "git",
@@ -16,6 +28,9 @@
     "illuminate/database": "^6.0",
     "illuminate/events": "^6.0",
     "illuminate/validation": "^6.0",
+    "illuminate/view": "^6.0",
+    "illuminate/container": "^6.0",
+    "arrilot/bitrix-hermitage": "^1",
     "symfony/dotenv": "^5.2",
     "vlucas/phpdotenv": "3.*",
     "bitrix-expert/tools": "^1.5",
