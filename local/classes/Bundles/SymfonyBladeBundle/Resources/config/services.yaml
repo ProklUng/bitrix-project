@@ -58,7 +58,7 @@ services:
     arguments: ['@symfony_blade.compiler', !tagged bitrix.custom.directive]
     tags: ['service.bootstrap']
 
-  # Фреймворконезависимый регистратор кастомных директив для Битрикса.
+  # Фреймворконезависимый регистратор кастомных директив.
   symfony_blade.directive_registrator_agnostic:
     class: Local\Bundles\SymfonyBladeBundle\Services\DirectiveRegistrator
     arguments: ['@symfony_blade.compiler_agnostic', !tagged bitrix.custom.directive]
