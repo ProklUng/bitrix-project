@@ -17,7 +17,7 @@ class ViewFinder extends FileViewFinder
      *
      * @return void
      */
-    public function setPaths(array $paths) : void
+    public function setPaths($paths) : void
     {
         $this->paths = $paths;
     }
