@@ -41,16 +41,17 @@ class Blade
     /**
      * Получить View шаблона.
      *
-     * @param string $file Blade шаблон.
+     * @param string $file      Blade шаблон.
+     * @param array  $data      Данные.
+     * @param array  $mergeData Данные.
      *
      * @return View
-     * @throws RuntimeException Blade файл не найден.
      */
-    public function file(string $file) : View
+    public function file(string $file, array $data = [], array $mergeData = []) : View
     {
         foreach ($this->baseViewDirs as $dir) {
             if (file_exists($dir . $file)) {
-                return $this->viewFactory->file($dir . $file);
+                return $this->viewFactory->file($dir . $file, $data, $mergeData);
             }
         }
 
