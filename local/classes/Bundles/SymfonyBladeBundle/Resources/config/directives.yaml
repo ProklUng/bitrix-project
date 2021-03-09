@@ -4,7 +4,7 @@ services:
     autoconfigure: true
     public: true
 
-  # isTrue
+  # Логические директивы.
   Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeIsDirectives:
     class: Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeIsDirectives
     tags:
