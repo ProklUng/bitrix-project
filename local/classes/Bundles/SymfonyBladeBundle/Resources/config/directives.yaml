@@ -4,6 +4,22 @@ services:
     autoconfigure: true
     public: true
 
+  # Регистратор кастомных директив для Битрикса.
+  symfony_blade.directive_registrator:
+    class: Local\Bundles\SymfonyBladeBundle\Services\DirectiveRegistrator
+    arguments: ['@symfony_blade.compiler', !tagged bitrix.custom.directive]
+    tags: ['service.bootstrap']
+
+  # Фреймворконезависимый регистратор кастомных директив для Битрикса.
+  symfony_blade.directive_registrator_agnostic:
+    class: Local\Bundles\SymfonyBladeBundle\Services\DirectiveRegistrator
+    arguments: ['@symfony_blade.compiler_agnostic', !tagged bitrix.custom.directive]
+    tags: ['service.bootstrap']
+
+  ############
+  # Директивы
+  ###########
+
   # Логические директивы.
   Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeIsDirectives:
     class: Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeIsDirectives

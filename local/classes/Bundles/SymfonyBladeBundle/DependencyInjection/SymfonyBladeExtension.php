@@ -41,6 +41,7 @@ class SymfonyBladeExtension extends Extension
 
         $loader->load('services.yaml');
         $loader->load('directives.yaml');
+        $loader->load('filters.yaml');
     }
 
     /**

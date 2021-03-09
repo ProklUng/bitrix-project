@@ -52,18 +52,6 @@ services:
       - '@symfony_blade.view_factory_agnostic'
       - ['%symfony_blade.base_path%']
 
-  # Регистратор кастомных директив для Битрикса.
-  symfony_blade.directive_registrator:
-    class: Local\Bundles\SymfonyBladeBundle\Services\DirectiveRegistrator
-    arguments: ['@symfony_blade.compiler', !tagged bitrix.custom.directive]
-    tags: ['service.bootstrap']
-
-  # Фреймворконезависимый регистратор кастомных директив.
-  symfony_blade.directive_registrator_agnostic:
-    class: Local\Bundles\SymfonyBladeBundle\Services\DirectiveRegistrator
-    arguments: ['@symfony_blade.compiler_agnostic', !tagged bitrix.custom.directive]
-    tags: ['service.bootstrap']
-
   # Очистка кэша при наличии GET параметра clear_cache.
   symfony_blade.clear_cache:
     class: Local\Bundles\SymfonyBladeBundle\Services\Utils\BladeCacheClearer
