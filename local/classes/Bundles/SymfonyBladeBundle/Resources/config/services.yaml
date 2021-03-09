@@ -67,6 +67,5 @@ services:
   # Очистка кэша при наличии GET параметра clear_cache.
   symfony_blade.clear_cache:
     class: Local\Bundles\SymfonyBladeBundle\Services\Utils\BladeCacheClearer
-    arguments: ['%symfony_blade.cache_path%']
     tags:
       - { name: bitrix.events.init, module: main, event: OnProlog, method: clear, sort: 1 }
