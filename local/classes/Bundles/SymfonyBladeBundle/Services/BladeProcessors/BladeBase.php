@@ -10,6 +10,7 @@ use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Engines\PhpEngine;
 use Illuminate\View\Factory;
+use Local\Bundles\SymfonyBladeBundle\Services\Filters\BladeFiltersCompiler;
 use Local\Bundles\SymfonyBladeBundle\Services\ViewFinder;
 
 /**
@@ -58,14 +59,14 @@ class BladeBase
     public function __construct(array $viewPaths, string $cachePath, Container $container)
     {
        $this->viewPaths = $viewPaths;
-        $this->cachePath = $cachePath;
-        $this->container = $container;
+       $this->cachePath = $cachePath;
+       $this->container = $container;
 
-        $this->registerFilesystem();
-        $this->registerEvents();
-        $this->registerEngineResolver();
-        $this->registerViewFinder();
-        $this->registerFactory();
+       $this->registerFilesystem();
+       $this->registerEvents();
+       $this->registerEngineResolver();
+       $this->registerViewFinder();
+       $this->registerFactory();
     }
 
     /**
@@ -168,6 +169,10 @@ class BladeBase
             $cache = $me->cachePath;
 
             return new BladeCompiler($app['files'], $cache);
+        });
+
+        $app['blade.compiler']->extend(function ($view) use ($app) {
+            return $app[BladeFiltersCompiler::class]->compile($view);
         });
 
         $resolver->register('blade', function () use ($app) {

@@ -5,6 +5,7 @@ namespace Local\Bundles\SymfonyBladeBundle\Services\BladeProcessors;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Local\Bundles\SymfonyBladeBundle\Services\BladeCompilerBitrix;
+use Local\Bundles\SymfonyBladeBundle\Services\Filters\BladeFiltersCompiler;
 
 /**
  * Class BladeBitrix
@@ -28,6 +29,10 @@ class BladeBitrix extends BladeBase
             $cache = $me->cachePath;
 
             return new BladeCompilerBitrix($app['files'], $cache);
+        });
+
+        $app['blade.compiler.bitrix']->extend(function ($view) use ($app) {
+            return $app[BladeFiltersCompiler::class]->compile($view);
         });
 
         $resolver->register('blade', function () use ($app) {
