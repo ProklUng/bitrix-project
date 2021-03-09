@@ -130,6 +130,10 @@ services:
       - { name: twig.extension }
 
   # html_classes.
-  Fedy\Services\Twig\Extensions\HtmlExtension:
+  Local\Services\Twig\Extensions\HtmlExtension:
+    tags:
+      - { name: twig.extension }
+
+  Local\Services\Twig\Extensions\StringExtension:
     tags:
       - { name: twig.extension }
