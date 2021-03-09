@@ -4,7 +4,6 @@ namespace Local\Bundles\SymfonyBladeBundle\Services\BladeProcessors;
 
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
-use Local\Bundles\SymfonyBladeBundle\Services\BladeCompiler;
 use Local\Bundles\SymfonyBladeBundle\Services\BladeCompilerBitrix;
 
 /**
