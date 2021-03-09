@@ -25,3 +25,9 @@ services:
     class: Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeIsDirectives
     tags:
       - { name: bitrix.custom.directive }
+
+  # Отладочные директивы.
+  Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeDebugDirectives:
+    class: Local\Bundles\SymfonyBladeBundle\Services\Directives\BladeDebugDirectives
+    tags:
+      - { name: bitrix.custom.directive }
