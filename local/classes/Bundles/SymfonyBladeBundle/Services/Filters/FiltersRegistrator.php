@@ -46,7 +46,7 @@ class FiltersRegistrator
     {
         foreach ($this->classes as $filterClass) {
             if (method_exists($filterClass, $filter)) {
-                return $filterClass;
+                return "\\" . $filterClass;
             }
         }
 

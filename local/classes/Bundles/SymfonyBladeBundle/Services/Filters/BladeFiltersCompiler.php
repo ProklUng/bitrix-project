@@ -2,6 +2,8 @@
 
 namespace Local\Bundles\SymfonyBladeBundle\Services\Filters;
 
+use Exception;
+
 /**
  * Class BladeFiltersCompiler
  * @package Local\Bundles\SymfonyBladeBundle\Services\Filters
@@ -17,11 +19,13 @@ class BladeFiltersCompiler
 
     /**
      * BladeFiltersCompiler constructor.
+     * @throws Exception
      */
     public function __construct()
     {
         // Из-за сопряжения с Laravel Container пусть остается сервис-локатор.
         // Хоть это и плохо.
+        /** @psalm-suppress PropertyTypeCoercion */
         $this->filterFinder = container()->get(FiltersRegistrator::class);
     }
 
@@ -34,9 +38,11 @@ class BladeFiltersCompiler
      */
     public function compile(string $value) : string
     {
-        return preg_replace_callback('/(?<=((?<!@){{))(.*?)(?=}})/mu', function ($matches) {
-            return $this->parseFilters($matches[0]);
-        }, $value);
+        return preg_replace_callback('/(?<=((?<!@){{))(.*?)(?=}})/mu',
+            function (array $matches) : string {
+                return $this->parseFilters($matches[0]);
+            }, $value
+        );
     }
 
     /**

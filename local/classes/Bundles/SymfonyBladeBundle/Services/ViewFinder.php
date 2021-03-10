@@ -15,10 +15,12 @@ class ViewFinder extends FileViewFinder
      *
      * @param array $paths Пути.
      *
-     * @return void
+     * @return $this
      */
-    public function setPaths($paths) : void
+    public function setPaths($paths) : self
     {
         $this->paths = $paths;
+
+        return $this;
     }
 }

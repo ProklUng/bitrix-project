@@ -21,7 +21,7 @@ class Parser
      */
     public static function multipleArgs(string $expression) : Collection
     {
-        return collect(explode(',', $expression))->map(function ($item) {
+        return collect(explode(',', $expression))->map(function ($item) : string {
             return trim($item);
         });
     }

@@ -30,13 +30,13 @@ class BladeIsDirectives implements BladeDirectiveInterface
             | or @istrue($variable, $echoThisVariables)
             |
             */
-            'istrue' => function ($expression) {
+            'istrue' => function (string $expression) : string {
                 if (strpos($expression, ',') !== false) {
-                    $expression = Parser::multipleArgs($expression);
+                    $collection = Parser::multipleArgs($expression);
 
                     return implode('', [
-                        "<?php if (isset({$expression->get(0)}) && (bool) {$expression->get(0)} === true) : ?>",
-                        "<?php echo {$expression->get(1)}; ?>",
+                        "<?php if (isset({$collection->get(0)}) && (bool) {$collection->get(0)} === true) : ?>",
+                        "<?php echo {$collection->get(1)}; ?>",
                         '<?php endif; ?>',
                     ]);
                 }
@@ -44,17 +44,17 @@ class BladeIsDirectives implements BladeDirectiveInterface
                 return "<?php if (isset({$expression}) && (bool) {$expression} === true) : ?>";
             },
 
-            'endistrue' => function ($expression) {
+            'endistrue' => function (string $expression) : string {
                 return '<?php endif; ?>';
             },
 
-            'isfalse' => function ($expression) {
+            'isfalse' => function (string $expression) : string {
                 if (strpos($expression, ',') !== false) {
-                    $expression = Parser::multipleArgs($expression);
+                    $collection = Parser::multipleArgs($expression);
 
                     return implode('', [
-                        "<?php if (isset({$expression->get(0)}) && (bool) {$expression->get(0)} === false) : ?>",
-                        "<?php echo {$expression->get(1)}; ?>",
+                        "<?php if (isset({$collection->get(0)}) && (bool) {$collection->get(0)} === false) : ?>",
+                        "<?php echo {$collection->get(1)}; ?>",
                         '<?php endif; ?>',
                     ]);
                 }
@@ -62,7 +62,7 @@ class BladeIsDirectives implements BladeDirectiveInterface
                 return "<?php if (isset({$expression}) && (bool) {$expression} === false) : ?>";
             },
 
-            'endisfalse' => function ($expression) {
+            'endisfalse' => function (string $expression) : string {
                 return '<?php endif; ?>';
             },
 
@@ -77,13 +77,13 @@ class BladeIsDirectives implements BladeDirectiveInterface
             |
             */
 
-            'isnull' => function ($expression) {
+            'isnull' => function (string $expression) : string {
                 if (strpos($expression, ',') !== false) {
-                    $expression = Parser::multipleArgs($expression);
+                    $collection = Parser::multipleArgs($expression);
 
                     return implode('', [
-                        "<?php if (is_null({$expression->get(0)})) : ?>",
-                        "<?php echo {$expression->get(1)}; ?>",
+                        "<?php if (is_null({$collection->get(0)})) : ?>",
+                        "<?php echo {$collection->get(1)}; ?>",
                         '<?php endif; ?>',
                     ]);
                 }
@@ -91,17 +91,17 @@ class BladeIsDirectives implements BladeDirectiveInterface
                 return "<?php if (is_null({$expression})) : ?>";
             },
 
-            'endisnull' => function ($expression) {
+            'endisnull' => function (string $expression) : string {
                 return '<?php endif; ?>';
             },
 
-            'isnotnull' => function ($expression) {
+            'isnotnull' => function (string $expression) : string {
                 if (strpos($expression, ',') !== false) {
-                    $expression = Parser::multipleArgs($expression);
+                    $collection = Parser::multipleArgs($expression);
 
                     return implode('', [
-                        "<?php if (! is_null({$expression->get(0)})) : ?>",
-                        "<?php echo {$expression->get(1)}; ?>",
+                        "<?php if (! is_null({$collection->get(0)})) : ?>",
+                        "<?php echo {$collection->get(1)}; ?>",
                         '<?php endif; ?>',
                     ]);
                 }
@@ -109,7 +109,7 @@ class BladeIsDirectives implements BladeDirectiveInterface
                 return "<?php if (! is_null({$expression})) : ?>";
             },
 
-            'endisnotnull' => function ($expression) {
+            'endisnotnull' => function (string $expression) : string {
                 return '<?php endif; ?>';
             },
         ];
