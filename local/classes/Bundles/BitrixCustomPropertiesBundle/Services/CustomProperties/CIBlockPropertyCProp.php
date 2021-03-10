@@ -16,6 +16,8 @@ use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstr
  * @package Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties
  *
  * @since 10.02.2021
+ * @since 10.03.2021 Фикс ошибки загрузки файлов.
+ *
  * @see Модуль kit.cprop. Вытащено из модуля. Причесано.
  */
 class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
@@ -620,79 +622,79 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
             self::$showedJs = true;
             ?>
           <script>
-              $(document).on('click', 'a.mf-toggle', function (e) {
-                  e.preventDefault()
+            $(document).on('click', 'a.mf-toggle', function (e) {
+              e.preventDefault()
 
-                  var table = $(this).closest('tr').find('table.mf-fields-list')
-                  $(table).toggleClass('active')
-                  if ($(table).hasClass('active')) {
-                      $(this).text('<?=$hideText?>')
-                  } else {
-                      $(this).text('<?=$showText?>')
-                  }
+              var table = $(this).closest('tr').find('table.mf-fields-list')
+              $(table).toggleClass('active')
+              if ($(table).hasClass('active')) {
+                $(this).text('<?=$hideText?>')
+              } else {
+                $(this).text('<?=$showText?>')
+              }
+            })
+
+            $(document).on('click', 'a.mf-delete', function (e) {
+              e.preventDefault()
+
+              var textInputs = $(this).closest('tr').find('input[type="text"]')
+              $(textInputs).each(function (i, item) {
+                $(item).val('')
               })
 
-              $(document).on('click', 'a.mf-delete', function (e) {
-                  e.preventDefault()
-
-                  var textInputs = $(this).closest('tr').find('input[type="text"]')
-                  $(textInputs).each(function (i, item) {
-                      $(item).val('')
-                  })
-
-                  var textarea = $(this).closest('tr').find('textarea')
-                  $(textarea).each(function (i, item) {
-                      $(item).text('')
-                  })
-
-                  var checkBoxInputs = $(this).closest('tr').find('input[type="checkbox"]')
-                  $(checkBoxInputs).each(function (i, item) {
-                      $(item).attr('checked', 'checked')
-                  })
-
-                  $(this).closest('tr').hide('slow')
+              var textarea = $(this).closest('tr').find('textarea')
+              $(textarea).each(function (i, item) {
+                $(item).text('')
               })
 
-              // This is for multiple file type property (crutch)
-              BX.ready(function () {
-                  BX.addCustomEvent('onAddNewRowBeforeInner', function (data) {
-                      var html_string = data.html
+              var checkBoxInputs = $(this).closest('tr').find('input[type="checkbox"]')
+              $(checkBoxInputs).each(function (i, item) {
+                $(item).attr('checked', 'checked')
+              })
 
-                      // If cloned property of cprop
-                      if ($('<div>' + html_string + '</div>').find('table.mf-fields-list').length > 0) {
+              $(this).closest('tr').hide('slow')
+            })
 
-                          var blocks = $(html_string).find('.adm-input-file-control.adm-input-file-top-shift')
-                          if (blocks.length > 0) {
+            // This is for multiple file type property (crutch)
+            BX.ready(function () {
+              BX.addCustomEvent('onAddNewRowBeforeInner', function (data) {
+                var html_string = data.html
 
-                              document.cprop_endPos = 0
-                              $(blocks).each(function (i, item) {
-                                  blockId = $(item).attr('id')
+                // If cloned property of cprop
+                if ($('<div>' + html_string + '</div>').find('table.mf-fields-list').length > 0) {
 
-                                  if (blockId !== undefined && blockId !== null && blockId.length > 0) {
-                                      setTimeout(function (i, blockId, html_string) {
-                                          // Remove hidden inputs
-                                          var inputs = $('#' + blockId + ' .adm-input-file-new')
+                  var blocks = $(html_string).find('.adm-input-file-control.adm-input-file-top-shift')
+                  if (blocks.length > 0) {
 
-                                          if (inputs !== undefined && inputs.length > 0) {
-                                              inputs.each(function (i, item) {
-                                                  $(item).remove()
-                                              })
-                                          }
+                    document.cprop_endPos = 0
+                    $(blocks).each(function (i, item) {
+                      blockId = $(item).attr('id')
 
-                                          var start_pos = html_string.indexOf('new top.BX.file_input', document.cprop_endPos)
-                                          var end_pos = html_string.indexOf(': new BX.file_input', start_pos)
-                                          document.cprop_endPos = end_pos
-                                          var jsCode = html_string.substring(start_pos, end_pos)
+                      if (blockId !== undefined && blockId !== null && blockId.length > 0) {
+                        setTimeout(function (i, blockId, html_string) {
+                          // Remove hidden inputs
+                          var inputs = $('#' + blockId + ' .adm-input-file-new')
 
-                                          eval(jsCode)
-                                      }, 500, i, blockId, html_string)
-                                  }
-                              })
-                              document.cprop_endPos = 0
+                          if (inputs !== undefined && inputs.length > 0) {
+                            inputs.each(function (i, item) {
+                              $(item).remove()
+                            })
                           }
+
+                          var start_pos = html_string.indexOf('new top.BX.file_input', document.cprop_endPos)
+                          var end_pos = html_string.indexOf(': new BX.file_input', start_pos)
+                          document.cprop_endPos = end_pos
+                          var jsCode = html_string.substring(start_pos, end_pos)
+
+                          eval(jsCode)
+                        }, 500, i, blockId, html_string)
                       }
-                  })
+                    })
+                    document.cprop_endPos = 0
+                  }
+                }
               })
+            })
           </script>
             <?
         }
@@ -708,34 +710,34 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
         CJSCore::Init(['jquery']);
         ?>
       <script>
-          function addNewRows () {
-              $('#many-fields-table').append('' +
-                  '<tr valign="top">' +
-                  '<td><input type="text" class="inp-code" size="20"></td>' +
-                  '<td><input type="text" class="inp-title" size="35"></td>' +
-                  '<td><input type="text" class="inp-sort" size="5" value="500"></td>' +
-                  '<td><select class="inp-type"><?=self::getOptionList()?></select></td>' +
-                  '</tr>')
+        function addNewRows () {
+          $('#many-fields-table').append('' +
+            '<tr valign="top">' +
+            '<td><input type="text" class="inp-code" size="20"></td>' +
+            '<td><input type="text" class="inp-title" size="35"></td>' +
+            '<td><input type="text" class="inp-sort" size="5" value="500"></td>' +
+            '<td><select class="inp-type"><?=self::getOptionList()?></select></td>' +
+            '</tr>')
+        }
+
+        $(document).on('change', '.inp-code', function () {
+          var code = $(this).val()
+
+          if (code.length <= 0) {
+            $(this).closest('tr').find('input.inp-title').removeAttr('name')
+            $(this).closest('tr').find('input.inp-sort').removeAttr('name')
+            $(this).closest('tr').find('select.inp-type').removeAttr('name')
+          } else {
+            $(this).closest('tr').find('input.inp-title').attr('name', '<?=$inputName?>[' + code + '_TITLE]')
+            $(this).closest('tr').find('input.inp-sort').attr('name', '<?=$inputName?>[' + code + '_SORT]')
+            $(this).closest('tr').find('select.inp-type').attr('name', '<?=$inputName?>[' + code + '_TYPE]')
           }
+        })
 
-          $(document).on('change', '.inp-code', function () {
-              var code = $(this).val()
-
-              if (code.length <= 0) {
-                  $(this).closest('tr').find('input.inp-title').removeAttr('name')
-                  $(this).closest('tr').find('input.inp-sort').removeAttr('name')
-                  $(this).closest('tr').find('select.inp-type').removeAttr('name')
-              } else {
-                  $(this).closest('tr').find('input.inp-title').attr('name', '<?=$inputName?>[' + code + '_TITLE]')
-                  $(this).closest('tr').find('input.inp-sort').attr('name', '<?=$inputName?>[' + code + '_SORT]')
-                  $(this).closest('tr').find('select.inp-type').attr('name', '<?=$inputName?>[' + code + '_TYPE]')
-              }
-          })
-
-          $(document).on('input', '.inp-sort', function () {
-              var num = $(this).val()
-              $(this).val(num.replace(/[^0-9]/gim, ''))
-          })
+        $(document).on('input', '.inp-sort', function () {
+          var num = $(this).val()
+          $(this).val(num.replace(/[^0-9]/gim, ''))
+        })
       </script>
         <?php
     }
@@ -846,11 +848,13 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
     }
 
     /**
-     * @param array $arValue
+     * @param mixed $arValue
      *
      * @return false|int|mixed|string
+     *
+     * @internal Нюанс: загрузка по ссылке - без домена!
      */
-    private static function prepareFileToDB(array $arValue)
+    private static function prepareFileToDB($arValue)
     {
         $result = false;
 
