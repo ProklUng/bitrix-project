@@ -21,6 +21,8 @@ class IblockProperty
     public const UF_IBLOCK = 'ASD_IBLOCK';
 
     /**
+     * Получить свойство или все свойства.
+     *
      * @param integer $iblockId     ID инфоблока.
      * @param string  $codeProperty Свойство.
      *
@@ -61,5 +63,26 @@ class IblockProperty
         }
 
         return $codeProperty === '' ? $arReturn : $arReturn[$codeProperty];
+    }
+
+    /**
+     * Обновить свойства.
+     *
+     * @param integer $iblockId ID инфоблока.
+     * @param array   $arFields Поля.
+     *
+     * @return void
+     * @throws LoaderException
+     */
+    public function update(int $iblockId, array $arFields) : void
+    {
+        if (!Loader::includeModule('asd.iblock')) {
+            throw new RuntimeException(
+                'Модуль asd.iblock не установлен. Подключите его в админке.'
+            );
+        }
+
+        global $USER_FIELD_MANAGER;
+        $USER_FIELD_MANAGER->Update(self::UF_IBLOCK, $iblockId, $arFields);
     }
 }
