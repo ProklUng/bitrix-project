@@ -90,3 +90,7 @@ services:
     class: Local\Bundles\BitrixCustomPropertiesBundle\Services\PropertiesProcessor\CustomIblockPropertiesProcessor
     factory: ['@Local\Bundles\BitrixCustomPropertiesBundle\Services\PropertiesProcessor\CustomIblockPropertiesProcessor', 'register']
     tags: ['service.bootstrap']
+
+  # Работа с кастомными свойствами инфоблока через модуль asd.iblock.
+  bitrix_custom_properties_bundle.asd_iblock_tools:
+    class: Local\Bundles\BitrixCustomPropertiesBundle\Services\AsdIblockTools\IblockProperty
