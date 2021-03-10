@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Class Recursive
- * @package Fedy\Services\Collections\Extenders
+ * @package Local\Services\Collections\Extenders
  * Recursively convert nested arrays into Laravel Collections.
  *
  * @since 18.09.2020

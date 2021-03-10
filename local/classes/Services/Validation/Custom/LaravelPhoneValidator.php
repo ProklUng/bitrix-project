@@ -9,7 +9,7 @@ use libphonenumber\PhoneNumberUtil;
 
 /**
  * Class LaravelPhoneValidator
- * @package Fedy\Services\Validation\Custom
+ * @package Local\Services\Validation\Custom
  *
  * @since 07.09.2020
  * @since 07.10.2020 Локализация сообщения об ошибке.

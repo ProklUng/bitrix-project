@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Rule;
 
 /**
  * Class CustomEmailValidator
- * @package Fedy\Services\Validation\Custom
+ * @package Local\Services\Validation\Custom
  *
  * @since 08.09.2020
  */

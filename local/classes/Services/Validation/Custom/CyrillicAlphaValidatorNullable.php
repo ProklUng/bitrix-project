@@ -4,7 +4,7 @@ namespace Local\Services\Validation\Custom;
 
 /**
  * Class CyrillicAlphaValidator
- * @package Fedy\Services\Validation\Custom
+ * @package Local\Services\Validation\Custom
  *
  * @since 17.10.2020
  */

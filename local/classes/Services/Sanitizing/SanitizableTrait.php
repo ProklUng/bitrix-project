@@ -7,7 +7,7 @@ use Waavi\Sanitizer\Sanitizer;
 
 /**
  * Trait SanitizableTrait
- * @package Fedy\Services\Sanitizing
+ * @package Local\Services\Sanitizing
  *
  * @since 07.09.2020
  * @since 08.09.2020 Доработка.

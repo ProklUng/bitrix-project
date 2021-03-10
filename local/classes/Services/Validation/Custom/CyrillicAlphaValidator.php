@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 
 /**
  * Class CyrillicAlphaValidator
- * @package Fedy\Services\Validation\Custom
+ * @package Local\Services\Validation\Custom
  *
  * @since 17.10.2020
  */

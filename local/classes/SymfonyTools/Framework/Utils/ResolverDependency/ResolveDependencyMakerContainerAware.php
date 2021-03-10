@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 /**
  * Class ResolveDependencyMakerContainerAware
  * Реализация рекурсивного разрешения зависимостей с учетом сервис-контейнера.
- * @package Fedy\Lib\Objects
+ * @package Local\SymfonyTools\Framework\Utils\ResolverDependency
  *
  * @since 12.10.2020
  */

@@ -5,7 +5,7 @@ namespace Local\Services\Validation\Custom;
 /**
  * Class LaravelPhoneValidatorNullable
  * Валидатор телефона, но с возможностью пустого значения.
- * @package Fedy\Services\Validation\Custom
+ * @package Local\Services\Validation\Custom
  *
  * @since 08.10.2020
  */

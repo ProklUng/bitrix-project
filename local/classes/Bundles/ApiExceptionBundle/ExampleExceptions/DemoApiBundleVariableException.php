@@ -8,7 +8,7 @@ use Local\Bundles\ApiExceptionBundle\Exception\HttpException;
  * Class DemoApiBundleVariableException
  * Exception, описанный в конфигурации бандла, с переменной.
  * throw new DemoApiBundleException('255') // Параметры - строка!
- * @package Fedy\API\Exceptions
+ * @package Local\Bundles\ApiExceptionBundle\ExampleExceptions
  *
  * @since 25.10.2020
  */

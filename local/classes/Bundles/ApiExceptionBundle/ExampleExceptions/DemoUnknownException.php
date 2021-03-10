@@ -9,7 +9,7 @@ use Local\Bundles\ApiExceptionBundle\Exception\Interfaces\FlattenErrorExceptionI
  * Class DemoApiBundleVariableException
  * Exception, описанный в конфигурации бандла, с массивом ошибок.
  * throw new DemoApiBundleException('error1', 'error2') // Параметры - строка!
- * @package Fedy\API\Exceptions\ApiExceptionBundle
+ * @package Local\Bundles\ApiExceptionBundle\ExampleExceptions
  *
  * @since 25.10.2020
  */

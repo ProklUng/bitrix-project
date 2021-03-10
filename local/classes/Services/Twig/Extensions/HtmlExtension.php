@@ -1,6 +1,6 @@
 <?php
 
-namespace Fedy\Services\Twig\Extensions;
+namespace Local\Services\Twig\Extensions;
 
 use Twig\Error\RuntimeError;
 use Twig\Extension\AbstractExtension;
