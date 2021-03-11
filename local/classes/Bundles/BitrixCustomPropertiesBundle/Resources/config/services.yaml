@@ -69,6 +69,11 @@ services:
     tags:
       - { name: bitrix.uf.property.type }
 
+  # Кастомное UF свойство HTML.
+  Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties\CCustomTypeHtml:
+    tags:
+      - { name: bitrix.uf.property.type }
+
   # Инициализатор кастомных пользовательских (UF) свойств.
   Local\Bundles\BitrixCustomPropertiesBundle\Services\PropertiesProcessor\CustomUfPropertiesProcessor:
     class: Local\Bundles\BitrixCustomPropertiesBundle\Services\PropertiesProcessor\CustomUfPropertiesProcessor
