@@ -2,7 +2,6 @@
 
 namespace Local\Bundles\BitrixUtilsBundle\Services;
 
-use Bitrix\Main\LoaderException;
 use Bitrix\Main\ModuleManager;
 use CModule;
 use RuntimeException;
@@ -35,7 +34,6 @@ class ModuleInitializer
      * Инициализация запрошенных модулей.
      *
      * @return void
-     * @throws LoaderException
      */
     public function init() : void
     {
@@ -50,7 +48,6 @@ class ModuleInitializer
      * @param string $moduleId ID модуля.
      *
      * @return boolean
-     * @throws LoaderException
      */
     public function install(string $moduleId): bool
     {
