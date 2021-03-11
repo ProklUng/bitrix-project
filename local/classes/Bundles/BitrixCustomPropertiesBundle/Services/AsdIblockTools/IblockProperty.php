@@ -42,7 +42,7 @@ class IblockProperty
         $arReturn = [];
         $arUserFields = $USER_FIELD_MANAGER->GetUserFields(self::UF_IBLOCK, $iblockId, LANGUAGE_ID);
 
-        foreach ($arUserFields as $FIELD_NAME => $arUserField) {
+        foreach ($arUserFields as $field => $arUserField) {
             if ($arUserField['USER_TYPE_ID'] === 'enumeration') {
                 $arValue = [];
                 $enum = new CUserFieldEnum();
@@ -56,9 +56,9 @@ class IblockProperty
                     $arValue[$arSecEnum['ID']] = $arSecEnum['VALUE'];
                 }
 
-                $arReturn[$FIELD_NAME] = $arValue;
+                $arReturn[$field] = $arValue;
             } else {
-                $arReturn[$FIELD_NAME] = $arUserField['VALUE'];
+                $arReturn[$field] = $arUserField['VALUE'];
             }
         }
 
