@@ -39,7 +39,7 @@ class CASDiblockAction {
 			}
 			?><script type="text/javascript">
 				top.BX.closeWait(); top.BX.WindowManager.Get().AllowClose(); top.BX.WindowManager.Get().Close();
-				window.location.href = '/bitrix/tools/asd.iblock/props_export.php?ID=<? echo $BID; ?>';
+				window.location.href = '/local/modules/tools/asd.iblock/props_export.php?ID=<? echo $BID; ?>';
 			</script><?
 			die();
 		}

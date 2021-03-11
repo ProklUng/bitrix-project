@@ -6,7 +6,6 @@ if (!function_exists('htmlspecialcharsbx')) {
 	}
 }
 
-
 CModule::AddAutoloadClasses(
 	'asd.iblock',
 	array(
@@ -25,23 +24,23 @@ CModule::AddAutoloadClasses(
 	)
 );
 
-$arJSAsdIBlockConfig = array(
-	'asd_iblock' => array(
-		'js' => '/bitrix/js/asd.iblock/script.js',
-		'css' => '/bitrix/panel/asd.iblock/interface.css',
-		'rel' => array('jquery'),
-	),
-	'asd_element_list' => array(
+$arJSAsdIBlockConfig = [
+	'asd_iblock' => [
+		'js' => '/local/modules/asd.iblock/install/js/asd.iblock/script.js',
+		'css' => '/local/modules/asd.iblock/install/panel/asd.iblock/interface.css',
+		'rel' => ['jquery'],
+    ],
+	'asd_element_list' => [
 		'js' => '/bitrix/js/asd.iblock/admin/elementlist.js',
-		'css' => '/bitrix/panel/asd.iblock/interface.css',
-		'rel' => array('core')
-	),
-	'asd_palette' => array(
-		'js' => '/bitrix/js/asd.iblock/jpicker/jpicker-1.1.6.min.js',
-		'css' => '/bitrix/js/asd.iblock/jpicker/css/jPicker-1.1.6.min.css',
-		'rel' => array('jquery'),
-	),
-);
+		'css' => '/local/modules/asd.iblock/install/panel/asd.iblock/interface.css',
+		'rel' => ['core']
+    ],
+	'asd_palette' => [
+		'js' => '/local/modules/asd.iblock/install/js/asd.iblock/jpicker/jpicker-1.1.6.min.js',
+		'css' => '/local/modules/asd.iblock/install/js/asd.iblock/jpicker/css/jPicker-1.1.6.min.css',
+		'rel' => ['jquery'],
+    ],
+];
 
 foreach ($arJSAsdIBlockConfig as $ext => $arExt) {
 	CJSCore::RegisterExt($ext, $arExt);
