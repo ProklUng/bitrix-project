@@ -27,7 +27,7 @@ class IblockProperty
      * @param string  $codeProperty Свойство.
      *
      * @return mixed
-     * @throws LoaderException
+     * @throws LoaderException | RuntimeException
      */
     public function get(int $iblockId, string $codeProperty = '')
     {
@@ -72,7 +72,7 @@ class IblockProperty
      * @param array   $arFields Поля.
      *
      * @return void
-     * @throws LoaderException
+     * @throws LoaderException | RuntimeException
      */
     public function update(int $iblockId, array $arFields) : void
     {
