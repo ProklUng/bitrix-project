@@ -18,7 +18,7 @@ class IblockProperty
     /**
      * @const string UF_IBLOCK
      */
-    public const UF_IBLOCK = 'ASD_IBLOCK';
+    private const UF_IBLOCK = 'ASD_IBLOCK';
 
     /**
      * Получить свойство или все свойства.
