@@ -552,7 +552,7 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
             $arElem = CIBlockSection::GetList([], ['ID' => $id], false, [],
                 ['ID', 'IBLOCK_ID', 'IBLOCK_TYPE_ID', 'NAME'])->Fetch();
             if (!empty($arElem)) {
-                $elUrl .= '<a target="_blank" href="/bitrix/admin/iblock_element_edit.php?IBLOCK_ID='.$arElem['IBLOCK_ID'].'&ID='.$arElem['ID'].'&type='.$arElem['IBLOCK_TYPE_ID'].'">'.$arElem['NAME'].'</a>';
+                $elUrl .= '<a target="_blank" href="/bitrix/admin/iblock_section_search.php?IBLOCK_ID='.$arElem['IBLOCK_ID'].'&ID='.$arElem['ID'].'&type='.$arElem['IBLOCK_TYPE_ID'].'">'.$arElem['NAME'].'</a>';
             }
         }
 
