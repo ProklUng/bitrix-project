@@ -5,6 +5,7 @@ namespace Local\Bundles\BitrixCustomPropertiesBundle\Services\CustomProperties;
 use CFile;
 use CFileInput;
 use CIBlockElement;
+use CIBlockSection;
 use CJSCore;
 use CModule;
 use COption;
@@ -17,6 +18,7 @@ use Local\Bundles\BitrixCustomPropertiesBundle\Services\IblockPropertyType\Abstr
  *
  * @since 10.02.2021
  * @since 10.03.2021 Фикс ошибки загрузки файлов.
+ * @since 13.03.2021 Добавил тип поля - привязка к подразделу.
  *
  * @see Модуль kit.cprop. Вытащено из модуля. Причесано.
  */
@@ -103,6 +105,8 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
                 $result .= self::showDate($code, $arItem['TITLE'], $value, $strHTMLControlName);
             } elseif ($arItem['TYPE'] === 'element') {
                 $result .= self::showBindElement($code, $arItem['TITLE'], $value, $strHTMLControlName);
+            } elseif ($arItem['TYPE'] === 'group') {
+                $result .= self::showBindSection($code, $arItem['TITLE'], $value, $strHTMLControlName);
             }
         }
 
@@ -529,6 +533,42 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
     }
 
     /**
+     * @param string $code
+     * @param string $title
+     * @param array  $arValue
+     * @param array  $strHTMLControlName
+     *
+     * @return string
+     */
+    public static function showBindSection(string $code, string $title, array $arValue, array $strHTMLControlName) : string
+    {
+        $result = '';
+
+        $id = !empty($arValue['VALUE'][$code]) ? $arValue['VALUE'][$code] : '';
+
+        $elUrl = '';
+        if (!empty($id)) {
+            /** @psalm-suppress PossiblyInvalidMethodCall */
+            $arElem = CIBlockSection::GetList([], ['ID' => $id], false, [],
+                ['ID', 'IBLOCK_ID', 'IBLOCK_TYPE_ID', 'NAME'])->Fetch();
+            if (!empty($arElem)) {
+                $elUrl .= '<a target="_blank" href="/bitrix/admin/iblock_element_edit.php?IBLOCK_ID='.$arElem['IBLOCK_ID'].'&ID='.$arElem['ID'].'&type='.$arElem['IBLOCK_TYPE_ID'].'">'.$arElem['NAME'].'</a>';
+            }
+        }
+
+        $result .= '<tr>
+                    <td align="right">'.$title.': </td>
+                    <td>
+                        <input name="'.$strHTMLControlName['VALUE'].'['.$code.']" id="'.$strHTMLControlName['VALUE'].'['.$code.']" value="'.$id.'" size="8" type="text" class="mf-inp-bind-elem">
+                        <input type="button" value="..." onClick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_section_search.php?lang=ru&IBLOCK_ID=0&n='.$strHTMLControlName['VALUE'].'&k='.$code.'\', 900, 700);">&nbsp;
+                        <span>'.$elUrl.'</span>
+                    </td>
+                </tr>';
+
+        return $result;
+    }
+
+    /**
      * @return void
      */
     private static function showCss() : void
@@ -622,79 +662,79 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
             self::$showedJs = true;
             ?>
           <script>
-            $(document).on('click', 'a.mf-toggle', function (e) {
-              e.preventDefault()
+              $(document).on('click', 'a.mf-toggle', function (e) {
+                  e.preventDefault()
 
-              var table = $(this).closest('tr').find('table.mf-fields-list')
-              $(table).toggleClass('active')
-              if ($(table).hasClass('active')) {
-                $(this).text('<?=$hideText?>')
-              } else {
-                $(this).text('<?=$showText?>')
-              }
-            })
-
-            $(document).on('click', 'a.mf-delete', function (e) {
-              e.preventDefault()
-
-              var textInputs = $(this).closest('tr').find('input[type="text"]')
-              $(textInputs).each(function (i, item) {
-                $(item).val('')
-              })
-
-              var textarea = $(this).closest('tr').find('textarea')
-              $(textarea).each(function (i, item) {
-                $(item).text('')
-              })
-
-              var checkBoxInputs = $(this).closest('tr').find('input[type="checkbox"]')
-              $(checkBoxInputs).each(function (i, item) {
-                $(item).attr('checked', 'checked')
-              })
-
-              $(this).closest('tr').hide('slow')
-            })
-
-            // This is for multiple file type property (crutch)
-            BX.ready(function () {
-              BX.addCustomEvent('onAddNewRowBeforeInner', function (data) {
-                var html_string = data.html
-
-                // If cloned property of cprop
-                if ($('<div>' + html_string + '</div>').find('table.mf-fields-list').length > 0) {
-
-                  var blocks = $(html_string).find('.adm-input-file-control.adm-input-file-top-shift')
-                  if (blocks.length > 0) {
-
-                    document.cprop_endPos = 0
-                    $(blocks).each(function (i, item) {
-                      blockId = $(item).attr('id')
-
-                      if (blockId !== undefined && blockId !== null && blockId.length > 0) {
-                        setTimeout(function (i, blockId, html_string) {
-                          // Remove hidden inputs
-                          var inputs = $('#' + blockId + ' .adm-input-file-new')
-
-                          if (inputs !== undefined && inputs.length > 0) {
-                            inputs.each(function (i, item) {
-                              $(item).remove()
-                            })
-                          }
-
-                          var start_pos = html_string.indexOf('new top.BX.file_input', document.cprop_endPos)
-                          var end_pos = html_string.indexOf(': new BX.file_input', start_pos)
-                          document.cprop_endPos = end_pos
-                          var jsCode = html_string.substring(start_pos, end_pos)
-
-                          eval(jsCode)
-                        }, 500, i, blockId, html_string)
-                      }
-                    })
-                    document.cprop_endPos = 0
+                  var table = $(this).closest('tr').find('table.mf-fields-list')
+                  $(table).toggleClass('active')
+                  if ($(table).hasClass('active')) {
+                      $(this).text('<?=$hideText?>')
+                  } else {
+                      $(this).text('<?=$showText?>')
                   }
-                }
               })
-            })
+
+              $(document).on('click', 'a.mf-delete', function (e) {
+                  e.preventDefault()
+
+                  var textInputs = $(this).closest('tr').find('input[type="text"]')
+                  $(textInputs).each(function (i, item) {
+                      $(item).val('')
+                  })
+
+                  var textarea = $(this).closest('tr').find('textarea')
+                  $(textarea).each(function (i, item) {
+                      $(item).text('')
+                  })
+
+                  var checkBoxInputs = $(this).closest('tr').find('input[type="checkbox"]')
+                  $(checkBoxInputs).each(function (i, item) {
+                      $(item).attr('checked', 'checked')
+                  })
+
+                  $(this).closest('tr').hide('slow')
+              })
+
+              // This is for multiple file type property (crutch)
+              BX.ready(function () {
+                  BX.addCustomEvent('onAddNewRowBeforeInner', function (data) {
+                      var html_string = data.html
+
+                      // If cloned property of cprop
+                      if ($('<div>' + html_string + '</div>').find('table.mf-fields-list').length > 0) {
+
+                          var blocks = $(html_string).find('.adm-input-file-control.adm-input-file-top-shift')
+                          if (blocks.length > 0) {
+
+                              document.cprop_endPos = 0
+                              $(blocks).each(function (i, item) {
+                                  blockId = $(item).attr('id')
+
+                                  if (blockId !== undefined && blockId !== null && blockId.length > 0) {
+                                      setTimeout(function (i, blockId, html_string) {
+                                          // Remove hidden inputs
+                                          var inputs = $('#' + blockId + ' .adm-input-file-new')
+
+                                          if (inputs !== undefined && inputs.length > 0) {
+                                              inputs.each(function (i, item) {
+                                                  $(item).remove()
+                                              })
+                                          }
+
+                                          var start_pos = html_string.indexOf('new top.BX.file_input', document.cprop_endPos)
+                                          var end_pos = html_string.indexOf(': new BX.file_input', start_pos)
+                                          document.cprop_endPos = end_pos
+                                          var jsCode = html_string.substring(start_pos, end_pos)
+
+                                          eval(jsCode)
+                                      }, 500, i, blockId, html_string)
+                                  }
+                              })
+                              document.cprop_endPos = 0
+                          }
+                      }
+                  })
+              })
           </script>
             <?
         }
@@ -710,34 +750,34 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
         CJSCore::Init(['jquery']);
         ?>
       <script>
-        function addNewRows () {
-          $('#many-fields-table').append('' +
-            '<tr valign="top">' +
-            '<td><input type="text" class="inp-code" size="20"></td>' +
-            '<td><input type="text" class="inp-title" size="35"></td>' +
-            '<td><input type="text" class="inp-sort" size="5" value="500"></td>' +
-            '<td><select class="inp-type"><?=self::getOptionList()?></select></td>' +
-            '</tr>')
-        }
-
-        $(document).on('change', '.inp-code', function () {
-          var code = $(this).val()
-
-          if (code.length <= 0) {
-            $(this).closest('tr').find('input.inp-title').removeAttr('name')
-            $(this).closest('tr').find('input.inp-sort').removeAttr('name')
-            $(this).closest('tr').find('select.inp-type').removeAttr('name')
-          } else {
-            $(this).closest('tr').find('input.inp-title').attr('name', '<?=$inputName?>[' + code + '_TITLE]')
-            $(this).closest('tr').find('input.inp-sort').attr('name', '<?=$inputName?>[' + code + '_SORT]')
-            $(this).closest('tr').find('select.inp-type').attr('name', '<?=$inputName?>[' + code + '_TYPE]')
+          function addNewRows () {
+              $('#many-fields-table').append('' +
+                  '<tr valign="top">' +
+                  '<td><input type="text" class="inp-code" size="20"></td>' +
+                  '<td><input type="text" class="inp-title" size="35"></td>' +
+                  '<td><input type="text" class="inp-sort" size="5" value="500"></td>' +
+                  '<td><select class="inp-type"><?=self::getOptionList()?></select></td>' +
+                  '</tr>')
           }
-        })
 
-        $(document).on('input', '.inp-sort', function () {
-          var num = $(this).val()
-          $(this).val(num.replace(/[^0-9]/gim, ''))
-        })
+          $(document).on('change', '.inp-code', function () {
+              var code = $(this).val()
+
+              if (code.length <= 0) {
+                  $(this).closest('tr').find('input.inp-title').removeAttr('name')
+                  $(this).closest('tr').find('input.inp-sort').removeAttr('name')
+                  $(this).closest('tr').find('select.inp-type').removeAttr('name')
+              } else {
+                  $(this).closest('tr').find('input.inp-title').attr('name', '<?=$inputName?>[' + code + '_TITLE]')
+                  $(this).closest('tr').find('input.inp-sort').attr('name', '<?=$inputName?>[' + code + '_SORT]')
+                  $(this).closest('tr').find('select.inp-type').attr('name', '<?=$inputName?>[' + code + '_TYPE]')
+              }
+          })
+
+          $(document).on('input', '.inp-sort', function () {
+              var num = $(this).val()
+              $(this).val(num.replace(/[^0-9]/gim, ''))
+          })
       </script>
         <?php
     }
@@ -833,6 +873,7 @@ class CIBlockPropertyCProp implements IblockPropertyTypeNativeInterface
             'text' => 'Текст',
             'date' => 'Дата/Время',
             'element' => 'Привязка к элементу',
+            'group' => 'Привязка к подразделу',
         ];
 
         foreach ($arOption as $code => $name) {
