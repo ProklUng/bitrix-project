@@ -61,9 +61,12 @@ services:
     class: CMain
     factory: ['@Local\Services\Bitrix\GetApplication', 'instance']
 
-  CFile: ~
-  CUser: ~
-  CMain: ~
+  CFile:
+    class: CFile
+  CUser:
+    class: CUser
+  CMain:
+    class: CMain
   Bitrix\Main\UserTable: ~
   Bitrix\Main\Mail\Event: ~
 
