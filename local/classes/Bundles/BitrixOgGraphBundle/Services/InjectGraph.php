@@ -20,7 +20,7 @@ class InjectGraph
     /**
      * @var Asset $assetHandler Битриксовый Asset.
      */
-    private Asset $assetHandler;
+    private $assetHandler;
 
     /**
      * InjectGraph constructor.
