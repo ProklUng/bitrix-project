@@ -21,7 +21,7 @@ class InstagramParserController
     /**
      * Controller
      *
-     * @internal Instagram логин: gutapars / WebGuta30~88
+     * @internal Instagram логин: xxxxx / Web30~99
      *
      * @param Request $obRequest      Объект Request.
      * @param integer $count_pictures Количество картинок.
@@ -29,7 +29,7 @@ class InstagramParserController
      *
      * @return Response $content
      */
-    public function action(Request $obRequest, int $count_pictures, string $instagram)
+    public function action(Request $obRequest, int $count_pictures, string $instagram) : Response
     {
         /** @var integer $paramCountPicture GET параметр количество картинок. */
         $paramCountPicture = $obRequest->query->get('count_pictures');
