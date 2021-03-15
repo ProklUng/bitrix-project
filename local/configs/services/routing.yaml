@@ -172,3 +172,8 @@ services:
       - add: [['Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\BaseDTOInterface']]
 
   Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag: '@ignored.autowiring.controller.arguments'
+
+  request_stack:
+    class: Symfony\Component\HttpFoundation\RequestStack
+
+  Symfony\Component\HttpFoundation\RequestStack: '@request_stack'
