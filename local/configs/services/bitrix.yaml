@@ -12,6 +12,9 @@ services:
   CIBlockElement:
     class: CIBlockElement
 
+  CIBlockSection:
+    class: CIBlockSection
+
   iblock.element.manager:
     class: Local\Services\IblockElementManager
 

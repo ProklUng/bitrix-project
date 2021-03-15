@@ -115,7 +115,7 @@ services:
 
   # Symfony Encore.
   Local\Services\Twig\Extensions\SymfonyEncoreExtension:
-    arguments: ['@guta.assets']
+    arguments: ['@assets.manager']
     tags:
       - { name: twig.extension }
 
