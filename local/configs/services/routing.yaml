@@ -12,12 +12,58 @@ services:
     autoconfigure: true
     public: true
 
-  Local\Services\AppRequest: '@request'
+  #####################
+  # Роутер.
+  #####################
+
+  Symfony\Component\HttpKernel\Controller\ControllerResolver:
+    class: Symfony\Component\HttpKernel\Controller\ControllerResolver
+
+  # Коллекция загруженных роутов.
+  routes.collection:
+    class: Symfony\Component\Routing\RouteCollection
+    factory: ['@router', 'getRouteCollection']
+
+  router.default: '@router'
+
+  # Стандартный контроллер ошибок.
+  standart.error.controller:
+    class: Local\SymfonyTools\Framework\Controllers\ErrorController
+    arguments: ['@serialize']
+
+  # Json контроллер ошибок.
+  json.error.controller:
+    class: Local\SymfonyTools\Framework\Controllers\ErrorJsonController
+    arguments: ['@serialize']
+
+  Local\SymfonyTools\Framework\Controllers\ErrorJsonController: '@json.error.controller'
+
+  # Инициализатор роутов.
+  init.router:
+    class: Local\SymfonyTools\Router\InitRouter
+    arguments:
+      - '@routes.collection'
+      - '@json.error.controller'
+      - '@event_dispatcher'
+      - '@controller_resolver'
+      - '@argument_resolver'
+      - '@request_stack'
+
+    # Подвязка на битриксовое событие.
+    tags:
+      - { name: bitrix.events.init, module: main, event: OnProlog, method: handle, sort: 1 }
+
+  # Проверка роутов.
+  route.checker:
+    class: Local\ServiceProvider\Utils\RouteChecker
+    arguments: ['@routes.collection']
 
   # Запрос.
   request:
     class: Local\Services\AppRequest
     tags: ['service.bootstrap']
+
+  Local\Services\AppRequest: '@request'
 
   # Request приложения.
   global.request:
@@ -77,62 +123,16 @@ services:
   router:
     class: Symfony\Component\Routing\Router
     arguments:
-      - '@@routing.resolver'
+      - '@routing.loader'
       - '%kernel.project_dir%/local/configs/routes.yaml'
-      - []
+      -   cache_dir: '%kernel.cache_dir%'
+          debug: '%kernel.debug%'
       - '@request.context'
 
   Symfony\Component\Routing\RouterInterface: '@router'
   Symfony\Component\Routing\RequestContextAwareInterface: '@router'
   Symfony\Component\Routing\Generator\UrlGeneratorInterface: '@router'
   Symfony\Component\Routing\Matcher\UrlMatcherInterface: '@router'
-
-  #####################
-  # Роутер.
-  #####################
-
-  Symfony\Component\HttpKernel\Controller\ControllerResolver:
-    class: Symfony\Component\HttpKernel\Controller\ControllerResolver
-
-  # Коллекция загруженных роутов.
-  routes.collection:
-    class: Symfony\Component\Routing\RouteCollection
-    factory: ['@router', 'getRouteCollection']
-
-  router.default: '@router'
-
-  # Стандартный контроллер ошибок.
-  standart.error.controller:
-    class: Local\SymfonyTools\Framework\Controllers\ErrorController
-    arguments: ['@serialize']
-
-  # Json контроллер ошибок.
-  json.error.controller:
-    class: Local\SymfonyTools\Framework\Controllers\ErrorJsonController
-    arguments: ['@serialize']
-
-  Local\SymfonyTools\Framework\Controllers\ErrorJsonController: '@json.error.controller'
-
-  # Диспетчер запуска контроллеров.
-
-  # Инициализатор роутов.
-  init.router:
-    class: Local\SymfonyTools\Router\InitRouter
-    arguments:
-      - '@routes.collection'
-      - '@json.error.controller'
-      - '@event_dispatcher'
-      - '@controller_resolver'
-      - '@argument_resolver'
-      - '@request_stack'
-    # Подвязка на битриксовое событие.
-    tags:
-      - { name: bitrix.events.init, module: main, event: OnProlog, method: handle, sort: 1 }
-
-  # Проверка роутов.
-  route.checker:
-    class: Local\ServiceProvider\Utils\RouteChecker
-    arguments: ['@routes.collection']
 
   # Диспетчер запуска контроллеров.
   dispatcher.controller:
@@ -172,8 +172,3 @@ services:
       - add: [['Local\Bundles\ApiDtoConvertorBundle\DependencyInjection\BaseDTOInterface']]
 
   Local\ServiceProvider\Utils\IgnoredAutowiringControllerParamsBag: '@ignored.autowiring.controller.arguments'
-
-  request_stack:
-    class: Symfony\Component\HttpFoundation\RequestStack
-
-  Symfony\Component\HttpFoundation\RequestStack: '@request_stack'
