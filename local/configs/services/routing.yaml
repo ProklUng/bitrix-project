@@ -34,58 +34,58 @@ services:
   file_locator:
     class: Symfony\Component\Config\FileLocator
 
-    routing.resolver:
-      class: Symfony\Component\Config\Loader\LoaderResolver
+  routing.resolver:
+    class: Symfony\Component\Config\Loader\LoaderResolver
 
-    routing.loader.yml:
-      class: Symfony\Component\Routing\Loader\YamlFileLoader
-      arguments: ['@file_locator']
-      tags:
-        - { name: routing.loader }
+  routing.loader.yml:
+    class: Symfony\Component\Routing\Loader\YamlFileLoader
+    arguments: ['@file_locator']
+    tags:
+      - { name: routing.loader }
 
-    routing.loader.php:
-      class: Symfony\Component\Routing\Loader\PhpFileLoader
-      arguments: ['@file_locator']
-      tags:
-        - { name: routing.loader }
+  routing.loader.php:
+    class: Symfony\Component\Routing\Loader\PhpFileLoader
+    arguments: ['@file_locator']
+    tags:
+      - { name: routing.loader }
 
-    routing.loader.xml:
-      class: Symfony\Component\Routing\Loader\XmlFileLoader
-      arguments: ['@file_locator']
-      tags:
-        - { name: routing.loader }
+  routing.loader.xml:
+    class: Symfony\Component\Routing\Loader\XmlFileLoader
+    arguments: ['@file_locator']
+    tags:
+      - { name: routing.loader }
 
-    routing.loader.glob:
-      class: Symfony\Component\Routing\Loader\GlobFileLoader
-      arguments: ['@file_locator']
-      tags:
-        - { name: routing.loader }
+  routing.loader.glob:
+    class: Symfony\Component\Routing\Loader\GlobFileLoader
+    arguments: ['@file_locator']
+    tags:
+      - { name: routing.loader }
 
-    routing.loader.directory:
-      class: Symfony\Component\Routing\Loader\DirectoryLoader
-      arguments: ['@file_locator']
-      tags:
-        - { name: routing.loader }
+  routing.loader.directory:
+    class: Symfony\Component\Routing\Loader\DirectoryLoader
+    arguments: ['@file_locator']
+    tags:
+      - { name: routing.loader }
 
-    routing.loader:
-      class: Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader
-      arguments:
-        - '@routing.resolver'
-        - []
-        - []
+  routing.loader:
+    class: Symfony\Bundle\FrameworkBundle\Routing\DelegatingLoader
+    arguments:
+      - '@routing.resolver'
+      - []
+      - []
 
-    router:
-      class: Symfony\Component\Routing\Router
-      arguments:
-        - '@@routing.resolver'
-        - '%kernel.project_dir%/local/configs/routes.yaml'
-        - []
-        - '@request.context'
+  router:
+    class: Symfony\Component\Routing\Router
+    arguments:
+      - '@@routing.resolver'
+      - '%kernel.project_dir%/local/configs/routes.yaml'
+      - []
+      - '@request.context'
 
-    Symfony\Component\Routing\RouterInterface: '@router'
-    Symfony\Component\Routing\RequestContextAwareInterface: '@router'
-    Symfony\Component\Routing\Generator\UrlGeneratorInterface: '@router'
-    Symfony\Component\Routing\Matcher\UrlMatcherInterface: '@router'
+  Symfony\Component\Routing\RouterInterface: '@router'
+  Symfony\Component\Routing\RequestContextAwareInterface: '@router'
+  Symfony\Component\Routing\Generator\UrlGeneratorInterface: '@router'
+  Symfony\Component\Routing\Matcher\UrlMatcherInterface: '@router'
 
   #####################
   # Роутер.
