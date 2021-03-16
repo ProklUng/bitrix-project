@@ -3,11 +3,14 @@
 namespace Local\Util;
 
 use CMain;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class ErrorScreen
  * @package Local\Util
+ *
+ * @since 16.03.2021 Легкий рефакторинг.
  */
 class ErrorScreen
 {
@@ -27,17 +30,33 @@ class ErrorScreen
     protected $application;
 
     /**
+     * @var string $pathErrorHandler Путь к файлу, выводящему ошибки.
+     */
+    private $pathErrorHandler;
+
+    /**
      * ErrorScreen constructor.
      *
-     * @param LoaderContent|null $loaderContent Загрузчик контента.
-     * @param CMain|null         $application   Экземпляр $APPLICATION.
+     * @param LoaderContent $loaderContent    Загрузчик контента.
+     * @param CMain         $application      Экземпляр $APPLICATION.
+     * @param string        $pathErrorHandler Путь к файлу, выводящему ошибки.
+     *
+     * @throws RuntimeException Файл-шаблон не найден.
      */
     public function __construct(
-        LoaderContent $loaderContent = null,
-        CMain $application = null
+        LoaderContent $loaderContent,
+        CMain $application,
+        string $pathErrorHandler = ''
     ) {
         $this->loaderContent = $loaderContent;
         $this->application = $application;
+        $this->pathErrorHandler = $pathErrorHandler ?: static::ERROR_PAGE;
+
+        if (!file_exists($_SERVER['DOCUMENT_ROOT' . $this->pathErrorHandler])) {
+            throw new RuntimeException(
+                'Файл-шаблон ' . $this->pathErrorHandler . ' вывода ошибок не существует'
+            );
+        }
     }
 
     /**
@@ -45,11 +64,11 @@ class ErrorScreen
      *
      * @param string $message Сообщение об ошибке.
      *
-     * @return bool
+     * @return boolean
      */
     public function die(string $message = '') : ?bool
     {
-        if (!empty($_SESSION['PHPUNIT_RUNNING']) && $_SESSION['PHPUNIT_RUNNING'] === true) {
+        if (defined('PHPUNIT_COMPOSER_INSTALL') && defined('__PHPUNIT_PHAR__')) {
             echo $message;
             return false;
         }
@@ -71,7 +90,7 @@ class ErrorScreen
      */
     private function prepareErrorScreen(string $message) : string
     {
-        $content = $this->loaderContent->getContentPage(Request::createFromGlobals(), self::ERROR_PAGE);
+        $content = $this->loaderContent->getContentPage(Request::createFromGlobals(), $this->pathErrorHandler);
 
         return str_replace(self::ERROR_MESSAGE_TAG, $message, $content);
     }
