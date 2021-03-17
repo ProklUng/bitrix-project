@@ -52,7 +52,7 @@ class ErrorScreen
         $this->application = $application;
         $this->pathErrorHandler = $pathErrorHandler ?: static::ERROR_PAGE;
 
-        if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $this->pathErrorHandler)) {
+        if (!defined('BITRIX_CLI') && !file_exists($_SERVER['DOCUMENT_ROOT'] . $this->pathErrorHandler)) {
             throw new RuntimeException(
                 'Файл-шаблон ' . $this->pathErrorHandler . ' вывода ошибок не существует'
             );

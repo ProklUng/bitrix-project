@@ -52,6 +52,7 @@ class LoaderBitrix
             return static::BITRIX_STATUS_UNAVAILABLE;
         }
 
+        define('BITRIX_CLI', true);
         define('NO_KEEP_STATISTIC', true);
         define('NOT_CHECK_PERMISSIONS', true);
         define("LANGUAGE_ID", "pa");
